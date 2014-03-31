@@ -1,0 +1,27 @@
+package hu.sztaki.lpds.pgportal.services.credential;
+
+import javax.xml.ws.WebFault;
+
+/**
+ *
+ * @author s.shahand@amc.uva.nl
+ */
+@WebFault(name = "GetFault")
+public class GetFault extends Exception {
+
+    private GetFaultBean faultinfo;
+
+    public GetFault(String message, GetFaultBean faultinfo) {
+        super(message);
+        this.faultinfo = faultinfo;
+    }
+
+    public GetFault(String message, GetFaultBean faultinfo, Throwable cause) {
+        super(message, cause);
+        this.faultinfo = faultinfo;
+    }
+
+    public GetFaultBean getFaultInfo() {
+        return this.faultinfo;
+    }
+}

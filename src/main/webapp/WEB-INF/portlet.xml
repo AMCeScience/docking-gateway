@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<portlet-app xmlns='http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd' version='2.0'>
+    <portlet>
+        <description xml:lang='en'></description>
+        <portlet-name>autodock</portlet-name>
+        <display-name xml:lang='en'>Application Specific Module Sample</display-name>
+        <portlet-class>nl.amc.biolab.pgportal.portlets.asm.AutodockVinaPortlet</portlet-class>
+        <init-param>
+            <name>check-auth-token</name>
+            <value>false</value>
+        </init-param>
+        <init-param>
+            <name>view-jsp</name>
+            <value>/autodock/jsp/autodock_vina/new_job.jsp</value>
+        </init-param>
+
+        <expiration-cache>0</expiration-cache>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>VIEW</portlet-mode>
+        </supports>
+        <supported-locale>en</supported-locale>
+        <portlet-info>
+            <title>Autodock Vina</title>
+            <short-title>Autodock Vina</short-title>
+            <keywords>text</keywords>
+        </portlet-info>
+    </portlet>
+
+</portlet-app>

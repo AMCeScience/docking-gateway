@@ -23,15 +23,18 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     public void initStuff(String liferayId) {
         User catalogUser = getUser(liferayId);
 
+        System.out.println("initStuff");
+        
         if (catalogUser == null) {
+            System.out.println("in here");
             // Create user
             User user = _storeUser(liferayId);
-
+            
             // Create vlemed resource
             Resource resource1 = _storeResource(); // local
             Resource resource2 = _storeResource2(); // grid
-
-            // Bind user to resource
+            
+            // Bind user to resource            
             setUserPassword(user.getDbId(), "webdavuser", "key.webdav", resource1.getDbId());
 
             // Create application
@@ -41,11 +44,11 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
             storeIOPort(1, "3@Generator", "ligands.zip", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(2, "4@Generator", "config.txt", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(3, "5@Generator", "receptor.pdbqt", "Input", "File", null, appId, "glite;vlemed", true);
-            storeIOPort(4, "0@collector.sh", "output.tar.gz", "Output", "File", "ZIP", appId, "glite;vlemed", true);
+            Long io = storeIOPort(4, "0@collector.sh", "output.tar.gz", "Output", "File", "ZIP", appId, "glite;vlemed", true);
             
             VarConfig config = new VarConfig();
             
-            Project project = storeProject("test project", "test project description", user);
+            Project project = storeProject("testProject1", "test project description", user);
         
             Collection<Project> projects = new ArrayList<Project>();
             
@@ -69,7 +72,20 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
                     config.getOutputFileName("testProj1"),
                     null, null, null, projects, resource2);
             
-            storeProcessing(1L, "testProj1", "description", user.getDbId(), "completed");
+            Long procID = getNewProcessingID(project.getDbId(), appId);
+            storeProcessing(procID, "test", "desc", user.getDbId(), "done");
+            
+            List items = new ArrayList();
+            
+            items.add(ligands.getDbId());
+            items.add(receptor.getDbId());
+            items.add(configuration.getDbId());
+            
+            List bam = new ArrayList();
+            bam.add(items);
+            
+            Long subm = storeSubmission(procID, "test", "done", bam);
+            _storeSubmissionIO(getSubmission(subm), output, _getIOPort(4), "Output");
         }
     }
 
@@ -103,25 +119,28 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
 
         return user;
     }
-
-    // TESTING PURPOSES
-    private Preference _storePreference(String desc, String key, String val) {
-        Preference pref = new Preference();
-
-        pref.setDescription(desc);
-        pref.setKey(key);
-        pref.setValue(val);
-
-        persist(pref);
-
-        return pref;
+    
+    private SubmissionIO _storeSubmissionIO(Submission sub, DataElement de, IOPort port, String io) {
+        SubmissionIO subm = new SubmissionIO();
+        
+        subm.setSubmission(sub);
+        subm.setDataElement(de);
+        subm.setPort(port);
+        subm.setType(io);
+        
+        persist(subm);
+        
+        return subm;
     }
 
     // TESTING PURPOSES
     private Resource _storeResource() {
         Resource resource = new Resource();
 
-        resource.setName("xnatZ0");
+        VarConfig config = new VarConfig();
+        
+        resource.setName("webdav");
+        resource.setBaseURI(config.getWebDavUri());
         resource.setDescription("localhost resource");
         resource.setProtocol("http");
 
@@ -161,29 +180,6 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         
         return null;
     }
-    
-    /*@Override
-    public String getMasterOutputURI(Long SubmissionId, Long userId) {
-        VarConfig config = new VarConfig();
-        Project project;
-        
-        List<Object> projects = _getSession().createSQLQuery("SELECT {p.*} "
-                + "FROM Submission AS s "
-                + "JOIN Processing AS pr ON s.ProcessingID = pr.ProcessingID "
-                + "JOIN Project AS p ON p.ProjectID = pr.ProjectID "
-                + "JOIN UserProject as up ON p.ProjectID = up.ProjectID "
-                + "JOIN User as u ON up.UserKey = u.UserKey "
-                + "WHERE s.SubmissionID = " + SubmissionId + " "
-                    + "AND (u.LiferayID = " + userId + " OR u.UserKey = " + userId + ")").addEntity("p", Project.class).list();
-        
-        if (!projects.isEmpty()) {
-            project = (Project) projects.get(0);
-
-            return config.getOutputPath(project.getName());
-        }
-        
-        return "";
-    }*/
 
     public Resource getResource(String name) {
         Resource resource = new Resource();
@@ -345,6 +341,16 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         return QUERY;
     }
 
+    private IOPort _getIOPort(int port) {
+        IOPort ioport = new IOPort();
+        
+        List<Object> resources = _getSession().createSQLQuery("SELECT * FROM IOPort WHERE PortID = 4").addEntity(ioport.getClass()).list();
+
+        ioport = (IOPort) resources.get(0);
+        
+        return ioport;
+    }
+    
     @Override
     public Long storeIOPort(int portNumber, String portName, String displayName, String ioType, String dataType, String dataFromat, Long applicationId, String resourceName, boolean visible) {
         //Resource resource = (Resource) get(Resource.class, resourceId);

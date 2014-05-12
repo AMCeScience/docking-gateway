@@ -1,6 +1,5 @@
 package nl.amc.biolab.autodock.input.tools;
 
-import crappy.logger.Logger;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +13,7 @@ import nl.amc.biolab.autodock.constants.VarConfig;
  *
  * @author Allard van Altena
  */
-public class ConfigFactory extends Logger {    
+public class ConfigFactory extends VarConfig {    
     public ConfigFactory() {}
     
     public Configuration setData(HashMap formMap) {
@@ -54,9 +53,6 @@ public class ConfigFactory extends Logger {
         }
         
         file.setSize(size);
-        
-        // Load configuration parameters
-        VarConfig config = new VarConfig();
         
         // Get filenames for configuration file and receptor file
         String configFilePath = config.getProjectFilePath(project_name) + config.getConfigFileName();

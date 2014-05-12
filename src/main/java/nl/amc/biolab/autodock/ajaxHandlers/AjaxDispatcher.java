@@ -1,10 +1,11 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
-import crappy.logger.Logger;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import nl.amc.biolab.autodock.output.tools.Downloader;
 import nl.amc.biolab.autodock.output.tools.LigandCollector;
 import nl.amc.biolab.autodock.output.tools.SearchProjects;
 import nl.amc.biolab.autodock.projectFunctions.StatusUpdater;
@@ -14,7 +15,7 @@ import nl.amc.biolab.persistencemanager.PersistenceManager;
  *
  * @author Allard
  */
-public class AjaxDispatcher extends Logger {
+public class AjaxDispatcher extends VarConfig {
     private AjaxInterface AJAXOBJ;
             
     public AjaxDispatcher() {}
@@ -44,6 +45,10 @@ public class AjaxDispatcher extends Logger {
         
         if (callFunction.equals("updateStatus")) {
             _setAjaxObj(new StatusUpdater());
+        }
+        
+        if (callFunction.equals("doDownload")) {
+            _setAjaxObj(new Downloader());
         }
         
         // Check if AjaxInterface was set

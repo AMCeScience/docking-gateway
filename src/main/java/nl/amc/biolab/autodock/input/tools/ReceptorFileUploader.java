@@ -1,6 +1,5 @@
 package nl.amc.biolab.autodock.input.tools;
 
-import crappy.logger.Logger;
 import java.io.File;
 import nl.amc.biolab.autodock.input.objects.Receptor;
 import nl.amc.biolab.autodock.constants.VarConfig;
@@ -10,7 +9,7 @@ import org.apache.commons.fileupload.FileItem;
  *
  * @author Allard
  */
-public class ReceptorFileUploader extends Logger {    
+public class ReceptorFileUploader extends VarConfig {    
     public ReceptorFileUploader() {}
     
     public Receptor doUpload(FileItem receptorFile, String project_name) {
@@ -18,9 +17,6 @@ public class ReceptorFileUploader extends Logger {
         
         try {
             log.log(receptorFile);
-            
-            // Load configuration parameters
-            VarConfig config = new VarConfig();
             
             if (receptorFile != null && receptorFile.getSize() > 0) {
                 log.log("Receptor file size: " + receptorFile.getSize());

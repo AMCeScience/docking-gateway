@@ -14,6 +14,10 @@ form {
     margin-top: 15px;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .menu {
     list-style: none;
 }
@@ -48,6 +52,21 @@ form {
     padding: 10px 0 10px 5px;
     margin: 10px 2% 10px 2%;
     border: 1px solid #ebccd1;
+}
+
+.graph {
+    height: 300px;
+    width: 815px;
+    margin: 10px 0 30px 0;
+}
+
+// tilt labels on x axis of flot graphs
+.graph div.xAxis div.tickLabel {    
+    transform: rotate(45deg);
+    -ms-transform:rotate(45deg); /* IE 9 */
+    -moz-transform:rotate(45deg); /* Firefox */
+    -webkit-transform:rotate(45deg); /* Safari and Chrome */
+    -o-transform:rotate(45deg); /* Opera */
 }
 
 .new_job input, .new_job textarea, .search input, .search select {
@@ -300,6 +319,10 @@ ul.compound_list li {
     width: 100%;
     display: inline-block;
     margin-bottom: 10px;
+}
+
+.accordion_content .compound_disp {
+    width: 10% !important;
 }
 
 .bottom {

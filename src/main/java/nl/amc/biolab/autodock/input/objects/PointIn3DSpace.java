@@ -1,6 +1,6 @@
 package nl.amc.biolab.autodock.input.objects;
 
-import crappy.logger.Logger;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author Allard van Altena
  */
-public class PointIn3DSpace extends Logger {
+public class PointIn3DSpace extends VarConfig {
     private String X = "";
     private String Y = "";
     private String Z = "";

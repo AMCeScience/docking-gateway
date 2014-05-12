@@ -1,7 +1,6 @@
 package nl.amc.biolab.autodock.input.tools;
 
 import nl.amc.biolab.persistencemanager.PersistenceManager;
-import crappy.logger.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import org.apache.commons.io.FileUtils;
  *
  * @author Allard van Altena
  */
-public class FormSubmitter extends Logger {
+public class FormSubmitter extends VarConfig {
     private String ERRORS = "";
     private PersistenceManager PERSISTENCE;
     
@@ -43,9 +42,7 @@ public class FormSubmitter extends Logger {
         _getDb().shutdown();
     }
     
-    private void _cleanUp(HashMap formMap) {
-        VarConfig config = new VarConfig();
-        
+    private void _cleanUp(HashMap formMap) {        
         File directory = new File(config.getProjectFilePath(formMap.get("project_name").toString()));
         
         try {
@@ -69,9 +66,7 @@ public class FormSubmitter extends Logger {
             User catalogUser = _getDb().getUser(liferayUserId);
 
             // Check if user exists in catalog database
-            if (catalogUser != null) {
-                VarConfig config = new VarConfig();
-                
+            if (catalogUser != null) {                
                 // Project name is set but is not unique
                 if (!_getDb().checkProjectNameUnique(formMap.get("project_name").toString())) {
                     _setError("Project name is not unique.<br/>");
@@ -171,8 +166,6 @@ public class FormSubmitter extends Logger {
     
     private void _saveProject(HashMap formMap, User catalogUser) {
         Resource resource = _getDb().getResource("xnatZ0");
-        
-        VarConfig config = new VarConfig();
         
         Collection<Project> projects = new ArrayList<Project>();
         

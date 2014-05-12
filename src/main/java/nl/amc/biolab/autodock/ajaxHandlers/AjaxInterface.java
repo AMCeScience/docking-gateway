@@ -1,6 +1,6 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
-import crappy.logger.Logger;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.LinkedHashMap;
 import nl.amc.biolab.persistencemanager.PersistenceManager;
 
@@ -10,7 +10,7 @@ import nl.amc.biolab.persistencemanager.PersistenceManager;
  * 
  * @author Allard van Altena
  */
-public abstract class AjaxInterface extends Logger {
+public abstract class AjaxInterface extends VarConfig {
     private JSONOutput JSONOBJ;
     private LinkedHashMap PARAMS;
     private PersistenceManager PERSISTENCE;

@@ -1,10 +1,10 @@
 package nl.amc.biolab.autodock.output.objects;
 
-import crappy.logger.Logger;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import nl.amc.biolab.autodock.constants.VarConfig;
 
@@ -12,28 +12,32 @@ import nl.amc.biolab.autodock.constants.VarConfig;
  *
  * @author Allard van Altena
  */
-public class EnergyMap extends Logger {
+public class EnergyMap extends VarConfig {
     private final LinkedHashMap ENERGY_MAP = new LinkedHashMap();
+    private final ArrayList<ArrayList> X_TICKS = new ArrayList<ArrayList>();
+    private final ArrayList<ArrayList> Y_TICKS = new ArrayList<ArrayList>();
+    private final ArrayList<ArrayList> ENERGY_LIST = new ArrayList<ArrayList>();
+    private int COUNT = 0;
     
     public EnergyMap() {}
     
-    public void initEnergyMap(String projectName) {
-        VarConfig config = new VarConfig();
+    public void initEnergyMapping(String csvName) {
+        log.log(csvName);
         
         try {
-            BufferedReader csvFile = new BufferedReader(new FileReader(config.getOutputFilePath(projectName)));
+            BufferedReader csvFile = new BufferedReader(new FileReader(csvName));
             
             String line;
             
-            while((line = csvFile.readLine()) != null) {
-                // Get number of parts in name
-                int nameParts = getNameParts(line);
-                
+            while((line = csvFile.readLine()) != null) {                
                 // Split name from row
-                String[] row = line.split(" ", nameParts + 1);
+                String[] row = line.split(",", 2);
                 
-                // Add row to map
-                _addRow(getName(line), row[nameParts].split(" "));
+                if(row.length > 1) { 
+                    // Add row to map
+                    _addRow(row[0], row[1].split(","));
+                    _addLigandCount();
+                }
             }
         } catch(FileNotFoundException e) {
             log.log(e);
@@ -47,27 +51,50 @@ public class EnergyMap extends Logger {
         return ENERGY_MAP;
     }
     
-    private String getName(String line) {
-        String[] testVal = line.split(" ");
+    public LinkedHashMap getEnergyMapForFlot() {
+        LinkedHashMap data = new LinkedHashMap();
         
-        if (!testVal[1].contains("\\.")) {
-            return testVal[0] + " " + testVal[1];
-        }
+        data.put("xaxis", X_TICKS);
+        data.put("yaxis", Y_TICKS);
         
-        return testVal[0];
+        return data;
     }
     
-    private int getNameParts(String line) {
-        String testVal = line.split(" ")[1];
-        
-        if (!testVal.contains("\\.")) {
-            return 2;
-        }
-        
-        return 1;
+    public ArrayList getEnergyListForFlot() {
+        return ENERGY_LIST;
+    }
+    
+    public int getLigandCount() {
+        return COUNT;
+    }
+    
+    private void _addLigandCount() {
+        COUNT++;
     }
     
     private void _addRow(String name, String[] row) {
-        ENERGY_MAP.put(name, row);
+        //Joiner commaJoiner = Joiner.on(",").skipNulls();
+        
+        ENERGY_MAP.put(name, row[0]);
+        
+        ArrayList tick = new ArrayList();
+        
+        tick.add(name);
+        tick.add(row[0]);
+        
+        ENERGY_LIST.add(tick);
+        
+//        ArrayList xPoint = new ArrayList();
+//        
+//        xPoint.add(getLigandCount());
+//        xPoint.add(name);
+//        
+//        X_TICKS.add(xPoint);
+//        
+//        ArrayList yPoint = new ArrayList();
+//        
+//        yPoint.add(row[0]);
+//        
+//        Y_TICKS.add(yPoint);
     }
 }

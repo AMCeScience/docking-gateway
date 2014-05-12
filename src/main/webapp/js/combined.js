@@ -103,6 +103,8 @@ function outcomes() {
 
             $('.compound_disp', scope).text(Math.round((max_compounds / 100) * this.value));
         });
+        
+        init_project_buttons();
     }
     
     function ajaxContinue(ajax_data) {
@@ -115,14 +117,12 @@ function outcomes() {
             
             return;
         }
-        
-        var projects_html = buildProjectHtml(ajax_data);
 
-        log(ajax_data);
+        $('.spinner').remove();
         
-        // Init the accordion
-        $('.accordion').html(projects_html.join(''));
-        
+        buildProjectHtml('.accordion', ajax_data);
+
+        // Init the accordion        
         if ($('.accordion').hasClass('ui-accordion')) {
             $('.accordion').accordion('refresh');
         } else {
@@ -160,13 +160,11 @@ function in_process() {
             return;
         }
         
-        var projects_html = buildProjectHtml(ajax_data);
-
-        log(projects_html);
+        $('.spinner').remove();
         
-        // Init the accordion
-        $('.accordion').html(projects_html.join(''));
+        buildProjectHtml('.accordion', ajax_data);
         
+        // Init the accordion        
         if ($('.accordion').hasClass('ui-accordion')) {
             $('.accordion').accordion('refresh');
         } else {
@@ -229,20 +227,24 @@ function buildLibraryHtml(ajax_data) {
     return html;
 }
 
-function buildProjectHtml(ajax_data) {
+function buildProjectHtml(div, ajax_data) {
     log("buildProjectHtml called");
 
     log(ajax_data);
 
-    var html = [];
-
     var page_type = ajax_data.page_type;
 
     $.each(ajax_data.projects, function(key, project) {
-        html.push(projectHtml(project, page_type));
+        $(div).append(projectHtml(project, page_type));
+        
+        $('.project_data_div', div).last().data('project', project);
+        
+        if (ajax_data.page_type === 'outcomes') {
+            graph('.graph_' + project.project_id, project.output.graph);
+        }
     });
 
-    return html;
+    return;
 }
 
 function projectHtml(project_data, page_type) {
@@ -288,7 +290,7 @@ function projectHtml(project_data, page_type) {
     
     var project_html =
             "<h3>" + project_data.project_name + " - Started: " + project_data.date_started + "</h3>\
-            <div data-project-id='" + project_data.project_id + "'>\
+            <div class='project_data_div' data-project=''>\
                 <div class='accordion_content'>\
                     <span class='icon'>X</span>\
                     <div class='project_content'>\
@@ -337,22 +339,22 @@ function projectHtml(project_data, page_type) {
                             project_html +=
                             "<div class='outcomes_items_wrapper'>\
                                 <h2>Output</h2>\
-                                <span>" + project_data.output + "</span>\
+                                <div class='graph graph_" + project_data.project_id + "'></div>\
                                 \
-                                Select % of data to download\
+                                <span class='bold'>Select % of data to download</span>\
                                 <div class='download_slider'></div>\
                                 \
                                 <input class='download_input' name='download_input' type='text' value='100'/>\
                                 <label class='download_input' for='download_input'>%</label>\
                                 \
-                                <span>Selected number of compounds: <span class='compound_disp'>" + project_data.compound_count + "</span></span>\
+                                <span>Selected number of compounds: <span class='compound_disp'>" + project_data.output.compound_count + "</span></span>\
                                 \
-                                <input name='max_compounds' type='hidden' value='" + project_data.compound_count + "'/>\
+                                <input name='max_compounds' type='hidden' value='" + project_data.output.compound_count + "'/>\
                                 \
-                                <input class='button' type='button' value='Download Data'/>";
+                                <input class='download button' type='button' value='Download Data'/>";
 
                                 // If no provenance exists for this project do not display it
-                                if (project_data.provenance_count * 1 === 0) {
+                                if (project_data.provenance_count * 1 !== 0) {
                                     project_html +=
                                     "<span>This experiment is linked to " + project_data.provenance_count + " others</span>\
                                     <input class='button' type='button' value='View Provenance'/>";

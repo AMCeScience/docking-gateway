@@ -1,7 +1,6 @@
 package nl.amc.biolab.autodock.projectFunctions;
 
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
-import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
 
 /**
@@ -16,9 +15,7 @@ public class StatusUpdater extends AjaxInterface {
         _updateStatus();
     }
     
-    private void _updateStatus() {
-        VarConfig config = new VarConfig();
-        
+    private void _updateStatus() {        
         ProcessingManagerClient client = new ProcessingManagerClient(config.getProcessingWSDL());
         
         // Get processId we want to update from the ajax params

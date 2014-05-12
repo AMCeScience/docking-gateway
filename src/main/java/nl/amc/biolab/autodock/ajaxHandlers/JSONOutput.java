@@ -1,6 +1,6 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
-import crappy.logger.Logger;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import java.io.IOException;
 import javax.portlet.ResourceResponse;
 import org.json.simple.JSONObject;
@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
  *
  * @author Allard van Altena
  */
-public class JSONOutput extends Logger {
+public class JSONOutput extends VarConfig {
     private JSONObject JSONObj;
     private ResourceResponse RESPONSE;
     

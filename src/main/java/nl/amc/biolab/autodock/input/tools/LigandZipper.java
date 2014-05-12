@@ -1,7 +1,6 @@
 package nl.amc.biolab.autodock.input.tools;
 
 import java.io.FileInputStream;
-import crappy.logger.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +20,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Allard van Altena
  */
-public class LigandZipper extends Logger {
+public class LigandZipper extends VarConfig {
     public LigandZipper() {}
     
     public Ligands prepareLigandFile(HashMap formMap) {
@@ -34,8 +33,6 @@ public class LigandZipper extends Logger {
         try {
             JSONObject ligandJSON = (JSONObject) parser.parse(formMap.get("compound_list").toString());
             JSONArray ligandArray = (JSONArray) ligandJSON.get("compound_array");
-            
-            VarConfig config = new VarConfig();
             
             String zipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getLigandsZipFileName();
             

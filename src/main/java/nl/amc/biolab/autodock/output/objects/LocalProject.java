@@ -1,6 +1,6 @@
 package nl.amc.biolab.autodock.output.objects;
 
-import crappy.logger.Logger;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -16,7 +16,7 @@ import nl.amc.biolab.nsgdm.SubmissionIO;
  *
  * @author Allard
  */
-public class LocalProject extends Logger {
+public class LocalProject extends VarConfig {
     // Project items
     private Long ID = null;
     private String NAME = "";
@@ -38,7 +38,6 @@ public class LocalProject extends Logger {
     private final Collection<SubmissionIO> SUBMISSIONIO;
     
     // DataElements
-    private int COMPOUND_COUNT = 0;
     private final Collection<DataElement> INPUT;
     private final Collection<DataElement> OUTPUT;
     
@@ -113,7 +112,7 @@ public class LocalProject extends Logger {
             
             output.initOutput(getName());
             
-            project.put("outputs", output.getMap());
+            project.put("output", output.getMap());
         }
         
         project.put("provenance_count", getProvenanceCount());
@@ -216,14 +215,6 @@ public class LocalProject extends Logger {
 
     public void setOwner(String owner) {
         this.OWNER = owner;
-    }
-
-    public Integer getCompoundCount() {
-        return COMPOUND_COUNT;
-    }
-
-    public void setCompoundCount(int compound_count) {
-        this.COMPOUND_COUNT = compound_count;
     }
 
     public int getProvenanceCount() {

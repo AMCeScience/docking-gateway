@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import nl.amc.biolab.autodock.constants.VarConfig;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -37,8 +36,6 @@ public class LigandCollector extends AjaxInterface {
     }
     
     private boolean _cacheNeedsUpdate() {        
-        VarConfig config = new VarConfig();
-        
         File ligandCache = new File(config.getLigandCache());
         
         if (!ligandCache.exists()) {
@@ -59,9 +56,7 @@ public class LigandCollector extends AjaxInterface {
         return ligandCache.lastModified() < latestFile;
     }
     
-    private boolean _updateLigandCache() {
-        VarConfig config = new VarConfig();
-        
+    private boolean _updateLigandCache() {        
         File folder = new File(config.getLigandPath());
         
         _fileLoop(folder);
@@ -102,8 +97,6 @@ public class LigandCollector extends AjaxInterface {
     
     private void _setLigandCache() {
         log.log("setting items");
-        
-        VarConfig config = new VarConfig();
         
         JSONParser parser = new JSONParser();
         

@@ -165,7 +165,7 @@ public class FormSubmitter extends VarConfig {
     }
     
     private void _saveProject(HashMap formMap, User catalogUser) {
-        Resource resource = _getDb().getResource("xnatZ0");
+        Resource resource = _getDb().getResource("webdav");
         
         Collection<Project> projects = new ArrayList<Project>();
         

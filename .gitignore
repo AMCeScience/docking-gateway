@@ -4,6 +4,8 @@ styles-backup.css
 
 *.pydevproject
 .metadata
+.classpath
+.project
 .gradle
 bin/
 tmp/

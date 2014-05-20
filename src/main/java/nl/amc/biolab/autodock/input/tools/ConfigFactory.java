@@ -16,7 +16,7 @@ import nl.amc.biolab.autodock.constants.VarConfig;
 public class ConfigFactory extends VarConfig {    
     public ConfigFactory() {}
     
-    public Configuration setData(HashMap formMap) {
+    public Configuration setData(HashMap<String, String> formMap) {
         Configuration file = new Configuration();
         
         String project_name = formMap.get("project_name").toString();

@@ -1,10 +1,13 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
+
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
+
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+
 import nl.amc.biolab.autodock.output.tools.Downloader;
 import nl.amc.biolab.autodock.output.tools.LigandCollector;
 import nl.amc.biolab.autodock.output.tools.SearchProjects;
@@ -26,7 +29,7 @@ public class AjaxDispatcher extends VarConfig {
         persist.initStuff(ajaxParameters.getRemoteUser());
         persist.shutdown();
         
-        LinkedHashMap params = _processParams(ajaxParameters);
+        LinkedHashMap<String, String> params = _processParams(ajaxParameters);
         
         String callFunction = params.get("callFunction").toString();
         
@@ -66,9 +69,9 @@ public class AjaxDispatcher extends VarConfig {
         }
     }
     
-    private LinkedHashMap _processParams(ResourceRequest params) {
+    private LinkedHashMap<String, String> _processParams(ResourceRequest params) {
         // Create return map
-        LinkedHashMap paramMap = new LinkedHashMap();
+        LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
         // Get names of parameters passed by ajax request
         Enumeration<String> names = params.getParameterNames();
         

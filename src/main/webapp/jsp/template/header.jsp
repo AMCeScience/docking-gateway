@@ -31,13 +31,14 @@
 <html>
     <head>
         <!-- load CSS files -->
-        <link href="${pageContext.request.contextPath}/css/styles.css?v=168" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/styles.css?v=169" rel="stylesheet" type="text/css"/>
         <link href="${pageContext.request.contextPath}/css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
         
         <!-- load javascript libraries -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/logger.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/validation.js"></script>
         
         <!-- bind ajax urls to body as data -->
         <script type="text/javascript">
@@ -52,7 +53,7 @@
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=154"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=104"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=203"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=214"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=107"></script>
     </head>
     <body>

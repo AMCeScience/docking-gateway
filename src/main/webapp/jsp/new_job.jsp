@@ -20,41 +20,43 @@
     </div>
 <% } %>
 
+<div class="form_errors error hidden"></div>
+
 <form class="new_job" action="<%= submit_job_url.toString() %>" method="POST" enctype="multipart/form-data">
     <div class="top">
         <label for="project_name">Project Name</label>
-        <input name="project_name" type="text"/>
+        <input name="project_name" type="text" required/>
 
         <label for="project_description">Project Description</label>
-        <textarea name="project_description"></textarea>
+        <textarea name="project_description" required></textarea>
 
         <label for="receptor_file">Receptor File</label>
-        <input name="receptor_file" type="file"/>
+        <input name="receptor_file" type="file" required/>
     </div>
 
     <div class="middle">
         <div class="third_col first">
             <h3>Center</h3>
             <label for="center_x">X</label>
-            <input name="center_x" type="text"/>
+            <input name="center_x" type="text" required/>
 
             <label for="center_y">Y</label>
-            <input name="center_y" type="text"/>
+            <input name="center_y" type="text" required/>
 
             <label for="center_z">Z</label>
-            <input name="center_z" type="text"/>
+            <input name="center_z" type="text" required/>
         </div>
 
         <div class="third_col">
             <h3>Size</h3>
             <label for="size_x">X</label>
-            <input name="size_x" type="text"/>
+            <input name="size_x" type="text" required/>
 
             <label for="size_y">Y</label>
-            <input name="size_y" type="text"/>
+            <input name="size_y" type="text" required/>
 
             <label for="size_z">Z</label>
-            <input name="size_z" type="text"/>
+            <input name="size_z" type="text" required/>
         </div>
 
         <div class="third_col">

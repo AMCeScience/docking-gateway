@@ -12,7 +12,7 @@ import nl.amc.biolab.persistencemanager.PersistenceManager;
  */
 public abstract class AjaxInterface extends VarConfig {
     private JSONOutput JSONOBJ;
-    private LinkedHashMap PARAMS;
+    private LinkedHashMap<String, String> PARAMS;
     private PersistenceManager PERSISTENCE;
     
     /**
@@ -20,7 +20,7 @@ public abstract class AjaxInterface extends VarConfig {
      * @param params LinkedHashMap of the data that was sent with this ajax request.
      * @param response JSONOutput object where we can write the response to.
      */
-    public void init(LinkedHashMap params, JSONOutput response) {
+    public void init(LinkedHashMap<String, String> params, JSONOutput response) {
         log.log("Init ajaxInterface.");
         
         // Get new object of the persistence manager
@@ -62,7 +62,7 @@ public abstract class AjaxInterface extends VarConfig {
      * Setter for parameter class variable.
      * @param params LinkedHashMap of the data the ajax request sent.
      */
-    private void _setParams(LinkedHashMap params) {
+    private void _setParams(LinkedHashMap<String, String> params) {
         PARAMS = params;
     }
     
@@ -86,7 +86,7 @@ public abstract class AjaxInterface extends VarConfig {
      * Get all the parameters as a LinkedHashMap.
      * @return LinkedHashMap with all the parameters.
      */
-    private LinkedHashMap _getParams() {
+    private LinkedHashMap<String, String> _getParams() {
         return PARAMS;
     }
     

@@ -10,7 +10,7 @@ public class Configuration {
     private String EXHAUSTIVENESS = "";
     private String ENERGY_RANGE = "";
     
-    private String FILENAME = "";
+    //private String FILENAME = "";
     private String FILEPATH = "";
     
     private String ERRORS = "";

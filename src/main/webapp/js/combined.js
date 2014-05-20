@@ -46,27 +46,50 @@ function new_job() {
 }
 
 function new_job_submit() {
-    // TODO: Basic validation
+	$('.form_errors').hide();
+	
+    $('.new_job').validate({
+    	rules: {
+    		center_x: { number: true, required: true },
+    		center_y: { number: true, required: true },
+    		center_z: { number: true, required: true },
+    		size_x: { number: true, required: true },
+    		size_y: { number: true, required: true },
+    		size_z: { number: true, required: true },
+    	},
+    	errorPlacement: function(error, element) {
+			$('.form_errors').append(error);
+    	},
+    	invalidHandler: function() {
+    		console.log('invalid');
+    		$('.form_errors').show();
+    	},
+    	submitHandler: function(form) {
+    		console.log('valid');
+    		
+    		$('#dialog-modal').dialog({
+    	        closeOnEscape: false
+    	    });
 
-    $('#dialog-modal').dialog({
-        closeOnEscape: false
-    });
+    	    // Get all selected compounds in a map
+    	    var checked_compounds = $('input[name=compound_check]:checked', form).map(function() {
+    	        // Put value in array
+    	        var folder_name = $(this).parent().parent().attr('class').split(' ')[0];
+    	        
+    	        return "{\"" + folder_name.slice(4, folder_name.length) + "\":\"" + this.value + "\"}";
+    	    });
 
-    // Get all selected compounds in a map
-    var checked_compounds = $('input[name=compound_check]:checked', '.new_job').map(function() {
-        // Put value in array
-        var folder_name = $(this).parent().parent().attr('class').split(' ')[0];
-        
-        return "{\"" + folder_name.slice(4, folder_name.length) + "\":\"" + this.value + "\"}";
-    });
+    	    // Remove checkboxes from form, so we don't post these to the backend
+    	    $('input[name=library_check]', form).remove();
+    	    $('input[name=compound_check]', form).remove();
 
-    // Remove checkboxes from form, so we don't post these to the backend
-    $('input[name=library_check]').remove();
-    $('input[name=compound_check]').remove();
+    	    // Add values to one input field
+    	    $('input[name=compound_list]', form).val("{ \"compound_array\": [" + checked_compounds.get().join(',') + "]}");
 
-    // Add values to one input field
-    $('input[name=compound_list]').val("{ \"compound_array\": [" + checked_compounds.get().join(',') + "]}");
-
+    	    form.submit();
+    	}
+	});
+    
     $('.new_job').submit();
 }
 
@@ -307,7 +330,7 @@ function projectHtml(project_data, page_type) {
                                 }
                                 
                                 project_html += "<div class='" + class_name + "'>\
-                                    <span>Name: " + input.name + "</span>";
+                                    <a href='/webdav/" + project_data.project_name + "/" + input.name + "'>Name: " + input.name + "</a>";
 
                                 if (input.scan_id !== null) {
                                     project_html += "<span>Ligand count: " + input.scan_id + "</span>";

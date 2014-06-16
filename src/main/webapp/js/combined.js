@@ -346,7 +346,7 @@ function projectHtml(project_data, page_type) {
                                 var class_name = "input_details";
                                 
                                 if (count === 0) {
-                                    class_name = "input_details first"
+                                    class_name = "input_details first";
                                 }
                                 
                                 project_html += "<div class='" + class_name + "'>\
@@ -364,7 +364,6 @@ function projectHtml(project_data, page_type) {
                         
                         project_html += "</div><div class='clear'></div>";
 
-                        // TODO: hook up buttons
                         if (page_type === "in_process") {
                             project_html +=
                             "<div class='in_process_items_wrapper' data-project-id='" + project_data.project_id + "'>\
@@ -372,9 +371,6 @@ function projectHtml(project_data, page_type) {
                                 <span>" + project_data.latest_status + "</span>\
                                 \
                                 <input class='button update' type='button' value='Update'/>\
-                                <input class='button' type='button' value='View'/>\
-                                <input class='button' type='button' value='Restart'/>\
-                                <input class='button' type='button' value='Abort'/>\
                             </div>";
                         }
 

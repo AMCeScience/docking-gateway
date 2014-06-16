@@ -20,7 +20,7 @@
 
 <div class="running_projects">
     <div class="accordion">
-        <span class="spinner"</span>
+        <span class="spinner"></span>
     </div>
 </div>
 

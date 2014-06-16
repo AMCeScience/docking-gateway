@@ -22,8 +22,6 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     // TESTING PURPOSES
     public void initStuff(String liferayId) {
         User catalogUser = getUser(liferayId);
-
-        System.out.println("initStuff");
         
         if (catalogUser == null) {
             System.out.println("in here");
@@ -38,15 +36,15 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
             setUserPassword(user.getDbId(), "webdavuser", "key.webdav", resource1.getDbId());
 
             // Create application
-            Long appId = storeApplication("Autodock", "Autodock description test", "122;10196", 1);
+            Long appId = storeApplication("Autodock", "Autodock description test", "121;10196", 1);
 
             // Create IOPorts
             storeIOPort(1, "3@Generator", "ligands.zip", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(2, "4@Generator", "config.txt", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(3, "5@Generator", "receptor.pdbqt", "Input", "File", null, appId, "glite;vlemed", true);
-            Long io = storeIOPort(4, "0@collector.sh", "output.tar.gz", "Output", "File", "ZIP", appId, "glite;vlemed", true);
+            storeIOPort(4, "0@collector.sh", "output.tar.gz", "Output", "File", "ZIP", appId, "glite;vlemed", true);
             
-            VarConfig config = new VarConfig();
+            /*VarConfig config = new VarConfig();
             
             Project project = storeProject("testProject1", "test project description", user);
         
@@ -85,7 +83,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
             bam.add(items);
             
             Long subm = storeSubmission(procID, "test", "done", bam);
-            _storeSubmissionIO(getSubmission(subm), output, _getIOPort(4), "Output");
+            _storeSubmissionIO(getSubmission(subm), output, _getIOPort(4), "Output");*/
         }
     }
 

@@ -1,6 +1,7 @@
 package nl.amc.biolab.autodock.input.tools;
 
 import nl.amc.biolab.persistencemanager.PersistenceManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,7 +9,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.portlet.ActionRequest;
+
 import nl.amc.biolab.autodock.input.objects.Configuration;
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.input.objects.Receptor;
@@ -18,6 +21,7 @@ import nl.amc.biolab.nsgdm.DataElement;
 import nl.amc.biolab.nsgdm.Project;
 import nl.amc.biolab.nsgdm.Resource;
 import nl.amc.biolab.nsgdm.User;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -42,7 +46,7 @@ public class FormSubmitter extends VarConfig {
         _getDb().shutdown();
     }
     
-    private void _cleanUp(HashMap formMap) {        
+    private void _cleanUp(HashMap<String, Object> formMap) {        
         File directory = new File(config.getProjectFilePath(formMap.get("project_name").toString()));
         
         try {
@@ -56,7 +60,7 @@ public class FormSubmitter extends VarConfig {
         // Determains the success of this method
         boolean stored = false;
         
-        HashMap formMap = _createFormMap(formParameters);
+        HashMap<String, Object> formMap = _createFormMap(formParameters);
         
         if (formMap != null) {
             // Get liferay user ID
@@ -164,7 +168,7 @@ public class FormSubmitter extends VarConfig {
         return stored;
     }
     
-    private void _saveProject(HashMap formMap, User catalogUser) {
+    private void _saveProject(HashMap<String, Object> formMap, User catalogUser) {
         Resource resource = _getDb().getResource("webdav");
         
         Collection<Project> projects = new ArrayList<Project>();
@@ -214,15 +218,15 @@ public class FormSubmitter extends VarConfig {
         client.submit(project.getDbId(), _getDb().getApplicationByName(config.getAutodockName()).getDbId(), submits, catalogUser.getDbId(), catalogUser.getLiferayID(), project.getDescription());
     }
     
-    private HashMap _createFormMap(ActionRequest formParameters) {
+    private HashMap<String, Object> _createFormMap(ActionRequest formParameters) {
         DiskFileItemFactory factory = new DiskFileItemFactory();
         PortletFileUpload pfu = new PortletFileUpload(factory);
 
-        HashMap formMap = new HashMap();
+        HashMap<String, Object> formMap = new HashMap<String, Object>();
         
         try {
-            List fileItems = pfu.parseRequest(formParameters);
-            Iterator iter = fileItems.iterator();
+            @SuppressWarnings("rawtypes")
+			Iterator iter = pfu.parseRequest(formParameters).iterator();
 
             while(iter.hasNext()) {
                 FileItem item = (FileItem) iter.next();

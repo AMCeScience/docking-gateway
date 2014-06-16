@@ -78,7 +78,7 @@ public class LigandCollector extends AjaxInterface {
     }
     
     private void _fileLoop(File folder) {        
-        ArrayList fileNames = new ArrayList();
+        ArrayList<String> fileNames = new ArrayList<String>();
         
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {

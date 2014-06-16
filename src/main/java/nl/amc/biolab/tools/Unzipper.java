@@ -1,21 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package nl.amc.biolab.tools;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import nl.amc.biolab.autodock.constants.VarConfig;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -24,15 +19,28 @@ import java.util.zip.ZipFile;
 public class Unzipper extends VarConfig {
     public Unzipper() {}
     
+    /**
+     * Unzip a specific project that is on the server
+     * 
+     * @param projectName name of the project as String
+     */
     public void unzipProjectOutput(String projectName) {
         unzip(config.getProjectFilePath(projectName), config.getOutputFilePath(projectName));
     }
     
+    /**
+     * Unzip specific path to output path
+     * 
+     * @param outputPath path to write the file to
+     * @param zipPath path where the zip file exists
+     * @return returns success as boolean
+     */
     public boolean unzip(String outputPath, String zipPath) {    
         try {
             ZipFile outputZip = new ZipFile(zipPath);
 
-            for (Enumeration zipEntries = outputZip.entries(); zipEntries.hasMoreElements();) {
+            for (@SuppressWarnings("rawtypes")
+			Enumeration zipEntries = outputZip.entries(); zipEntries.hasMoreElements();) {
                 ZipEntry entry = (ZipEntry) zipEntries.nextElement();
 
                 if (entry.isDirectory()) {
@@ -41,7 +49,8 @@ public class Unzipper extends VarConfig {
                     continue;
                 }
 
-                copyInputStream(outputZip.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(outputPath + "/" + entry.getName())));
+                // write to file
+                IOUtils.copy(outputZip.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(outputPath + "/" + entry.getName())));
             }
 
             outputZip.close();
@@ -54,15 +63,7 @@ public class Unzipper extends VarConfig {
         return true;
     }
     
-    private void copyInputStream(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int length;
-        
-        while((length = in.read(buffer)) >= 0) {
-            out.write(buffer, 0, length);
-        }
-        
-        in.close();
-        out.close();
+    public void unzipLigands() {
+    	
     }
 }

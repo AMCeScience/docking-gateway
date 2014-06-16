@@ -1,9 +1,21 @@
 package nl.amc.biolab.pgportal.portlets;
 
+import java.io.IOException;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.GenericPortlet;
+import javax.portlet.PortletException;
+import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.ProcessAction;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxDispatcher;
 import nl.amc.biolab.autodock.input.tools.FormSubmitter;
-import java.io.IOException;
-import javax.portlet.*;
+import crappy.logger.Logger;
 
 /**
  * @author Allard van Altena
@@ -11,6 +23,7 @@ import javax.portlet.*;
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
     private final String PROJECT_DISPLAY_PAGE = "project_display";
+    private Logger LOG = new Logger();
 
     public AutodockVinaPortlet() {}
     
@@ -28,8 +41,8 @@ public class AutodockVinaPortlet extends GenericPortlet {
             response.setRenderParameter("form_errors", submit.getErrors());
             response.setRenderParameter("nextJSP", NEW_JOB_PAGE);
             
-            System.out.println(submit.getErrors());
-        } else {            
+            LOG.log(submit.getErrors());
+        } else {
             // Redirect to project display page of projects in process
             response.setRenderParameter("page_type", "in_process");
             response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
@@ -68,7 +81,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
             dispatcher = getPortletContext().getRequestDispatcher("/jsp/".concat(nextJSP).concat(".jsp"));
             dispatcher.include(request, response);
         } catch (IOException e) {
-            System.out.println(e);
+            LOG.log(e);
         }
     }
     
@@ -80,7 +93,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
         // Init ajax
         dispatch.dispatch(ajaxParameters, response);
         
-        // Write JSON response
+        // Get and write JSON response
         dispatch.response();
     }
 }

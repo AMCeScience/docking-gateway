@@ -39,9 +39,14 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/validation.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/additional-methods.min.js"></script>
         
-        <!-- bind ajax urls to body as data -->
+        <!-- bind ajax urls to body as data, add validation methods -->
         <script type="text/javascript">
+        	$.validator.addMethod("ligandCount", function() {
+        		return $('input[name=compound_check]:checked').size() > 0;
+        	}, "Please select ligands/compounds.");
+        
             $('body').data('ajax-urls', {
                 "searchUrl": "<%= ajaxSearchUrl %>",
                 "updateStatusUrl": "<%= ajaxUpdateStatusUrl %>",
@@ -53,7 +58,7 @@
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=154"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=104"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=214"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=216"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=107"></script>
     </head>
     <body>

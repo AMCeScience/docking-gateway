@@ -1,8 +1,11 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
+
 import java.io.IOException;
+
 import javax.portlet.ResourceResponse;
+
 import org.json.simple.JSONObject;
 
 /**
@@ -18,7 +21,8 @@ public class JSONOutput extends VarConfig {
         _setResponseObj(response);
     }
     
-    public void add(String key, Object val) {
+    @SuppressWarnings("unchecked")
+	public void add(String key, Object val) {
         if (val.toString().length() < 4000) {
             log.log("Adding value " + key + " " + val);
         }

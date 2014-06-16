@@ -47,25 +47,45 @@ function new_job() {
 
 function new_job_submit() {
 	$('.form_errors').hide();
+	$('.form_errors').html('');
+
+	var prev_errs = [];
 	
     $('.new_job').validate({
     	rules: {
-    		center_x: { number: true, required: true },
-    		center_y: { number: true, required: true },
-    		center_z: { number: true, required: true },
-    		size_x: { number: true, required: true },
-    		size_y: { number: true, required: true },
-    		size_z: { number: true, required: true },
+    		project_name: { ligandCount: true },
+    		receptor_file: { extension: '.pdbqt' },
+    		center_x: { digits: true },
+    		center_y: { digits: true },
+    		center_z: { digits: true },
+    		size_x: { digits: true },
+    		size_y: { digits: true },
+    		size_z: { digits: true },
+    		number_runs: { digits: true },
+    		exhaustiveness: { digits: true },
+    		energy_range: { digits: true }
     	},
     	errorPlacement: function(error, element) {
-			$('.form_errors').append(error);
+    		var err_text = error.text();
+    		
+    		if (err_text === 'This field is required.') {
+				err_text = 'Please fill out the required fields.';
+			}
+    		
+    		// only add errors one time
+    		if ($.inArray(err_text, prev_errs) === -1) {
+    			$('.form_errors').append(err_text + '<br/>');
+    		}
+			
+			prev_errs.push(err_text);
     	},
     	invalidHandler: function() {
-    		console.log('invalid');
+    		log('invalid');
+    		prev_errs = [];
     		$('.form_errors').show();
     	},
     	submitHandler: function(form) {
-    		console.log('valid');
+    		log('valid');
     		
     		$('#dialog-modal').dialog({
     	        closeOnEscape: false

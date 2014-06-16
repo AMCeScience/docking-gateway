@@ -88,9 +88,9 @@ public class LocalProject extends VarConfig {
         }
     }
             
-    public LinkedHashMap getProjectMap() {
-        LinkedHashMap project = new LinkedHashMap();
-        LinkedHashMap inputs;
+    public LinkedHashMap<String, Object> getProjectMap() {
+        LinkedHashMap<String, Object> project = new LinkedHashMap<String, Object>();
+        LinkedHashMap<Object, Object> inputs;
         
         project.put("project_id", getID());
         project.put("project_name", getName());
@@ -120,13 +120,13 @@ public class LocalProject extends VarConfig {
         return project;
     }
     
-    private LinkedHashMap getDataElementMap(Collection<DataElement> rawData, String type) {
-        LinkedHashMap dataElement;
-        LinkedHashMap dataElements = new LinkedHashMap();
+    private LinkedHashMap<Object, Object> getDataElementMap(Collection<DataElement> rawData, String type) {
+        LinkedHashMap<String, String> dataElement;
+        LinkedHashMap<Object, Object> dataElements = new LinkedHashMap<Object, Object>();
         int count = 0;
         
         for (DataElement singleData : rawData) {
-            dataElement = new LinkedHashMap();
+            dataElement = new LinkedHashMap<String, String>();
             
             dataElement.put("name", singleData.getName());
             dataElement.put("scan_id", singleData.getScanID());

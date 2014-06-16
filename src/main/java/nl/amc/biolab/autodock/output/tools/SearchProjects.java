@@ -42,7 +42,7 @@ public class SearchProjects extends AjaxInterface {
         // Set page type in return JSON
         _getJSONObj().add("page_type", _getSearchTermEntry("page_type"));
         
-        LinkedHashMap<String, Map> projectData = new LinkedHashMap<String, Map>();
+        LinkedHashMap<String, Map<String, Object>> projectData = new LinkedHashMap<String, Map<String, Object>>();
 
         if (projects.isEmpty()) {
             // Indicate that there are no projects and return
@@ -55,8 +55,8 @@ public class SearchProjects extends AjaxInterface {
         _getJSONObj().add("no_projects", false);
         
         // Make data nice for display in front end
-        for (Entry rawProject : projects.entrySet()) {
-            LinkedHashMap<String, Object> thisProjectData = (LinkedHashMap<String, Object>) rawProject.getValue();
+        for (Entry<String, LinkedHashMap<String, Object>> rawProject : projects.entrySet()) {
+            LinkedHashMap<String, Object> thisProjectData = rawProject.getValue();
             
             // Create LocalProject object which contains more information than the nsgdm Project object
             LocalProject project = getSingleProjectData((Project) thisProjectData.get("project"), (Processing) thisProjectData.get("processing"));
@@ -88,7 +88,7 @@ public class SearchProjects extends AjaxInterface {
         LinkedHashMap<String, LinkedHashMap<String, Object>> filteredProjects = new LinkedHashMap<String, LinkedHashMap<String, Object>>();
         
         // Create hashmaps for the sql query building
-        LinkedHashMap order_list = new LinkedHashMap();
+        LinkedHashMap<String, String> order_list = new LinkedHashMap<String, String>();
         LinkedHashMap<String, String> tables = new LinkedHashMap<String, String>();
         LinkedHashMap<String, String> select = new LinkedHashMap<String, String>();
         LinkedHashMap<String, String> joins = new LinkedHashMap<String, String>();
@@ -145,13 +145,13 @@ public class SearchProjects extends AjaxInterface {
 
         // Add where for the status
         if (_getSearchTermEntry("status") != null && !_getSearchTermEntry("status").equals("all")) {
-            Iterator statusIter = Arrays.asList(_getSearchTermEntry("status").split(",")).iterator();
+            Iterator<String> statusIter = Arrays.asList(_getSearchTermEntry("status").split(",")).iterator();
             
             _getPersistence().setWhereOpen();
             
             while (statusIter.hasNext()) {
                 // WHERE status = xxxxx
-                _getPersistence().setWhere("po.ProcessingStatus", "LIKE", "'%" + (String) statusIter.next() + "'");
+                _getPersistence().setWhere("po.ProcessingStatus", "LIKE", "'%" + statusIter.next() + "'");
                 
                 if (statusIter.hasNext()) {
                     _getPersistence().setWhereOr();
@@ -193,7 +193,7 @@ public class SearchProjects extends AjaxInterface {
         
         // Add each row to the filteredProjects map, so we have the objects split into key/value
         for (Object[] row : projectList) {
-            LinkedHashMap thisProject = new LinkedHashMap();
+            LinkedHashMap<String, Object> thisProject = new LinkedHashMap<String, Object>();
             
             Project thisProjectObj = (Project) row[0];
             

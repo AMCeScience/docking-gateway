@@ -13,10 +13,10 @@ import nl.amc.biolab.autodock.constants.VarConfig;
  * @author Allard van Altena
  */
 public class EnergyMap extends VarConfig {
-    private final LinkedHashMap ENERGY_MAP = new LinkedHashMap();
-    private final ArrayList<ArrayList> X_TICKS = new ArrayList<ArrayList>();
-    private final ArrayList<ArrayList> Y_TICKS = new ArrayList<ArrayList>();
-    private final ArrayList<ArrayList> ENERGY_LIST = new ArrayList<ArrayList>();
+    private final LinkedHashMap<String, String> ENERGY_MAP = new LinkedHashMap<String, String>();
+    private final ArrayList<ArrayList<String>> X_TICKS = new ArrayList<ArrayList<String>>();
+    private final ArrayList<ArrayList<String>> Y_TICKS = new ArrayList<ArrayList<String>>();
+    private final ArrayList<ArrayList<String>> ENERGY_LIST = new ArrayList<ArrayList<String>>();
     private int COUNT = 0;
     
     public EnergyMap() {}
@@ -39,6 +39,8 @@ public class EnergyMap extends VarConfig {
                     _addLigandCount();
                 }
             }
+            
+            csvFile.close();
         } catch(FileNotFoundException e) {
             log.log(e);
         } catch(IOException ex) {
@@ -47,12 +49,12 @@ public class EnergyMap extends VarConfig {
         
     }
     
-    public LinkedHashMap getEnergyMap() {
+    public LinkedHashMap<String, String> getEnergyMap() {
         return ENERGY_MAP;
     }
     
-    public LinkedHashMap getEnergyMapForFlot() {
-        LinkedHashMap data = new LinkedHashMap();
+    public LinkedHashMap<String, ArrayList<ArrayList<String>>> getEnergyMapForFlot() {
+        LinkedHashMap<String, ArrayList<ArrayList<String>>> data = new LinkedHashMap<String, ArrayList<ArrayList<String>>>();
         
         data.put("xaxis", X_TICKS);
         data.put("yaxis", Y_TICKS);
@@ -60,7 +62,7 @@ public class EnergyMap extends VarConfig {
         return data;
     }
     
-    public ArrayList getEnergyListForFlot() {
+    public ArrayList<ArrayList<String>> getEnergyListForFlot() {
         return ENERGY_LIST;
     }
     
@@ -77,7 +79,7 @@ public class EnergyMap extends VarConfig {
         
         ENERGY_MAP.put(name, row[0]);
         
-        ArrayList tick = new ArrayList();
+        ArrayList<String> tick = new ArrayList<String>();
         
         tick.add(name);
         tick.add(row[0]);

@@ -4,7 +4,7 @@
         <description xml:lang='en'></description>
         <portlet-name>autodock</portlet-name>
         <display-name xml:lang='en'>Application Specific Module Sample</display-name>
-        <portlet-class>nl.amc.biolab.pgportal.portlets.asm.AutodockVinaPortlet</portlet-class>
+        <portlet-class>nl.amc.biolab.pgportal.portlets.AutodockVinaPortlet</portlet-class>
         <init-param>
             <name>check-auth-token</name>
             <value>false</value>

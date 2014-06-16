@@ -12,7 +12,7 @@ import nl.amc.biolab.tools.Unzipper;
  * @author Allard van Altena
  */
 public class ProjectOutput extends VarConfig {
-    private final LinkedHashMap OUTPUT_MAP = new LinkedHashMap();
+    private final LinkedHashMap<String, Object> OUTPUT_MAP = new LinkedHashMap<String, Object>();
     
     public ProjectOutput() {}
     
@@ -26,7 +26,7 @@ public class ProjectOutput extends VarConfig {
         _addToMap("compound_count", processed.getLigandCount());
     }
     
-    public LinkedHashMap getMap() {
+    public LinkedHashMap<String, Object> getMap() {
         return OUTPUT_MAP;
     }
     

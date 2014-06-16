@@ -9,8 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.constants.VarConfig;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -23,7 +25,7 @@ import org.json.simple.parser.ParseException;
 public class LigandZipper extends VarConfig {
     public LigandZipper() {}
     
-    public Ligands prepareLigandFile(HashMap formMap) {
+    public Ligands prepareLigandFile(HashMap<String, Object> formMap) {
         JSONParser parser = new JSONParser();
         
         Ligands ligandsObj = new Ligands();
@@ -41,7 +43,8 @@ public class LigandZipper extends VarConfig {
             for (Object obj : ligandArray) {
                 JSONObject ligand = (JSONObject) obj;
                 
-                Iterator ligandIter = ligand.keySet().iterator();
+                @SuppressWarnings("rawtypes")
+				Iterator ligandIter = ligand.keySet().iterator();
                 
                 String folder = ligandIter.next().toString();
                 String fileName = ligand.get(folder).toString();

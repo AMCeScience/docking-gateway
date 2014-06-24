@@ -92,8 +92,8 @@
         <input name="compound_list" type="hidden"/>
 
         <div class="submit_row">
-            <!--<input name="run_pilot" type="checkbox" value="1" checked="checked"/>
-            <label for="run_pilot">Run pilot job</label>-->
+            <input name="run_pilot" type="checkbox" value="1" checked="checked"/>
+            <label for="run_pilot">Run pilot job</label>
 
             <input class="submit" type="button" value="Submit" onclick="new_job_submit();" />
         </div>

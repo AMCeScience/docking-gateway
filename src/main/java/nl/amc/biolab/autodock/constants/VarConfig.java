@@ -1,5 +1,13 @@
 package nl.amc.biolab.autodock.constants;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import crappy.logger.Logger;
 
 /**
@@ -7,118 +15,152 @@ import crappy.logger.Logger;
  * @author Allard van Altena
  */
 public class VarConfig extends Logger {
-    private final String PROJECT_ROOT = "guse/apache-tomcat-6.0.36/webapps/autodock/projects/";
-    private final String LIGAND_PATH = "guse/apache-tomcat-6.0.36/webapps/autodock/ligands/";
-    private final String LIGAND_CACHE_PATH = "guse/apache-tomcat-6.0.36/webapps/autodock/ligandsCache.json";
-    private final String WEBDAV = "http://localhost/webdav/";
-    private final String PROCESSING_WSDL = "http://localhost:8080/processingmanagerPortlet/ProcessingManagerService?wsdl";
-    
-    private final String ZIP_FILE_NAME = "compounds_file";
-    private final String ZIP_FILE_EXT = ".zip";
-    
-    private final String RECEPTOR_FILE_NAME = "receptor_file";
-    private final String RECEPTOR_FILE_EXT = ".pdbqt";
-    
-    private final String CONFIG_FILE_NAME = "config_file";
-    private final String CONFIG_FILE_EXT = ".txt";
-    
-    private final String OUTPUT_FILE_NAME = "output";
-    private final String OUTPUT_FILE_EXT = ".tar.gz";
-    
-    private final String OUTPUT_FILE_CSV_EXT = ".csv";
-    private final String OUTPUT_FILE_LIGANDS_EXT = ".tar.gz";
-    
-    private final String UNZIP_LOCATION = "unzipped";
-    
-    private final String AUTODOCK_NAME = "Autodock";
+	private final String FILE_PATH = "guse/apache-tomcat-6.0.36/webapps/autodock_files/config.json";
+	private JSONObject OBJ;
     
     public VarConfig config;
     
     public VarConfig() {
-        config = this;
+    	JSONParser parser = new JSONParser();
+    	
+    	try {
+    		_setJSON((JSONObject) parser.parse(new FileReader(FILE_PATH)));
+    	} catch(FileNotFoundException e) {
+    		log(e.toString());
+    	} catch (IOException e) {
+    		log(e.toString());
+		} catch (ParseException e) {
+			log(e.toString());
+		}
+    	
+    	config = this;
+    }
+    
+    private void _setJSON(JSONObject obj) {
+    	OBJ = obj;
+    }
+    
+    private JSONObject _getJSON() {
+    	return OBJ;
+    }
+    
+    public String getItem(String name) throws Exception {
+    	if (_getJSON().containsKey(name)) {
+    		return _getItem(name);
+    	} else {
+    		throw new Exception("key does not exist in configuration file.");
+    	}
+    }
+    
+    private String _getItem(String name) {
+    	return _getJSON().get(name).toString();
     }
     
     public String getAutodockName() {
-        return AUTODOCK_NAME;
+        return _getItem("autodock_name");
     }
     
     public String getWebDavUri() {
-        return WEBDAV;
+        return _getItem("webdav");
+    }
+    
+    public String getExternalWebDavUri() {
+        return _getItem("webdav_external");
     }
     
     public String getUri(String folderName, String fileName) {
-        return WEBDAV + folderName + "/" + fileName;
+        return getWebDavUri() + folderName + "/" + fileName;
     }
     
     public String getFilePath() {
-        return PROJECT_ROOT;
+        return _getItem("project_root");
     }
     
     public String getProjectFilePath(String projectName) {
-        return PROJECT_ROOT + projectName + "/";
+        return getFilePath() + projectName + "/";
     }
     
     public String getOutputCSVExt() {
-        return OUTPUT_FILE_CSV_EXT;
+        return _getItem("output_file_csv_ext");
     }
     
     public String getOuputLigandsZipExt() {
-        return OUTPUT_FILE_LIGANDS_EXT;
+        return _getItem("output_file_ligands_ext");
     }
     
     public String getOutputUnzipLocation(String folderName) {
-        return getOutputPath(folderName) + "/" + UNZIP_LOCATION + "/";
+        return getProjectFilePath(folderName) + _getItem("unzip_location") + "/";
     }
     
-    public String getOutputPath(String folderName) {
-        return WEBDAV + folderName;
+    public String getWebDavPath(String folderName) {
+        return getWebDavUri() + folderName + "/";
+    }
+    
+    public String getExternalWebDavPath(String folderName) {
+        return getExternalWebDavUri() + folderName + "/";
     }
     
     public String getOutputFileName(String folderName) {
-        return WEBDAV + folderName + "/" + OUTPUT_FILE_NAME + OUTPUT_FILE_EXT;
+        return getWebDavUri() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
+    }
+    
+    public String getExternalOutputFileName(String folderName) {
+        return getExternalWebDavUri() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
     }
     
     public String getOutputFilePath(String folderName) {
-        return PROJECT_ROOT + folderName + "/" + OUTPUT_FILE_NAME + OUTPUT_FILE_EXT;
+        return getFilePath() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
+    }
+    
+    public String getExternalUnzippedOutputPath(String folderName) {
+    	return getExternalWebDavPath(folderName) + _getItem("unzip_location");
     }
     
     public String getLigandPath() {
-        return LIGAND_PATH;
+        return _getItem("ligand_path");
     }
     
     public String getLigandFileName(String folderName, String fileName) {
-        return LIGAND_PATH + folderName + "/" + fileName;
+        return getLigandPath() + folderName + "/" + fileName;
     }
     
     public String getLigandCache() {
-        return LIGAND_CACHE_PATH;
+        return _getItem("ligand_cache_path");
     }
     
     public String getLigandsZipFileName() {
-        return ZIP_FILE_NAME + ZIP_FILE_EXT;
+        return _getItem("zip_file_name") + getLigandsZipExt();
+    }
+    
+    public String getPilotLigandsZipFileName() {
+        return _getItem("pilot_zip_file_name") + getLigandsZipExt();
     }
     
     public String getLigandsZipExt() {
-        return ZIP_FILE_EXT;
+        return _getItem("zip_file_ext");
     }
     
     public String getReceptorFileName() {
-        return RECEPTOR_FILE_NAME + RECEPTOR_FILE_EXT;
+        return _getItem("receptor_file_name") + getReceptorExt();
     }
     
     public String getReceptorExt() {
-        return RECEPTOR_FILE_EXT;
+        return _getItem("receptor_file_ext");
     }
     
     public String getConfigFileName() {
-        return CONFIG_FILE_NAME + CONFIG_FILE_EXT;
+        return _getItem("config_file_name") + getConfigExt();
     }
     
     public String getConfigExt() {
-        return CONFIG_FILE_EXT;
+        return _getItem("config_file_ext");
     }
     
     public String getProcessingWSDL() {
-        return PROCESSING_WSDL;
+        return _getItem("processing_wsdl");
+    }
+    
+    public int getPilotLigandCount() {
+    	return new Integer(_getItem("pilot_ligand_count"));
     }
 }

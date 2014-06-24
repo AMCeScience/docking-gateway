@@ -1,16 +1,28 @@
 package nl.amc.biolab.persistencemanager;
 
-import com.google.common.base.Joiner;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
 import nl.amc.biolab.autodock.constants.VarConfig;
-import nl.amc.biolab.nsgdm.*;
+import nl.amc.biolab.nsgdm.Application;
+import nl.amc.biolab.nsgdm.DataElement;
+import nl.amc.biolab.nsgdm.IOPort;
+import nl.amc.biolab.nsgdm.Processing;
+import nl.amc.biolab.nsgdm.Project;
+import nl.amc.biolab.nsgdm.Resource;
+import nl.amc.biolab.nsgdm.Submission;
+import nl.amc.biolab.nsgdm.SubmissionIO;
+import nl.amc.biolab.nsgdm.User;
+
 import org.hibernate.Session;
+
+import com.google.common.base.Joiner;
 
 /**
  * @author Allard van Altena
@@ -22,6 +34,9 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     // TESTING PURPOSES
     public void initStuff(String liferayId) {
         User catalogUser = getUser(liferayId);
+        
+        System.out.println("init stuff");
+        System.out.println(liferayId);
         
         if (catalogUser == null) {
             System.out.println("in here");
@@ -182,11 +197,19 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     public Resource getResource(String name) {
         Resource resource = new Resource();
 
-        List<Object> resources = executeSQL("SELECT * FROM Resource WHERE Name = ?", resource.getClass(), name);
+        try {
+	        List<Object> resources = executeSQL("SELECT * FROM Resource WHERE Name = ?", resource.getClass(), name);
+	        
+	        Iterator<Object> iter = resources.iterator();
+	        
+	        while (iter.hasNext()) {
+	        	return (Resource) iter.next();
+	        }
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
 
-        resource = (Resource) resources.get(0);
-
-        return resource;
+        return null;
     }
 
     public List<Project> getProjectsDataById(List<Long> projectIds) {
@@ -237,6 +260,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         dataElement.setSubject(subject);
         dataElement.setResource(resource);
         dataElement.setURI(uri);
+        dataElement.setSize(1);
 
         dataElement.getProjects().add((Project) projects.toArray()[0]);
 

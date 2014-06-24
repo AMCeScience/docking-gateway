@@ -23,7 +23,9 @@ public class Downloader extends AjaxInterface {
         
         _unpack(project_name);
         
-        _getJSONObj().add("redirect", true);
+        // Return the whole thing for the moment, do not take selection of ligands into account
+        //_getJSONObj().add("redirect", config.getUnzippedOutputPath(project_name));
+        _getJSONObj().add("redirect", config.getExternalOutputFileName(project_name));
     }
     
     private void _unpack(String project_name) {
@@ -32,15 +34,8 @@ public class Downloader extends AjaxInterface {
         
         Unzipper unzipper = new Unzipper();
         
-        if(!outputZipFile.exists()) {            
-            unzipper.unzipProjectOutput(project_name);
-        }
-        
-        // check if output zip is already unzipped into folder
-        File unzipDir = new File(config.getOutputUnzipLocation(project_name));
-        
-        if(!unzipDir.exists() && !unzipDir.isDirectory()) {
-            unzipper.unzip(config.getOutputFileName(project_name), config.getOutputUnzipLocation(project_name));
+        if(!outputZipFile.exists()) {
+            unzipper.untarProjectOutput(project_name);
         }
     }
 }

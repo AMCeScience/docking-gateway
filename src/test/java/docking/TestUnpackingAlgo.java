@@ -2,6 +2,7 @@ package docking;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -29,7 +31,46 @@ public class TestUnpackingAlgo {
 	// Try unpacking 10000 files
 	private int fileCountMax = 80000;
 	
-    @Test
+	@Test 
+	public void testTar() {
+		try {
+	    	TarArchiveInputStream tin = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(new File("../../Downloads/output.tar.gz"))));
+	
+	        TarArchiveEntry entry;
+	        
+	        while ((entry = tin.getNextTarEntry()) != null) {
+	        	System.out.println(entry.getName());
+	        	// create a file with the same name as the entry
+	            File destPath = new File("../../Downloads/test", entry.getName());
+	            
+	            if (entry.isDirectory()) {
+		            // entry is directory, create the folders
+	                destPath.mkdirs();
+	            } else {
+	            	// entry is file, write the file
+	                destPath.createNewFile();
+	                
+	                byte [] bytes = new byte[1024];
+	                
+	                BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(destPath));
+	                int len = 0;
+	
+	                while((len = tin.read(bytes)) != -1) {
+	                    bout.write(bytes, 0, len);
+	                }
+	                
+	                bout.close();
+	                bytes = null;
+	            }
+	        }
+	        
+	        tin.close();
+    	} catch (IOException e) {
+    		
+    	}
+	}
+	
+    /*@Test
     public void testTree() throws IOException {
     	long startTime = System.nanoTime();
     	
@@ -130,5 +171,5 @@ public class TestUnpackingAlgo {
     	System.out.println(new File("../../Downloads/test.zip").exists());
     	
         assertEquals(true, true);
-    }
+    }*/
 }

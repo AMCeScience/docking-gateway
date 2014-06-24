@@ -104,6 +104,7 @@ public class SearchProjects extends AjaxInterface {
         joins.put("Processing as po", "p.ProjectID = po.ProjectID");
         joins.put("UserProject as up", "p.ProjectID = up.ProjectID");
         joins.put("User as u", "up.UserKey = u.UserKey");
+        joins.put("Submission as s", "po.ProcessingID = s.ProcessingID");
         
         // Add to query
         _getPersistence().setSelect(select);
@@ -151,7 +152,7 @@ public class SearchProjects extends AjaxInterface {
             
             while (statusIter.hasNext()) {
                 // WHERE status = xxxxx
-                _getPersistence().setWhere("po.ProcessingStatus", "LIKE", "'%" + statusIter.next() + "'");
+                _getPersistence().setWhere("s.Status", "LIKE", "'%" + statusIter.next() + "'");
                 
                 if (statusIter.hasNext()) {
                     _getPersistence().setWhereOr();

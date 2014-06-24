@@ -19,7 +19,7 @@ public class StatusUpdater extends AjaxInterface {
         ProcessingManagerClient client = new ProcessingManagerClient(config.getProcessingWSDL());
         
         // Get processId we want to update from the ajax params
-        Long processId = new Long(_getSearchTermEntry("project_id"));
+        Long processId = new Long(_getSearchTermEntry("processing_id"));
         
         // Update the status through the processingmanager webservice
         client.updateStatus(processId);
@@ -28,6 +28,7 @@ public class StatusUpdater extends AjaxInterface {
         String newStatus = _getPersistence().getProcessing(processId).getSubmissions().iterator().next().getStatus();
         
         // Output the new status to the ajax request
+        _getJSONObj().add("project_id", _getSearchTermEntry("project_id"));
         _getJSONObj().add("new_status", newStatus);
     }
 }

@@ -17,6 +17,8 @@ public class ProjectOutput extends VarConfig {
     public ProjectOutput() {}
     
     public void initOutput(String projectName) {
+    	log.log("initOutput");
+    	
         _checkCSVFile(projectName);
         
         EnergyMap processed = _getCSV(projectName);
@@ -34,7 +36,7 @@ public class ProjectOutput extends VarConfig {
         FileCheck csvFile = new FileCheck();
         EnergyMap energyMap = new EnergyMap();
         
-        File[] csvFiles = csvFile.getFilesWithExtension(config.getProjectFilePath(name), config.getOutputCSVExt());
+        File[] csvFiles = csvFile.getFilesWithExtension(config.getOutputUnzipLocation(name), config.getOutputCSVExt());
         
         if(csvFiles != null && csvFiles.length > 0) {        
             energyMap.initEnergyMapping(csvFiles[0].getPath());
@@ -47,15 +49,17 @@ public class ProjectOutput extends VarConfig {
         OUTPUT_MAP.put(name, object);
     }
     
-    private void _checkCSVFile(String name) {        
+    private void _checkCSVFile(String projectName) {        
         FileCheck csvExists = new FileCheck();
         
         // if csv does not exist
-        if(!csvExists.checkIfFilesWithExtensionExists(config.getProjectFilePath(name), config.getOutputCSVExt())) {
+        if(!csvExists.checkIfFilesWithExtensionExists(config.getOutputUnzipLocation(projectName), config.getOutputCSVExt())) {
+        	log.log("untarring");
+        	
             Unzipper unzip = new Unzipper();
             
             // unzip project output folder
-            unzip.unzipProjectOutput(name);
+            unzip.untarProjectOutput(projectName);
         }
     }
 }

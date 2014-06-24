@@ -1,7 +1,5 @@
 package nl.amc.biolab.autodock.input.tools;
 
-import nl.amc.biolab.persistencemanager.PersistenceManager;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,15 +10,17 @@ import java.util.List;
 
 import javax.portlet.ActionRequest;
 
+import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.input.objects.Configuration;
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.input.objects.Receptor;
-import nl.amc.biolab.autodock.constants.VarConfig;
+import nl.amc.biolab.autodock.input.objects.JobSubmission;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
 import nl.amc.biolab.nsgdm.DataElement;
 import nl.amc.biolab.nsgdm.Project;
 import nl.amc.biolab.nsgdm.Resource;
 import nl.amc.biolab.nsgdm.User;
+import nl.amc.biolab.persistencemanager.PersistenceManager;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -63,6 +63,11 @@ public class FormSubmitter extends VarConfig {
         HashMap<String, Object> formMap = _createFormMap(formParameters);
         
         if (formMap != null) {
+        	JobSubmission job = new JobSubmission();
+            
+            job.setProjectName(formMap.get("project_name").toString());
+            job.setProjectDescription(formMap.get("project_description").toString());
+        	
             // Get liferay user ID
             String liferayUserId = formParameters.getRemoteUser();
 
@@ -72,7 +77,7 @@ public class FormSubmitter extends VarConfig {
             // Check if user exists in catalog database
             if (catalogUser != null) {                
                 // Project name is set but is not unique
-                if (!_getDb().checkProjectNameUnique(formMap.get("project_name").toString())) {
+                if (!_getDb().checkProjectNameUnique(job.getProjectName())) {
                     _setError("Project name is not unique.<br/>");
 
                     close();
@@ -80,10 +85,11 @@ public class FormSubmitter extends VarConfig {
                     return false;
                 }
                 
-                File directory = new File(config.getFilePath() + "/" + formMap.get("project_name").toString());
+                File directory = new File(config.getFilePath() + "/" + job.getProjectName());
                 
                 directory.mkdirs();
                 
+                // Project name is not set, return immediately                
                 if (!directory.exists()) {
                     _setError("Could not create project folder.<br/>");
                     
@@ -96,7 +102,6 @@ public class FormSubmitter extends VarConfig {
                 ConfigFactory configFactory = new ConfigFactory();
                 Configuration configuration = configFactory.setData(formMap);
 
-                // Project name is not set, return immediately
                 if (!configuration.getValid()) {
                     _setError(configuration.getErrors());
 
@@ -119,7 +124,7 @@ public class FormSubmitter extends VarConfig {
 
                 // Write the receptor file to the system
                 ReceptorFileUploader uploader = new ReceptorFileUploader();
-                Receptor receptor = uploader.doUpload((FileItem) formMap.get("receptor_file"), formMap.get("project_name").toString());
+                Receptor receptor = uploader.doUpload((FileItem) formMap.get("receptor_file"), job.getProjectName());
 
                 if (!receptor.validate()) {
                     _setError(receptor.getErrors());
@@ -138,15 +143,38 @@ public class FormSubmitter extends VarConfig {
                     
                     return false;
                 }
-
-                // Add file information to formMap
-                formMap.put("ligands_uri", config.getUri(formMap.get("project_name").toString(), config.getLigandsZipFileName()));
-                formMap.put("ligands_count", ligands.getCount());
-                formMap.put("receptor_uri", config.getUri(formMap.get("project_name").toString(), config.getReceptorFileName()));
-                formMap.put("config_uri", config.getUri(formMap.get("project_name").toString(), config.getConfigFileName()));
+                
+                job.setLigandsUri(config.getUri(job.getProjectName(), config.getLigandsZipFileName()));
+                job.setLigandsCount(ligands.getCount());
+                
+                if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
+	                job.setPilotLigandsUri(config.getUri(job.getProjectName(), config.getPilotLigandsZipFileName()));
+	                job.setPilotLigandsCount(config.getPilotLigandCount());
+                }
+                
+                job.setReceptorUri(config.getUri(job.getProjectName(), config.getReceptorFileName()));
+                job.setConfigurationUri(config.getUri(job.getProjectName(), config.getConfigFileName()));
+                
+                // Do this as the last step because from now on the JobSubmission will return the project name with "_pilot" addition
+                if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
+                	job.setPilot(true);
+                }
+                
+                job.setUser(catalogUser);
                 
                 // Store project
-                _saveProject(formMap, catalogUser);
+                Project project = _saveProject(job);
+                job.setProject(project);
+                
+                // Store data elements
+                HashMap<String, DataElement> data = _saveData(job);
+                job.setLigands(data.get("ligands"));
+                job.setConfiguration(data.get("configuration"));
+                job.setReceptor(data.get("receptor"));
+                job.setPilotLigands(data.get("pilot_ligands"));
+                
+                // Submit the job
+            	_submit(job);
 
                 stored = true;
             } else {
@@ -168,54 +196,87 @@ public class FormSubmitter extends VarConfig {
         return stored;
     }
     
-    private void _saveProject(HashMap<String, Object> formMap, User catalogUser) {
-        Resource resource = _getDb().getResource("webdav");
+    private Project _saveProject(JobSubmission job) {
+        Project project = _getDb().storeProject(job.getProjectName(), job.getProjectDescription(), job.getUser());
         
-        Collection<Project> projects = new ArrayList<Project>();
+        return project;
+    }
         
-        String projectName = formMap.get("project_name").toString();
-        String projectDescription = formMap.get("project_description").toString();
-        
-        Project project = _getDb().storeProject(projectName, projectDescription, catalogUser);
-        
+    private HashMap<String, DataElement> _saveData(JobSubmission job) {
+    	Resource resource = _getDb().getResource("webdav");
+    	
+    	Collection<Project> projects = new ArrayList<Project>();
+    	
+    	HashMap<String, DataElement> dataMap = new HashMap<String, DataElement>();
+    	
         // Add created project to collection
-        projects.add(project);
+        projects.add(job.getProject());
         
         // Store ligands zip
         String ligandsFormat = config.getLigandsZipExt();
         String ligandsName = config.getLigandsZipFileName();
-        String ligandsUri = formMap.get("ligands_uri").toString();
-        String ligandsCount = formMap.get("ligands_count").toString();
+        String ligandsUri = job.getLigandsUri();
+        String ligandsCount = job.getLigandsCount().toString();
         
-        DataElement ligands = _getDb().storeDataElement(ligandsFormat, ligandsName, ligandsUri, ligandsCount, null, null, projects, resource);
+        DataElement ligands = _getDb().storeDataElement(ligandsFormat, ligandsName, ligandsUri, ligandsCount, "filler", "filler", projects, resource);
+        
+        DataElement pilotLigands = null;
+        
+        if (job.isPilot()) {
+        	// Store ligands zip
+            String pilotLigandsName = config.getPilotLigandsZipFileName();
+            String pilotLigandsUri = job.getPilotLigandsUri();
+            String pilotLigandsCount = String.valueOf(job.getPilotLigandsCount());
+            
+            pilotLigands = _getDb().storeDataElement(ligandsFormat, pilotLigandsName, pilotLigandsUri, pilotLigandsCount, "filler", "filler", projects, resource);
+        }
         
         // Store receptor file
         String receptorFormat = config.getReceptorExt();
         String receptorName = config.getReceptorFileName();
-        String receptorUri = formMap.get("receptor_uri").toString();
+        String receptorUri = job.getReceptorUri();
         
-        DataElement receptor = _getDb().storeDataElement(receptorFormat, receptorName, receptorUri, null, null, null, projects, resource);
+        DataElement receptor = _getDb().storeDataElement(receptorFormat, receptorName, receptorUri, null, "filler", "filler", projects, resource);
         
         // Store configuration file
         String configFormat = config.getConfigExt();
         String configName = config.getConfigFileName();
-        String configUri = formMap.get("config_uri").toString();
+        String configUri = job.getConfigurationUri();
         
-        DataElement configuration = _getDb().storeDataElement(configFormat, configName, configUri, null, null, null, projects, resource);
+        DataElement configuration = _getDb().storeDataElement(configFormat, configName, configUri, null, "filler", "filler", projects, resource);
         
-        // Send to processing manager
+        dataMap.put("ligands", ligands);
+        dataMap.put("pilot_ligands", pilotLigands);
+        dataMap.put("receptor", receptor);
+        dataMap.put("configuration", configuration);
+        
+        return dataMap;
+    }
+    
+    private void _submit(JobSubmission job) {
+    	// Send to processing manager
         List<Long> submits = new ArrayList<Long>();
         
         // Do not change order of adding ids, this is linked to the processingmanager which requires the input to be in the right order
-        submits.add(ligands.getDbId());
-        submits.add(configuration.getDbId());
-        submits.add(receptor.getDbId());
+        // Add either the pilot ligands to the submission or the full ligand set
+        if (job.isPilot()) {
+        	submits.add(job.getPilotLigands().getDbId());
+        } else {
+        	submits.add(job.getLigands().getDbId());
+        }
+        submits.add(job.getConfiguration().getDbId());
+        submits.add(job.getReceptor().getDbId());
         
         // Get processingmanager webservice client
         ProcessingManagerClient client = new ProcessingManagerClient(config.getProcessingWSDL());
         
         // Submit the job through the processingmanager webservice
-        client.submit(project.getDbId(), _getDb().getApplicationByName(config.getAutodockName()).getDbId(), submits, catalogUser.getDbId(), catalogUser.getLiferayID(), project.getDescription());
+        client.submit(job.getProject().getDbId(), 
+        		_getDb().getApplicationByName(config.getAutodockName()).getDbId(), 
+        		submits, 
+        		job.getUser().getDbId(), 
+        		job.getUser().getLiferayID(), 
+        		job.getProject().getDescription());
     }
     
     private HashMap<String, Object> _createFormMap(ActionRequest formParameters) {

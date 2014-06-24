@@ -55,15 +55,15 @@ function new_job_submit() {
     	rules: {
     		project_name: { ligandCount: true },
     		receptor_file: { extension: '.pdbqt' },
-    		center_x: { digits: true },
-    		center_y: { digits: true },
-    		center_z: { digits: true },
-    		size_x: { digits: true },
-    		size_y: { digits: true },
-    		size_z: { digits: true },
-    		number_runs: { digits: true },
-    		exhaustiveness: { digits: true },
-    		energy_range: { digits: true }
+    		center_x: { number: true },
+    		center_y: { number: true },
+    		center_z: { number: true },
+    		size_x: { number: true },
+    		size_y: { number: true },
+    		size_z: { number: true },
+    		number_runs: { number: true },
+    		exhaustiveness: { number: true },
+    		energy_range: { number: true }
     	},
     	errorPlacement: function(error, element) {
     		var err_text = error.text();
@@ -333,7 +333,7 @@ function projectHtml(project_data, page_type) {
     
     var project_html =
             "<h3>" + project_data.project_name + " - Started: " + project_data.date_started + "</h3>\
-            <div class='project_data_div' data-project=''>\
+            <div class='project_data_div project_id_" + project_data.project_id + "' data-project=''>\
                 <div class='accordion_content'>\
                     <span class='icon'>X</span>\
                     <div class='project_content'>\
@@ -350,7 +350,7 @@ function projectHtml(project_data, page_type) {
                                 }
                                 
                                 project_html += "<div class='" + class_name + "'>\
-                                    <a href='/webdav/" + project_data.project_name + "/" + input.name + "'>Name: " + input.name + "</a>";
+                                    <a href='/webdav/" + project_data.project_name.replace("_pilot", "") + "/" + input.name + "'>Name: " + input.name + "</a>";
 
                                 if (input.scan_id !== null) {
                                     project_html += "<span>Ligand count: " + input.scan_id + "</span>";
@@ -366,9 +366,9 @@ function projectHtml(project_data, page_type) {
 
                         if (page_type === "in_process") {
                             project_html +=
-                            "<div class='in_process_items_wrapper' data-project-id='" + project_data.project_id + "'>\
+                            "<div class='in_process_items_wrapper'>\
                                 <h2>Status</h2>\
-                                <span>" + project_data.latest_status + "</span>\
+                                <span class='project_status_disp'>" + project_data.latest_status + "</span>\
                                 \
                                 <input class='button update' type='button' value='Update'/>\
                             </div>";

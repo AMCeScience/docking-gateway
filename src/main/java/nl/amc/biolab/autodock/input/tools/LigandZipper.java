@@ -81,6 +81,8 @@ public class LigandZipper extends VarConfig {
                 zip.closeEntry();
                 
                 if (isPilot && ligandsWritten <= pilotLigandCount) {
+                	ligandsObj.addPilotCount();
+                	
                 	pilotZip.closeEntry();
                 }
                 

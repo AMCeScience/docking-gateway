@@ -2,7 +2,7 @@
     "project_root": "guse/apache-tomcat-6.0.36/webapps/autodock_files/projects/",
     "ligand_path": "guse/apache-tomcat-6.0.36/webapps/autodock_files/ligands/",
     "ligand_cache_path": "guse/apache-tomcat-6.0.36/webapps/autodock_files/ligandsCache.json",
-    "webdav": "http://localhost/webdav/",
+    "webdav_internal": "http://localhost/webdav-curl/",
     "webdav_external": "http://docking.ebioscience.amc.nl/webdav/",
     "processing_wsdl": "http://localhost:8080/processingmanagerPortlet/ProcessingManagerService?wsdl",
     "zip_file_name": "compounds_file",

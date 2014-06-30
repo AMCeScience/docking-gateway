@@ -69,7 +69,7 @@ public class VarConfig extends Logger {
     }
     
     public String getWebDavUri() {
-        return _getItem("webdav");
+        return _getItem("webdav_internal");
     }
     
     public String getExternalWebDavUri() {

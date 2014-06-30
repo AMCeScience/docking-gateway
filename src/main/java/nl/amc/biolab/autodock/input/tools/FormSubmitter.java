@@ -56,26 +56,11 @@ public class FormSubmitter extends VarConfig {
     	return _getDb().checkUserAuth(liferayUserId);
     }
     
-    public boolean setupUser(ActionRequest formParameters) {
-    	boolean store = false;
-    	
+    public boolean setupUser(String liferayUserId) {
+    	// Setup app hook
     	_getDb().initApp();
     	
-    	HashMap<String, Object> formMap = _createFormMap(formParameters);
-    	
-    	// Get liferay user ID
-    	String liferayUserId = formParameters.getRemoteUser();
-    	
-    	// Get password
-    	String password = formMap.get("liferay_password").toString();
-    	
-    	store = _getDb().userSetup(liferayUserId, password);
-    	
-    	if (!store) {
-    		_setError("Password incorrect");
-    	}
-    	
-    	return store;
+    	return _getDb().userSetup(liferayUserId);
     }
     
     public boolean saveForm(ActionRequest formParameters) {
@@ -171,7 +156,7 @@ public class FormSubmitter extends VarConfig {
                 
                 if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
 	                job.setPilotLigandsUri(config.getUri(job.getProjectName(), config.getPilotLigandsZipFileName()));
-	                job.setPilotLigandsCount(config.getPilotLigandCount());
+	                job.setPilotLigandsCount(ligands.getPilotCount());
                 }
                 
                 job.setReceptorUri(config.getUri(job.getProjectName(), config.getReceptorFileName()));

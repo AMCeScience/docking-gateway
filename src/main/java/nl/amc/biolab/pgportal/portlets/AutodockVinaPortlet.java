@@ -23,7 +23,6 @@ import crappy.logger.Logger;
  */
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
-    private final String USER_SETUP_PAGE = "user_setup";
     private final String PROJECT_DISPLAY_PAGE = "project_display";
     private Logger LOG = new Logger();
 
@@ -48,27 +47,6 @@ public class AutodockVinaPortlet extends GenericPortlet {
             // Redirect to project display page of projects in process
             response.setRenderParameter("page_type", "in_process");
             response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
-        }
-    }
-    
-    // Handle user setup form submission
-    @ProcessAction(name = "submitUserSetupForm")
-    public void handleSubmitUserSetupForm(ActionRequest formParameters, ActionResponse response) {
-    	LOG.log("submitUserSetupForm");
-    	
-    	FormSubmitter submit = new FormSubmitter();
-    	
-    	boolean success = submit.setupUser(formParameters);
-    	
-    	if (!success) {
-    		// Set errors and reload form page
-    		response.setRenderParameter("form_errors", submit.getErrors());
-    		response.setRenderParameter("nextJSP", USER_SETUP_PAGE);
-    		
-    		LOG.log(submit.getErrors());
-    	} else {
-            // Redirect to job submission page
-            response.setRenderParameter("nextJSP", NEW_JOB_PAGE);
         }
     }
 
@@ -105,9 +83,9 @@ public class AutodockVinaPortlet extends GenericPortlet {
             	FormSubmitter submit = new FormSubmitter();
             	
             	if (!submit.checkUser(request.getRemoteUser())) {
-            		LOG.log("loading user setup page");
+            		LOG.log("user setup");
             		
-            		nextJSP = USER_SETUP_PAGE;
+            		submit.setupUser(request.getRemoteUser());
             	}
             }
 

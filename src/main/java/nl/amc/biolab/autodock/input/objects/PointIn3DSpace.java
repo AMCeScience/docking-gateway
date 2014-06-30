@@ -46,9 +46,9 @@ public class PointIn3DSpace extends VarConfig {
         return !X.isEmpty() && !Y.isEmpty() && !Z.isEmpty() && !POINT_TYPE.isEmpty();
     }
     
-    private boolean _isInt(String s) {
+    private boolean _isFloat(String s) {
         try {
-            Integer.parseInt(s);
+            Float.parseFloat(s);
         } catch(NumberFormatException e) {
             return false;
         }
@@ -88,7 +88,7 @@ public class PointIn3DSpace extends VarConfig {
      * @param x String with x coordinate.
      */
     public void set_x(String x) {
-        if (_isInt(x)) {
+        if (_isFloat(x)) {
             X = x;
         } else {
             setError("Coordinate x is not an integer.<br/>");
@@ -110,7 +110,7 @@ public class PointIn3DSpace extends VarConfig {
      * @param y String with x coordinate.
      */
     public void set_y(String y) {
-        if (_isInt(y)) {
+        if (_isFloat(y)) {
             Y = y;
         } else {
             setError("Coordinate y is not an integer.<br/>");
@@ -132,7 +132,7 @@ public class PointIn3DSpace extends VarConfig {
      * @param z String with x coordinate.
      */
     public void set_z(String z) {
-        if (_isInt(z)) {
+        if (_isFloat(z)) {
             Z = z;
         } else {
             setError("Coordinate z is not an integer.<br/>");

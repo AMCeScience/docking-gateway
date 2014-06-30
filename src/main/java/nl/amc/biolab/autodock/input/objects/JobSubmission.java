@@ -13,7 +13,7 @@ public class JobSubmission {
 	private Long ligandsCount = 0L;
 	private DataElement pilotLigands;
 	private String pilotLigandsUri = "";
-	private int pilotLigandsCount = 0;
+	private Long pilotLigandsCount = 0L;
 	private DataElement receptor;
 	private String receptorUri = "";
 	private DataElement configuration;
@@ -89,11 +89,11 @@ public class JobSubmission {
 		this.pilotLigandsUri = pilotLigandsUri;
 	}
 	
-	public int getPilotLigandsCount() {
+	public Long getPilotLigandsCount() {
 		return pilotLigandsCount;
 	}
 	
-	public void setPilotLigandsCount(int pilotLigandsCount) {
+	public void setPilotLigandsCount(Long pilotLigandsCount) {
 		this.pilotLigandsCount = pilotLigandsCount;
 	}
 	

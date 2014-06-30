@@ -8,6 +8,7 @@ public class Ligands {
     private String ERRORS = "";
     private boolean VALIDATES = false;
     private Long COUNT = 0L;
+    private Long PILOT_COUNT = 0L;
     
     public Ligands() {}
     
@@ -35,5 +36,13 @@ public class Ligands {
     
     public Long getCount() {
         return COUNT;
+    }
+    
+    public void addPilotCount() {
+        PILOT_COUNT = PILOT_COUNT + 1;
+    }
+    
+    public Long getPilotCount() {
+        return PILOT_COUNT;
     }
 }

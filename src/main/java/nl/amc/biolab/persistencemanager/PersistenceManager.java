@@ -43,9 +43,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     		UserAuthentication userAuth = _getUserAuthentication(catalogUser.getDbId());
     		
     		if (userAuth != null) {
-	    		String hashPass = DigestUtils.shaHex(decryptString(userAuth.getAuthentication()));
-	    		
-	    		if (hashPass.equals(liferayUser.get("password"))) {
+	    		if (decryptString(userAuth.getAuthentication()).equals(liferayUser.get("password"))) {
 	    			return true;
 	    		}
     		}
@@ -54,7 +52,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     	return false;
     }
     
-    public boolean userSetup(String liferayId, String password) {
+    public boolean userSetup(String liferayId) {
     	User catalogUser = getUser(liferayId);
     	
     	HashMap<String, String> liferayUser = _getLiferayCredentials(liferayId);
@@ -72,22 +70,18 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         	// Create user
             catalogUser = _storeUser(liferayId, liferayUser.get("first_name"), liferayUser.get("last_name"), liferayUser.get("email"));
             
+            // Check if success
             if (catalogUser != null) {
+            	// Going to set a password for this user
             	setPass = true;
             }
         }
     	
     	if (setPass) {
-			// Test against liferay database
-			String hashPass = DigestUtils.shaHex(password);
+			setUserPassword(catalogUser.getDbId(), catalogUser.getEmail(), liferayUser.get("password"), getResource("webdav").getDbId());
 			
-    		if (hashPass.equals(liferayUser.get("password"))) {
-    			// Set password
-    			setUserPassword(catalogUser.getDbId(), catalogUser.getEmail(), password, getResource("webdav").getDbId());
-    			
-    			// Setup is done
-        		setup = true;
-    		}
+			// Setup is done
+    		setup = true;
     	}
     	
     	return setup;
@@ -96,7 +90,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
     public void initApp() {
     	VarConfig config = new VarConfig();
     	
-    	if (config.getIsDev() == true && getResource("webdav") == null) {
+    	if (getResource("webdav") == null) {
             System.out.println("setting up appliciation and resources");
             
             // Create resources
@@ -284,7 +278,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         dataElement.setType(type);
         dataElement.setSubject(subject);
         dataElement.setResource(resource);
-        dataElement.setURI(uri);
+        dataElement.setURI(uri.replace(" ", "%20"));
         dataElement.setSize(1);
 
         dataElement.getProjects().add((Project) projects.toArray()[0]);

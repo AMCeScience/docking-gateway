@@ -5,6 +5,7 @@ import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 
+import javax.portlet.PortletSession;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -24,11 +25,6 @@ public class AjaxDispatcher extends VarConfig {
     public AjaxDispatcher() {}
     
     public void dispatch(ResourceRequest ajaxParameters, ResourceResponse response) {
-        PersistenceManager persist = new PersistenceManager();
-        persist.init();
-        persist.initStuff(ajaxParameters.getRemoteUser());
-        persist.shutdown();
-        
         LinkedHashMap<String, String> params = _processParams(ajaxParameters);
         
         String callFunction = params.get("callFunction").toString();

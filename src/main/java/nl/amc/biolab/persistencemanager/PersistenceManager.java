@@ -1,9 +1,15 @@
 package nl.amc.biolab.persistencemanager;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,39 +22,86 @@ import nl.amc.biolab.nsgdm.IOPort;
 import nl.amc.biolab.nsgdm.Processing;
 import nl.amc.biolab.nsgdm.Project;
 import nl.amc.biolab.nsgdm.Resource;
-import nl.amc.biolab.nsgdm.Submission;
-import nl.amc.biolab.nsgdm.SubmissionIO;
 import nl.amc.biolab.nsgdm.User;
+import nl.amc.biolab.nsgdm.UserAuthentication;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Session;
 
 import com.google.common.base.Joiner;
 
-/**
- * @author Allard van Altena
- */
 public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
 
     private String QUERY = "";
+    
+    public boolean checkUserAuth(String liferayId) {
+    	User catalogUser = getUser(liferayId);
+    	
+    	if (catalogUser != null) {
+    		HashMap<String, String> liferayUser = _getLiferayCredentials(liferayId);
+    		
+    		UserAuthentication userAuth = _getUserAuthentication(catalogUser.getDbId());
+    		
+    		if (userAuth != null) {
+	    		String hashPass = DigestUtils.shaHex(decryptString(userAuth.getAuthentication()));
+	    		
+	    		if (hashPass.equals(liferayUser.get("password"))) {
+	    			return true;
+	    		}
+    		}
+    	}
+    	
+    	return false;
+    }
+    
+    public boolean userSetup(String liferayId, String password) {
+    	User catalogUser = getUser(liferayId);
+    	
+    	HashMap<String, String> liferayUser = _getLiferayCredentials(liferayId);
+    	
+    	boolean setPass = false;
+    	boolean setup = false;
+    	
+    	// User already exists in catalog, thus password has changed
+    	if (catalogUser != null && liferayUser != null) {
+    		setPass = true;
+    	}
+    	
+    	// User does not exist in catalog yet, need to set up a new user and password
+    	if (catalogUser == null && liferayUser != null) {
+        	// Create user
+            catalogUser = _storeUser(liferayId, liferayUser.get("first_name"), liferayUser.get("last_name"), liferayUser.get("email"));
+            
+            if (catalogUser != null) {
+            	setPass = true;
+            }
+        }
+    	
+    	if (setPass) {
+			// Test against liferay database
+			String hashPass = DigestUtils.shaHex(password);
+			
+    		if (hashPass.equals(liferayUser.get("password"))) {
+    			// Set password
+    			setUserPassword(catalogUser.getDbId(), catalogUser.getEmail(), password, getResource("webdav").getDbId());
+    			
+    			// Setup is done
+        		setup = true;
+    		}
+    	}
+    	
+    	return setup;
+    }
 
-    // TESTING PURPOSES
-    public void initStuff(String liferayId) {
-        User catalogUser = getUser(liferayId);
-        
-        System.out.println("init stuff");
-        System.out.println(liferayId);
-        
-        if (catalogUser == null) {
-            System.out.println("in here");
-            // Create user
-            User user = _storeUser(liferayId);
+    public void initApp() {
+    	VarConfig config = new VarConfig();
+    	
+    	if (config.getIsDev() == true && getResource("webdav") == null) {
+            System.out.println("setting up appliciation and resources");
             
-            // Create vlemed resource
-            Resource resource1 = _storeResource(); // local
-            Resource resource2 = _storeResource2(); // grid
-            
-            // Bind user to resource            
-            setUserPassword(user.getDbId(), "webdavuser", "key.webdav", resource1.getDbId());
+            // Create resources
+            _storeResource("webdav", config.getWebDavUri(), "localhost resource", "http", false); // local
+            _storeResource("glite;vlemed", "lfn:/grid/vlemed/AutodockVinaGateway/autodock", "glite;vlemed", "lcg", true); // grid
 
             // Create application
             Long appId = storeApplication("Autodock", "Autodock description test", "121;10196", 1);
@@ -58,48 +111,7 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
             storeIOPort(2, "4@Generator", "config.txt", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(3, "5@Generator", "receptor.pdbqt", "Input", "File", null, appId, "glite;vlemed", true);
             storeIOPort(4, "0@collector.sh", "output.tar.gz", "Output", "File", "ZIP", appId, "glite;vlemed", true);
-            
-            /*VarConfig config = new VarConfig();
-            
-            Project project = storeProject("testProject1", "test project description", user);
-        
-            Collection<Project> projects = new ArrayList<Project>();
-            
-            // Add created project to collection
-            projects.add(project);
-            
-            DataElement ligands = storeDataElement(config.getLigandsZipExt(), 
-                    config.getLigandsZipFileName(), 
-                    config.getUri("testProj1", config.getLigandsZipFileName()), 
-                    "1234", null, null, projects, resource1);
-            DataElement receptor = storeDataElement(config.getReceptorExt(), 
-                    config.getReceptorFileName(), 
-                    config.getUri("testProj1", config.getReceptorFileName()),
-                    null, null, null, projects, resource1);
-            DataElement configuration = storeDataElement(config.getConfigExt(), 
-                    config.getConfigFileName(), 
-                    config.getUri("testProj1", config.getConfigFileName()),
-                    null, null, null, projects, resource1);
-            DataElement output = storeDataElement(config.getLigandsZipExt(), 
-                    "output", 
-                    config.getOutputFileName("testProj1"),
-                    null, null, null, projects, resource2);
-            
-            Long procID = getNewProcessingID(project.getDbId(), appId);
-            storeProcessing(procID, "test", "desc", user.getDbId(), "done");
-            
-            List items = new ArrayList();
-            
-            items.add(ligands.getDbId());
-            items.add(receptor.getDbId());
-            items.add(configuration.getDbId());
-            
-            List bam = new ArrayList();
-            bam.add(items);
-            
-            Long subm = storeSubmission(procID, "test", "done", bam);
-            _storeSubmissionIO(getSubmission(subm), output, _getIOPort(4), "Output");*/
-        }
+    	}
     }
 
     // TESTING PURPOSES, get private field 'session'
@@ -120,57 +132,70 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
         return null;
     }
 
-    // TESTING PURPOSES
-    private User _storeUser(String liferayId) {
+    private User _storeUser(String liferayId, String firstname, String lastname, String email) {
         User user = new User();
-
+        
         user.setLiferayID(liferayId);
-        user.setFirstName("Allard");
-        user.setLastName("van Altena");
+        user.setFirstName(firstname);
+        user.setLastName(lastname);
+        user.setEmail(email);
 
         persist(user);
-
+        
         return user;
     }
     
-    private SubmissionIO _storeSubmissionIO(Submission sub, DataElement de, IOPort port, String io) {
-        SubmissionIO subm = new SubmissionIO();
-        
-        subm.setSubmission(sub);
-        subm.setDataElement(de);
-        subm.setPort(port);
-        subm.setType(io);
-        
-        persist(subm);
-        
-        return subm;
+    private HashMap<String, String> _getLiferayCredentials(String liferayId) {
+    	HashMap<String, String> results = new HashMap<String, String>();
+    	
+	    try {
+	      Class.forName("com.mysql.jdbc.Driver");
+	      Connection connect = DriverManager.getConnection("jdbc:mysql://localhost/liferay?user=root&password=guseroot");
+
+	      Statement statement = connect.createStatement();
+	      ResultSet resultSet = statement.executeQuery("select * from User_ where userId = " + liferayId);
+	      
+	      while (resultSet.next()) {
+	    	  results.put("email", resultSet.getString("emailAddress"));
+	    	  results.put("password", resultSet.getString("password_"));
+	    	  results.put("first_name", resultSet.getString("firstName"));
+	    	  results.put("last_name", resultSet.getString("lastName"));
+	      }
+	      
+	      return results;
+	    } catch(ClassNotFoundException e) {
+	    	System.out.println(e);
+	    } catch(SQLException e) {
+	    	System.out.println(e);
+	    }
+	    
+	    return null;
+    }
+    
+    private UserAuthentication _getUserAuthentication(Long userId) {
+    	List<UserAuthentication> results = null;
+    	
+    	try {
+            results = _getSession().createQuery("from UserAuthentication where UserKey ='" + userId + "'").list();
+            
+            for (UserAuthentication u : results) {
+                return u;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    	
+    	return null;
     }
 
-    // TESTING PURPOSES
-    private Resource _storeResource() {
+    private Resource _storeResource(String name, String uri, String description, String protocol, boolean robot) {
         Resource resource = new Resource();
-
-        VarConfig config = new VarConfig();
         
-        resource.setName("webdav");
-        resource.setBaseURI(config.getWebDavUri());
-        resource.setDescription("localhost resource");
-        resource.setProtocol("http");
-
-        persist(resource);
-
-        return resource;
-    }
-
-    // TESTING PURPOSES
-    private Resource _storeResource2() {
-        Resource resource = new Resource();
-
-        resource.setName("glite;vlemed");
-        resource.setDescription("glite;vlemed");
-        resource.setBaseURI("lfn:/grid/vlemed/AutodockVinaGateway/autodock");
-        resource.setProtocol("lcg");
-        resource.setRobot(true);
+        resource.setName(name);
+        resource.setBaseURI(uri);
+        resource.setDescription(description);
+        resource.setProtocol(protocol);
+        resource.setRobot(robot);
 
         persist(resource);
 
@@ -361,16 +386,6 @@ public class PersistenceManager extends nl.amc.biolab.Tools.PersistenceManager {
 
     public String getQuery() {
         return QUERY;
-    }
-
-    private IOPort _getIOPort(int port) {
-        IOPort ioport = new IOPort();
-        
-        List<Object> resources = _getSession().createSQLQuery("SELECT * FROM IOPort WHERE PortID = 4").addEntity(ioport.getClass()).list();
-
-        ioport = (IOPort) resources.get(0);
-        
-        return ioport;
     }
     
     @Override

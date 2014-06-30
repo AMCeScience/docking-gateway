@@ -58,7 +58,7 @@
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=156"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=109"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=219"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=220"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=107"></script>
     </head>
     <body>

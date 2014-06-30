@@ -56,6 +56,14 @@ public class VarConfig extends Logger {
     	return _getJSON().get(name).toString();
     }
     
+    public boolean getIsDev() {
+    	if (_getItem("is_dev").equals("true")) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
     public String getAutodockName() {
         return _getItem("autodock_name");
     }

@@ -28,15 +28,11 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.io.FileUtils;
 
-/**
- *
- * @author Allard van Altena
- */
 public class FormSubmitter extends VarConfig {
     private String ERRORS = "";
     private PersistenceManager PERSISTENCE;
     
-    public FormSubmitter(String liferayId) {
+    public FormSubmitter() {
         _setDb(new PersistenceManager());
         
         _getDb().init();
@@ -54,6 +50,32 @@ public class FormSubmitter extends VarConfig {
         } catch(IOException e) {
             log.log(e);
         }
+    }
+    
+    public boolean checkUser(String liferayUserId) {
+    	return _getDb().checkUserAuth(liferayUserId);
+    }
+    
+    public boolean setupUser(ActionRequest formParameters) {
+    	boolean store = false;
+    	
+    	_getDb().initApp();
+    	
+    	HashMap<String, Object> formMap = _createFormMap(formParameters);
+    	
+    	// Get liferay user ID
+    	String liferayUserId = formParameters.getRemoteUser();
+    	
+    	// Get password
+    	String password = formMap.get("liferay_password").toString();
+    	
+    	store = _getDb().userSetup(liferayUserId, password);
+    	
+    	if (!store) {
+    		_setError("Password incorrect");
+    	}
+    	
+    	return store;
     }
     
     public boolean saveForm(ActionRequest formParameters) {

@@ -7,6 +7,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.GenericPortlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletSession;
 import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -22,6 +23,7 @@ import crappy.logger.Logger;
  */
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
+    private final String USER_SETUP_PAGE = "user_setup";
     private final String PROJECT_DISPLAY_PAGE = "project_display";
     private Logger LOG = new Logger();
 
@@ -30,9 +32,9 @@ public class AutodockVinaPortlet extends GenericPortlet {
     // Handle job form submission
     @ProcessAction(name = "submitJobForm")
     public void handleSubmitJobForm(ActionRequest formParameters, ActionResponse response) {
-        String userId = formParameters.getRemoteUser();
+    	LOG.log("submitJobForm");
         
-        FormSubmitter submit = new FormSubmitter(userId);
+        FormSubmitter submit = new FormSubmitter();
         
         boolean success = submit.saveForm(formParameters);
         
@@ -46,6 +48,27 @@ public class AutodockVinaPortlet extends GenericPortlet {
             // Redirect to project display page of projects in process
             response.setRenderParameter("page_type", "in_process");
             response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
+        }
+    }
+    
+    // Handle user setup form submission
+    @ProcessAction(name = "submitUserSetupForm")
+    public void handleSubmitUserSetupForm(ActionRequest formParameters, ActionResponse response) {
+    	LOG.log("submitUserSetupForm");
+    	
+    	FormSubmitter submit = new FormSubmitter();
+    	
+    	boolean success = submit.setupUser(formParameters);
+    	
+    	if (!success) {
+    		// Set errors and reload form page
+    		response.setRenderParameter("form_errors", submit.getErrors());
+    		response.setRenderParameter("nextJSP", USER_SETUP_PAGE);
+    		
+    		LOG.log(submit.getErrors());
+    	} else {
+            // Redirect to job submission page
+            response.setRenderParameter("nextJSP", NEW_JOB_PAGE);
         }
     }
 
@@ -73,7 +96,19 @@ public class AutodockVinaPortlet extends GenericPortlet {
             
             // If no page is set load the new job page
             if (nextJSP == null) {
-                nextJSP = NEW_JOB_PAGE;
+        		nextJSP = NEW_JOB_PAGE;
+            }
+            
+            if (nextJSP.equals(NEW_JOB_PAGE)) {
+            	LOG.log("checking user");
+            	
+            	FormSubmitter submit = new FormSubmitter();
+            	
+            	if (!submit.checkUser(request.getRemoteUser())) {
+            		LOG.log("loading user setup page");
+            		
+            		nextJSP = USER_SETUP_PAGE;
+            	}
             }
 
             // Load new JSP page
@@ -87,7 +122,9 @@ public class AutodockVinaPortlet extends GenericPortlet {
     
     // Handle ajax calls
     @Override
-    public void serveResource(ResourceRequest ajaxParameters, ResourceResponse response) throws PortletException {        
+    public void serveResource(ResourceRequest ajaxParameters, ResourceResponse response) throws PortletException {
+    	LOG.log("serveResource");
+    	
         AjaxDispatcher dispatch = new AjaxDispatcher();
         
         // Init ajax

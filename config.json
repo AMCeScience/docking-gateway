@@ -18,5 +18,6 @@
     "output_file_ligands_ext": ".tar.gz",
     "unzip_location": "unzipped",
     "autodock_name": "Autodock",
-    "pilot_ligand_count": 15
+    "pilot_ligand_count": 15,
+    "is_dev": true
 }

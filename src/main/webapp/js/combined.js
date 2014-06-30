@@ -1,3 +1,7 @@
+function user_setup() {
+	
+}
+
 function new_job() {
     function libraryInit() {
         // Click the dropdown button on a library
@@ -43,6 +47,43 @@ function new_job() {
     log("getLigands call for new job page");
 
     getLigands(ajaxContinue);
+}
+
+
+function user_setup_submit() {
+	$('.form_errors').hide();
+	$('.form_errors').html('');
+
+	var prev_errs = [];
+	
+    $('.new_job').validate({
+    	errorPlacement: function(error, element) {
+    		var err_text = error.text();
+    		
+    		if (err_text === 'This field is required.') {
+				err_text = 'Please fill out the required fields.';
+			}
+    		
+    		// only add errors one time
+    		if ($.inArray(err_text, prev_errs) === -1) {
+    			$('.form_errors').append(err_text + '<br/>');
+    		}
+			
+			prev_errs.push(err_text);
+    	},
+    	invalidHandler: function() {
+    		log('invalid');
+    		prev_errs = [];
+    		$('.form_errors').show();
+    	},
+    	submitHandler: function(form) {
+    		log('valid');
+    		
+    		form.submit();
+    	}
+	});
+    
+    $('.user_setup').submit();
 }
 
 function new_job_submit() {

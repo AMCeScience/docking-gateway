@@ -7,7 +7,7 @@ The Docking Gateway is a Liferay portlet aimed to work together with gUSE/WSPGRA
 
 Requirements
 ------------
-* gUSE/WSPGRADE 3.6.1 or later
+* Liferay 6.1.0
 * UMD2/3 middleware: gLite, MyProxy, lcg_utils, ...
 * XNAT 1.6
 * MySQL 5.1

@@ -42,6 +42,68 @@ Configuring Liferay
 2. Choose one of the Liferay sites and create a new page
 3. Insert a `autodock` porlet in the new page
 
+WebDAV and Liferay Authentication
+---------------------------------
+For a local deployment where the WebDAV repository and Liferay instance run on the same machine, WebDAV relies on the Liferay user credentials for athentication. Also, two different WebDAV context are provided:
+* a publicly available  WebDAV context, the one users can access from their browsers
+* a private one only reachable from localhost for internal communication between the portlet and WebDAV repository
+
+The proposed authentiation scheme is based on `mod_auth_mysql` and Apache >=2.2 server. The Apache configuration is as follows:
+```
+# public WebDAV context
+Alias /webdav "path/repository"
+# private localhost-only WebDAV context
+Alias /webdav-curl "path/repository"
+
+# WebDAV configuration
+<Location /webdav>
+        DAV On
+        AuthBasicAuthoritative Off
+        AuthUserFile /dev/null
+        AuthMySQLEnable On
+        AuthName "webdav"
+        AuthType Basic
+        AuthMySQLHost localhost
+        AuthMySQLUser liferay
+        AuthMySQLPassword liferay.password
+        AuthMySQLDB liferay
+        AuthMySQLUserTable User_
+        AuthMySQLNameField emailAddress
+        AuthMySQLPasswordField password_
+        AuthMySQLNoPasswd Off
+        AuthMySQLPwEncryption sha1
+        AuthMySQLAuthoritative On
+        require valid-user
+</Location>
+
+
+# WebDAV configuration, local context
+<Location /webdav>
+        DAV On
+        AuthBasicAuthoritative Off
+        AuthUserFile /dev/null
+        AuthMySQLEnable On
+        AuthName "webdav"
+        AuthType Basic
+        AuthMySQLHost localhost
+        AuthMySQLUser liferay
+        AuthMySQLPassword liferay.password
+        AuthMySQLDB liferay
+        AuthMySQLUserTable User_
+        AuthMySQLNameField emailAddress
+        AuthMySQLPasswordField password_
+        AuthMySQLNoPasswd Off
+        AuthMySQLPwEncryption sha1
+        AuthMySQLAuthoritative On
+        require valid-user
+</Location>
+```
+To make possible for `mod_auth_mysql` module to authenticate against Liferay User database, it is required to change the hasshing algorithm and encoding used by default by Liferay. The above authentication scheme would require the following options on `$HOMELIFERAY/porta-ext.properties`:
+```
+passwords.encryption.algorithm=SHA
+passwords.digest.encoding=hex
+```
+
 Further configuration
 ---------------------
 1. Create a folder inside the webapp directory of apache the default name is `autodock_files`

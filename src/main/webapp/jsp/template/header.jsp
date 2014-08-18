@@ -32,8 +32,9 @@
 <html>
     <head>
         <!-- load CSS files -->
-        <link href="${pageContext.request.contextPath}/css/styles.css?v=169" rel="stylesheet" type="text/css"/>
-        <link href="${pageContext.request.contextPath}/css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/styles.css?v=173" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
         
         <!-- load javascript libraries -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/logger.js"></script>

@@ -25,3 +25,4 @@
 </div>
 
 <jsp:include page="/jsp/template/footer.jsp" />
+<jsp:include page="/jsp/template/dialog.jsp" />

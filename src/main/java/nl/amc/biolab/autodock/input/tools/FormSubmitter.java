@@ -12,15 +12,16 @@ import javax.portlet.ActionRequest;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.input.objects.Configuration;
+import nl.amc.biolab.autodock.input.objects.JobSubmission;
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.input.objects.Receptor;
-import nl.amc.biolab.autodock.input.objects.JobSubmission;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
+import nl.amc.biolab.nsgdm.Application;
 import nl.amc.biolab.nsgdm.DataElement;
 import nl.amc.biolab.nsgdm.Project;
 import nl.amc.biolab.nsgdm.Resource;
 import nl.amc.biolab.nsgdm.User;
-import nl.amc.biolab.persistencemanager.PersistenceManager;
+import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -30,10 +31,10 @@ import org.apache.commons.io.FileUtils;
 
 public class FormSubmitter extends VarConfig {
     private String ERRORS = "";
-    private PersistenceManager PERSISTENCE;
+    private PersistenceManagerPlugin PERSISTENCE;
     
     public FormSubmitter() {
-        _setDb(new PersistenceManager());
+        _setDb(new PersistenceManagerPlugin());
         
         _getDb().init();
     }
@@ -50,17 +51,6 @@ public class FormSubmitter extends VarConfig {
         } catch(IOException e) {
             log.log(e);
         }
-    }
-    
-    public boolean checkUser(String liferayUserId) {
-    	return _getDb().checkUserAuth(liferayUserId);
-    }
-    
-    public boolean setupUser(String liferayUserId) {
-    	// Setup app hook
-    	_getDb().initApp();
-    	
-    	return _getDb().userSetup(liferayUserId);
     }
     
     public boolean saveForm(ActionRequest formParameters) {
@@ -157,15 +147,11 @@ public class FormSubmitter extends VarConfig {
                 if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
 	                job.setPilotLigandsUri(config.getUri(job.getProjectName(), config.getPilotLigandsZipFileName()));
 	                job.setPilotLigandsCount(ligands.getPilotCount());
+	                job.setPilot(true);
                 }
                 
                 job.setReceptorUri(config.getUri(job.getProjectName(), config.getReceptorFileName()));
                 job.setConfigurationUri(config.getUri(job.getProjectName(), config.getConfigFileName()));
-                
-                // Do this as the last step because from now on the JobSubmission will return the project name with "_pilot" addition
-                if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
-                	job.setPilot(true);
-                }
                 
                 job.setUser(catalogUser);
                 
@@ -204,7 +190,12 @@ public class FormSubmitter extends VarConfig {
     }
     
     private Project _saveProject(JobSubmission job) {
-        Project project = _getDb().storeProject(job.getProjectName(), job.getProjectDescription(), job.getUser());
+    	// Create list of apps used
+    	ArrayList<Application> apps = new ArrayList<Application>();
+    	// Add autodock app
+    	apps.add(_getDb().getApplicationByName(config.getAutodockName()));
+    	
+        Project project = _getDb().storeProject(job.getProjectName(), job.isPilot(), job.getProjectDescription(), job.getUser(), apps);
         
         return project;
     }
@@ -282,7 +273,6 @@ public class FormSubmitter extends VarConfig {
         		_getDb().getApplicationByName(config.getAutodockName()).getDbId(), 
         		submits, 
         		job.getUser().getDbId(), 
-        		job.getUser().getLiferayID(), 
         		job.getProject().getDescription());
     }
     
@@ -322,12 +312,11 @@ public class FormSubmitter extends VarConfig {
         return ERRORS;
     }
     
-    private void _setDb(PersistenceManager persistence) {
+    private void _setDb(PersistenceManagerPlugin persistence) {
         PERSISTENCE = persistence;
     }
     
-    private PersistenceManager _getDb() {
+    private PersistenceManagerPlugin _getDb() {
         return PERSISTENCE;
     }
-    
 }

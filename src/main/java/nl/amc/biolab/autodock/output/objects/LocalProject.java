@@ -1,10 +1,11 @@
 package nl.amc.biolab.autodock.output.objects;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+
+import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.output.tools.ProjectOutput;
 import nl.amc.biolab.nsgdm.DataElement;
 import nl.amc.biolab.nsgdm.Processing;
@@ -13,6 +14,7 @@ import nl.amc.biolab.nsgdm.Submission;
 import nl.amc.biolab.nsgdm.SubmissionIO;
 
 /**
+ * Takes the nsgdm objects and creates object with more complete data
  *
  * @author Allard
  */
@@ -22,222 +24,262 @@ public class LocalProject extends VarConfig {
     private String NAME = "";
     private String DESCRIPTION = "";
     private String OWNER = "";
+    private String APPLICATION = "";
+    private String OVERALL_STATUS = "";
     
     // Processing items
     private Long PROCESSING_ID = null;
     private Date DATE = null;
     
-    // TODO: provenance
-    private int PROVENANCE_COUNT = 0;
-    
     // Submission items
-    private Submission SUBMISSION;
-    private String STATUS = "";
+    private ArrayList<HashMap<String, Object>> SUBMISSIONS = new ArrayList<HashMap<String, Object>>();
+    private ArrayList<HashMap<String, Object>> SUBMISSIONIOS = new ArrayList<HashMap<String, Object>>();
     
-    // SubmissionIO items
-    private final Collection<SubmissionIO> SUBMISSIONIO;
+    // Extra items
+    private int COMPOUND_COUNT = 0;
+    private int PROVENANCE_COUNT = 0;
+    private DataElement OUTPUT;
     
-    // DataElements
-    private final Collection<DataElement> INPUT;
-    private final Collection<DataElement> OUTPUT;
+    private boolean FULLREPORT = false;
     
-    public LocalProject() {
-        SUBMISSIONIO = new ArrayList<SubmissionIO>();
-        INPUT = new ArrayList<DataElement>();
-        OUTPUT = new ArrayList<DataElement>();
+    /**
+     * Constructor takes Project and Processing as input and initiates the data formatting
+     * @param project Project class from nsgdm
+     * @param processing Processing class from nsgdm
+     * @param full_report Whether or not if we want to get the Project and Processing classes with additionally the Submission, SubmissionIO, and DataElement class
+     */
+    public LocalProject(Project project, Processing processing, boolean full_report) {
+    	_setFullReport(full_report);
+    	
+    	_initProject(project, processing);
     }
     
-    public void initProject(Project project, Processing processing) {
-        /*
-            processing
-            date
-            
-            project
-            name, description, owner
+    /**
+     * Sets the class variables for Project, Processing, Submission, SubmissionIO, and DataElement 
+     * @param project Project class from nsgdm
+     * @param processing Processing class from nsgdm
+     */
+    private void _initProject(Project project, Processing processing) {
+        _setID(project.getDbId());
+        _setName(project.getName());
+        _setDescription(project.getDescription());
+        _setOwner(project.getOwner());
         
-            submission
-            status
+        _setProcessingID(processing.getDbId());
+        _setProjectStatus(processing.getStatus());
+        _setDateStarted(processing.getDate());
+        _setApplication(processing.getApplication().getName());
         
-            submissionIO
-            compound_count, collection of inputs, collection of outputs
-        
-            TODO: provenance
-        */
-        
-        setID(project.getDbId());
-        setName(project.getName());
-        setDescription(project.getDescription());
-        setOwner(project.getOwner());
-        
-        setProcessingID(processing.getDbId());
-        setDateStarted(processing.getDate());
-        // Get first submission, in our use case there is only one submission per processing
-        setSubmission(processing.getSubmissions().iterator().next());
-        setStatus(getSubmission().getStatus());
-        
-        for (SubmissionIO subIO : getSubmission().getSubmissionIOs()) {
-            setSubmissionIO(subIO);
-            
-            log.log(subIO);
-            
-            if (subIO.getType().equals("Input")) {
-                setInput(subIO.getDataElement());
-            } else if (subIO.getType().equals("Output")) {
-                setOutput(subIO.getDataElement());
-            }
+        if (_getFullReport()) {
+	        // Get submissions for this project + processing
+	        for(Submission sub : processing.getSubmissions()) {
+	        	// Clear IO variable
+	        	_resetSubmissionIOs();
+	        	
+	        	// Get submissionIOs
+	        	for (SubmissionIO subIO : sub.getSubmissionIOs()) {
+	        		// Set IOs
+	        		_setSubmissionIO(subIO);
+	            }
+	        	
+	        	// Set submission
+	        	_setSubmission(sub);
+	        }
         }
     }
-            
+         
+    /**
+     * Outputs the class variables as LinkedHashMap formatted for use at the client side
+     * @return LinkedHashMap of project data
+     */
     public LinkedHashMap<String, Object> getProjectMap() {
         LinkedHashMap<String, Object> project = new LinkedHashMap<String, Object>();
-        LinkedHashMap<Object, Object> inputs;
         
-        project.put("project_id", getID());
-        project.put("project_name", getName());
-        project.put("description", getDescription());
-        project.put("user", getOwner());
+        project.put("project_id", _getID());
+        project.put("project_name", _getName());
+        project.put("description", _getDescription());
+        project.put("user", _getOwner());
+        project.put("application", _getApplication());
         
-        project.put("processing_id", getProcessingID());
-        project.put("date_started", getDateStarted().toString());
-        project.put("latest_status", getStatus());
+        project.put("processing_id", _getProcessingID());
+        project.put("overall_status", _getProjectStatus());
+        project.put("date_started", _getDateStarted().toString());
         
-        inputs = getDataElementMap(getInput(), "input");
-        
-        if (!inputs.isEmpty()) {
-            project.put("inputs", inputs);
+        if (_getFullReport()) {
+		    project.put("submissions", _getSubmissions());
+		    
+		    project.put("compound_count", _getCompoundCount());
+		    project.put("provenance_count", _getProvenanceCount());
+		    
+		    if (_getOutput() != null) {
+		    	ProjectOutput output = new ProjectOutput();
+		    	
+		    	output.initOutput(_getName());
+		    	
+		    	project.put("output", output.getMap());
+		    }
         }
-        
-        if (!getOutput().isEmpty()) {
-            ProjectOutput output = new ProjectOutput();
-            
-            output.initOutput(getName());
-            
-            project.put("output", output.getMap());
-        }
-        
-        project.put("provenance_count", getProvenanceCount());
         
         return project;
     }
     
-    private LinkedHashMap<Object, Object> getDataElementMap(Collection<DataElement> rawData, String type) {
-        LinkedHashMap<String, String> dataElement;
-        LinkedHashMap<Object, Object> dataElements = new LinkedHashMap<Object, Object>();
-        int count = 0;
-        
-        for (DataElement singleData : rawData) {
-            dataElement = new LinkedHashMap<String, String>();
-            
-            dataElement.put("name", singleData.getName());
-            dataElement.put("scan_id", singleData.getScanID());
-            dataElement.put("subject", singleData.getSubject());
-            dataElement.put("type", singleData.getType());
-            dataElement.put("format", singleData.getFormat());
-            
-            dataElements.put(++count, dataElement);
-        }
-        
-        return dataElements;
+    /**
+     * Get the data map for DataElement objects
+     * @param dataEl DataElement from nsgdm
+     * @return HashMap of DataElement data
+     */
+    private HashMap<String, Object> _getDataElementMap(DataElement dataEl) {
+    	HashMap<String, Object> dataMap = new HashMap<String, Object>();
+    	
+    	dataMap.put("name", dataEl.getName());
+    	dataMap.put("scan_id", dataEl.getScanID());
+    	dataMap.put("uri", dataEl.getURI());
+    	dataMap.put("subject", dataEl.getSubject());
+    	dataMap.put("type", dataEl.getType());
+    	dataMap.put("format", dataEl.getFormat());
+    	dataMap.put("date", (dataEl.getDate() != null ? dataEl.getDate().toString() : ""));
+    	dataMap.put("size", dataEl.getSize());
+    	
+    	if (dataEl.getScanID() != null) {
+    		_setCompoundCount(Integer.parseInt(dataEl.getScanID()));
+    	}
+    	
+    	return dataMap;
     }
     
-    public Long getID() {
+    /* ###################################################################### */
+    /* # 				CLASS VARIABLE GETTERS AND SETTERS 					# */
+    /* ###################################################################### */
+    
+    private void _setOutput(DataElement output) {
+    	OUTPUT = output;
+    }
+    
+    private DataElement _getOutput() {
+    	return OUTPUT;
+    }
+    
+    private Long _getID() {
         return ID;
     }
     
-    public void setID(Long id) {
+    private void _setID(Long id) {
         this.ID = id;
     }
 
-    public Long getProcessingID() {
+    private Long _getProcessingID() {
         return PROCESSING_ID;
     }
     
-    public void setProcessingID(Long id) {
+    private void _setProcessingID(Long id) {
         this.PROCESSING_ID = id;
     }
     
-    public String getName() {
+    private String _getApplication() {
+    	return APPLICATION;
+    }
+    
+    private void _setApplication(String app) {
+		APPLICATION += app.toString();
+    }
+    
+    private String _getName() {
         return NAME;
     }
 
-    public void setName(String name) {
+    private void _setName(String name) {
         this.NAME = name;
     }
 
-    public Date getDateStarted() {
+    private Date _getDateStarted() {
         return DATE;
     }
 
-    public void setDateStarted(Date date) {
+    private void _setDateStarted(Date date) {
         this.DATE = date;
     }
 
-    public String getDescription() {
+    private String _getDescription() {
         return DESCRIPTION;
     }
 
-    public void setDescription(String description) {
+    private void _setDescription(String description) {
         this.DESCRIPTION = description;
     }
-
-    public Collection<DataElement> getInput() {
-        return INPUT;
-    }
-
-    public void setInput(DataElement input) {
-        this.INPUT.add(input);
-    }
-
-    public String getStatus() {
-        // Check if status contains a number at the beginning and cut it from the string
-        if(STATUS.charAt(0) >= '0' && STATUS.charAt(0) <= '9') {
-            return STATUS.substring(2, STATUS.length());
-        }
-        
-        return STATUS;
-    }
-
-    public void setStatus(String status) {
-        this.STATUS = status;
-    }
-
-    public Collection<DataElement> getOutput() {
-        return OUTPUT;
-    }
-
-    public void setOutput(DataElement output) {
-        this.OUTPUT.add(output);
-    }
     
-    public String getOwner() {
+    private String _getOwner() {
         return OWNER;
     }
 
-    public void setOwner(String owner) {
+    private void _setOwner(String owner) {
         this.OWNER = owner;
     }
-
-    public int getProvenanceCount() {
-        return PROVENANCE_COUNT;
-    }
-
-    public void setProvenanceCount(int provenance_count) {
-        this.PROVENANCE_COUNT = provenance_count;
+    
+    private String _getProjectStatus() {
+    	return OVERALL_STATUS;
     }
     
-    public Collection<SubmissionIO> getSubmissionIO() {
-        return SUBMISSIONIO;
+    private void _setProjectStatus(String status) {
+    	this.OVERALL_STATUS += " " + status;
     }
     
-    public void setSubmissionIO(SubmissionIO submission) {
-        this.SUBMISSIONIO.add(submission);
+    private ArrayList<HashMap<String, Object>> _getSubmissions() {
+    	return SUBMISSIONS;
     }
     
-    public Submission getSubmission() {
-        return SUBMISSION;
+    private void _setSubmissionIO(SubmissionIO subIO) {
+    	HashMap<String, Object> IOMap = new HashMap<String, Object>();
+    	
+    	IOMap.put("type", subIO.getType());
+    	IOMap.put("data_element", _getDataElementMap(subIO.getDataElement()));
+    	
+    	if (subIO.getType().equals("Output")) {
+    		_setOutput(subIO.getDataElement());
+    	}
+    	
+    	SUBMISSIONIOS.add(IOMap);
     }
     
-    public void setSubmission(Submission submission) {
-        this.SUBMISSION = submission;
+    private void _resetSubmissionIOs() {
+    	SUBMISSIONIOS = new ArrayList<HashMap<String, Object>>();
+    }
+    
+    private ArrayList<HashMap<String, Object>> _getSubmissionIOs() {
+    	return SUBMISSIONIOS;
+    }
+    
+    private void _setSubmission(Submission submission) {
+    	HashMap<String, Object> local = new HashMap<String, Object>();
+    	
+    	local.put("submission_id", submission.getDbId());
+    	local.put("status", submission.getStatus());
+    	local.put("submission", submission.getName());
+    	local.put("submissionIO", _getSubmissionIOs());
+    	
+    	SUBMISSIONS.add(local);
+    }
+    
+    private void _setFullReport(boolean report) {
+    	FULLREPORT = report;
+    }
+    
+    private boolean _getFullReport() {
+    	return FULLREPORT;
+    }
+    
+    private void _setCompoundCount(int count) {
+    	COMPOUND_COUNT = count;
+    }
+    
+    private int _getCompoundCount() {
+    	return COMPOUND_COUNT;
+    }
+    
+    private void _setProvenanceCount(int count) {
+    	PROVENANCE_COUNT = count;
+    }
+    
+    private int _getProvenanceCount() {
+    	return PROVENANCE_COUNT;
     }
 }

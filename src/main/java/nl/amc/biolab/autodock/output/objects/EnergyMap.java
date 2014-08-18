@@ -75,8 +75,6 @@ public class EnergyMap extends VarConfig {
     }
     
     private void _addRow(String name, String[] row) {
-        //Joiner commaJoiner = Joiner.on(",").skipNulls();
-        
         ENERGY_MAP.put(name, row[0]);
         
         ArrayList<String> tick = new ArrayList<String>();
@@ -85,18 +83,5 @@ public class EnergyMap extends VarConfig {
         tick.add(row[0]);
         
         ENERGY_LIST.add(tick);
-        
-//        ArrayList xPoint = new ArrayList();
-//        
-//        xPoint.add(getLigandCount());
-//        xPoint.add(name);
-//        
-//        X_TICKS.add(xPoint);
-//        
-//        ArrayList yPoint = new ArrayList();
-//        
-//        yPoint.add(row[0]);
-//        
-//        Y_TICKS.add(yPoint);
     }
 }

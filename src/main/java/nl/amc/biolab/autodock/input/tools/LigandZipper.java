@@ -18,10 +18,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- * @author Allard van Altena
- */
 public class LigandZipper extends VarConfig {
     public LigandZipper() {}
     
@@ -38,7 +34,6 @@ public class LigandZipper extends VarConfig {
             
             boolean isPilot = formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1") ? true : false;
             int pilotLigandCount = config.getPilotLigandCount();
-            int ligandsWritten = 0;
             
             // Create streams
             String zipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getLigandsZipFileName();
@@ -60,7 +55,7 @@ public class LigandZipper extends VarConfig {
                 
                 zip.putNextEntry(new ZipEntry(fileName));
                 
-                if (isPilot && ligandsWritten <= pilotLigandCount) {
+                if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
                 	pilotZip.putNextEntry(new ZipEntry(fileName));
                 }
                 
@@ -71,7 +66,7 @@ public class LigandZipper extends VarConfig {
                 while((length = fin.read(b)) > 0) {
                     zip.write(b, 0, length);
                     
-                    if (isPilot && ligandsWritten <= pilotLigandCount) {
+                    if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
                     	pilotZip.write(b, 0, length);
                     }
                 }
@@ -80,15 +75,13 @@ public class LigandZipper extends VarConfig {
                 
                 zip.closeEntry();
                 
-                if (isPilot && ligandsWritten <= pilotLigandCount) {
+                if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
                 	ligandsObj.addPilotCount();
                 	
                 	pilotZip.closeEntry();
                 }
                 
                 fin.close();
-                
-                ligandsWritten++;
             }
 
             zip.close();

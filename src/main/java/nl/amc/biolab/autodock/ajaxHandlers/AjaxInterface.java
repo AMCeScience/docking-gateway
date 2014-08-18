@@ -1,8 +1,10 @@
 package nl.amc.biolab.autodock.ajaxHandlers;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import java.util.LinkedHashMap;
-import nl.amc.biolab.persistencemanager.PersistenceManager;
+
+import nl.amc.biolab.autodock.constants.VarConfig;
+import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
+import nl.amc.biolab.persistencemanager.SQLBuilderPlugin;
 
 /**
  * Interface class for all the ajax requests.
@@ -13,7 +15,8 @@ import nl.amc.biolab.persistencemanager.PersistenceManager;
 public abstract class AjaxInterface extends VarConfig {
     private JSONOutput JSONOBJ;
     private LinkedHashMap<String, String> PARAMS;
-    private PersistenceManager PERSISTENCE;
+    private PersistenceManagerPlugin PERSISTENCE;
+    private SQLBuilderPlugin SQLBUILDER;
     
     /**
      * Init function where the parameters for this ajax request and the response object are set.
@@ -21,11 +24,12 @@ public abstract class AjaxInterface extends VarConfig {
      * @param response JSONOutput object where we can write the response to.
      */
     public void init(LinkedHashMap<String, String> params, JSONOutput response) {
-        log.log("Init ajaxInterface.");
+        log("Init ajaxInterface");
         
         // Get new object of the persistence manager
-        _setPersistence(new PersistenceManager());
-        
+        _setPersistence(new PersistenceManagerPlugin());
+        _setSQLBuilder(new SQLBuilderPlugin());
+
         // Open a session
         _getPersistence().init();
         
@@ -34,12 +38,8 @@ public abstract class AjaxInterface extends VarConfig {
         
         // Call the _run function, this is overridden in the instantiated class of this interface
         _run();
-    }
-    
-    /**
-     * Closes the persistence manager session.
-     */
-    protected void close() {
+        
+        // Close the session
         _getPersistence().shutdown();
     }
     
@@ -53,8 +53,6 @@ public abstract class AjaxInterface extends VarConfig {
      * @return Boolean whether the response function was successful
      */
     public boolean getResponse() {
-        close();
-        
         return _getJSONObj().echo();
     }
     
@@ -67,15 +65,23 @@ public abstract class AjaxInterface extends VarConfig {
     }
     
     /**
+     * Add one parameter to the parameter map
+     * @param key String value of the key for this param
+     * @param value String value of the value for this param
+     */
+    protected void _addParam(String key, String value) {
+    	if (!PARAMS.isEmpty()) {
+    		PARAMS.put(key, value);
+    	}
+    }
+    
+    /**
      * Get a parameter from the parameter map.
      * @param key String of the item we are looking for in the parameter map.
      * @return Returns the value belonging to the key as a String or null if there is no such key.
      */
     protected String _getSearchTermEntry(String key) {
-        log.log("sent parameters: " + _getParams());
-        
         if (_getParams().containsKey(key) && _getParams().get(key).toString().length() != 0) {
-            log.log("_getEntry returns: " + _getParams().get(key).toString());
             return _getParams().get(key).toString();
         }
         
@@ -110,7 +116,7 @@ public abstract class AjaxInterface extends VarConfig {
      * Set the persistence manager class variable.
      * @param persist PersistenceManager object.
      */
-    protected void _setPersistence(PersistenceManager persist) {
+    protected void _setPersistence(PersistenceManagerPlugin persist) {
         PERSISTENCE = persist;
     }
     
@@ -118,7 +124,23 @@ public abstract class AjaxInterface extends VarConfig {
      * Get the persistence manager object.
      * @return PersistenceManager object.
      */
-    protected PersistenceManager _getPersistence() {
+    protected PersistenceManagerPlugin _getPersistence() {
         return PERSISTENCE;
+    }
+    
+    /**
+     * Set the sql builder class variable.
+     * @param sqlBuilder SQLBuilderPlugin object.
+     */
+    protected void _setSQLBuilder(SQLBuilderPlugin sqlBuilder) {
+    	SQLBUILDER = sqlBuilder;
+    }
+    
+    /**
+     * Get the sql builder object.
+     * @return SQLBuilder object.
+     */
+    protected SQLBuilderPlugin _getSQLBuilder() {
+    	return SQLBUILDER;
     }
 }

@@ -7,7 +7,6 @@ import javax.portlet.ActionResponse;
 import javax.portlet.GenericPortlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.PortletSession;
 import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -16,6 +15,7 @@ import javax.portlet.ResourceResponse;
 
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxDispatcher;
 import nl.amc.biolab.autodock.input.tools.FormSubmitter;
+import nl.amc.biolab.autodock.input.tools.UserConfigurator;
 import crappy.logger.Logger;
 
 /**
@@ -80,13 +80,16 @@ public class AutodockVinaPortlet extends GenericPortlet {
             if (nextJSP.equals(NEW_JOB_PAGE)) {
             	LOG.log("checking user");
             	
-            	FormSubmitter submit = new FormSubmitter();
+            	UserConfigurator userConfig = new UserConfigurator();
             	
-            	if (!submit.checkUser(request.getRemoteUser())) {
+            	if (!userConfig.checkUser(request.getRemoteUser())) {
             		LOG.log("user setup");
             		
-            		submit.setupUser(request.getRemoteUser());
+            		userConfig.setupUser(request.getRemoteUser());
             	}
+            	
+            	// Close db session
+            	userConfig.close();
             }
 
             // Load new JSP page

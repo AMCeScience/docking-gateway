@@ -171,4 +171,24 @@ public class VarConfig extends Logger {
     public int getPilotLigandCount() {
     	return new Integer(_getItem("pilot_ligand_count"));
     }
+    
+    public int getItemsPerPage() {
+    	return new Integer(_getItem("items_per_page"));
+    }
+    
+    /**
+     * Get formatted database connection url
+     * @return Formatted database connection url
+     */
+    public String getDbConnectionUrl() {
+    	return "jdbc:mysql://" + _getItem("db_url") + ":" + _getItem("db_port") + "/" + _getItem("db_scheme") + "?user=" + _getItem("db_user") + "&password=" + _getItem("db_password");
+    }
+    
+    /**
+     * Get formatted database connection url
+     * @return Formatted database connection url
+     */
+    public String getLiferayDbConnectionUrl() {
+    	return "jdbc:mysql://" + _getItem("db_url") + ":" + _getItem("db_port") + "/" + _getItem("liferay_db_scheme") + "?user=" + _getItem("db_user") + "&password=" + _getItem("db_password");
+    }
 }

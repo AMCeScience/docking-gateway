@@ -1,28 +1,37 @@
-function doSearch(dataArr, successFunc) {
+function do_search(dataArr, successFunc) {
     log('getProjectsAjax function running');
     
-    ajaxCall(dataArr, successFunc, $('body').data('ajax-urls').searchUrl, "POST", false);
+    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').searchUrl, "POST", false);
 }
 
 function getLigands(successFunc) {
     log('getLigands function running');
 
-    ajaxCall(null, successFunc, $('body').data('ajax-urls').ligandsUrl, "GET", true);
+    ajax_call(null, successFunc, $('body').data('ajax-urls').ligandsUrl, "GET", true);
 }
 
 function updateStatus(dataArr, successFunc) {
     log('updateStatus function running');
 
-    ajaxCall(dataArr, successFunc, $('body').data('ajax-urls').updateStatusUrl, "POST", false);
+    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').updateStatusUrl, "POST", false);
 }
 
 function downloadOutput(dataArr, successFunc) {
     log('downloadOutput function running');
     
-    ajaxCall(dataArr, successFunc, $('body').data('ajax-urls').downloadOutputUrl, "POST", false);
+    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').downloadOutputUrl, "POST", false);
 }
 
-function ajaxCall(dataIn, successFunc, urlIn, typeIn, cacheIn) {
+function get_details(dataArr, success_func) {
+    log('getDetails function running');
+
+    ajax_call(dataArr, success_func, $('body').data('ajax-urls').getDetailsUrl, "GET", false);
+}
+
+function ajax_call(dataIn, successFunc, urlIn, typeIn, cacheIn) {
+	log('ajax data:');
+	log(dataIn);
+	
     $.ajax({
         type: typeIn,
         dataType: "json",

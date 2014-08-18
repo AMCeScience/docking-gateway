@@ -12,7 +12,6 @@
         <div class="fourth_col">
             <label for="date_started">Date Started</label>
             <select name="date_started">
-                <option value="default">Select</option>
                 <option value="descending">Descending</option>
                 <option value="ascending">Ascending</option>
             </select>
@@ -21,7 +20,6 @@
         <div class="fourth_col">
             <label for="project_name">Project Name</label>
             <select name="project_name">
-                <option value="default">Select</option>
                 <option value="descending">Descending</option>
                 <option value="ascending">Ascending</option>
             </select>
@@ -35,8 +33,9 @@
                     <option value="in preparation">In Preparation</option>
                     <option value="in progress">In Progress</option>
                     <option value="on hold">On Hold</option>
-                    <option value="done">Done</option>
+                    <!--<option value="done">Done</option>
                     <option value="failed">Failed</option>
+                    <option value="aborted">Aborted</option>-->
                 </select>
             </div>
         <% } %>

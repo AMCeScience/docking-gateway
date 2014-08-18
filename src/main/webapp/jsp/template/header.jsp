@@ -21,10 +21,11 @@
 </portlet:actionURL>
 
 <% // Ajax url declarations %>
-<portlet:resourceURL var="ajaxSearchUrl" id="doSearch"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxUpdateStatusUrl" id="updateStatus"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxLigandsUrl" id="getLigands"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxDownloadOutputUrl" id="doDownload"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxSearchUrl" id="SearchProjects"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxUpdateStatusUrl" id="StatusUpdaterAjax"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxGetDetailsUrl" id="SubmissionDetails"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxLigandsUrl" id="LigandCollector"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxDownloadOutputUrl" id="Downloader"></portlet:resourceURL>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -50,16 +51,18 @@
             $('body').data('ajax-urls', {
                 "searchUrl": "<%= ajaxSearchUrl %>",
                 "updateStatusUrl": "<%= ajaxUpdateStatusUrl %>",
+                "getDetailsUrl": "<%= ajaxGetDetailsUrl %>",
                 "ligandsUrl": "<%= ajaxLigandsUrl %>",
                 "downloadOutputUrl": "<%= ajaxDownloadOutputUrl %>"
             });
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=156"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=109"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=220"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=107"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=160"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=113"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=109"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=225"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=116"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

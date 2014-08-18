@@ -22,10 +22,6 @@ public class JobSubmission {
 	private Project project;
 	
 	public String getProjectName() {
-		if (this.isPilot()) {
-			return projectName + "_pilot";
-		}
-		
 		return projectName;
 	}
 	

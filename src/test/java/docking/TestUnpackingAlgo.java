@@ -1,24 +1,14 @@
 package docking;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 /**
@@ -29,7 +19,7 @@ import org.junit.Test;
  */
 public class TestUnpackingAlgo {
 	// Try unpacking 10000 files
-	private int fileCountMax = 80000;
+	//private int fileCountMax = 80000;
 	
 	@Test 
 	public void testTar() {

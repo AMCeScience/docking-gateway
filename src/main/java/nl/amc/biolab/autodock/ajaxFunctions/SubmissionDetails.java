@@ -21,7 +21,7 @@ public class SubmissionDetails extends AjaxInterface {
     	Long submissionId = new Long(_getSearchTermEntry("submission_id"));
     	
         // Get the updated status from the database
-        List<nl.amc.biolab.nsgdm.Error> errors = _getPersistence().getSubmission(submissionId).getErrors();
+        List<nl.amc.biolab.datamodel.objects.Error> errors = _getPersistence().get.submission(submissionId).getErrors();
         
         String description = "";
         String message = "";

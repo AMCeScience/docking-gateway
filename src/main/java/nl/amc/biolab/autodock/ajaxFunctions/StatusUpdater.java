@@ -15,19 +15,15 @@ public class StatusUpdater extends VarConfig {
     public String updateStatus(Long processId) {        
         ProcessingManagerClient client = new ProcessingManagerClient(config.getProcessingWSDL());
         
-        log("updating status...");
-        
         // Update the status through the processingmanager webservice
         client.updateStatus(processId);
-        
-        log("done");
         
         // Open a session
         PersistenceManagerPlugin db = new PersistenceManagerPlugin();
         db.init();
         
         // Get the updated status from the database
-        String newStatus = db.getProcessing(processId).getSubmissions().iterator().next().getStatus();
+        String newStatus = db.get.processing(processId).getSubmissions().iterator().next().getStatus();
         
         db.shutdown();
         

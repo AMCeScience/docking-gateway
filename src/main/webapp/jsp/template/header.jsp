@@ -45,8 +45,12 @@
         
         <!-- bind ajax urls to body as data, add validation methods -->
         <script type="text/javascript">
-        	$.validator.addMethod("ligandCount", function() {
+        	/*$.validator.addMethod("ligandCount", function() {
         		return $('input[name=compound_check]:checked').size() > 0;
+        	}, "Please select ligands/compounds.");*/
+        	
+        	$.validator.addMethod("ligandCount", function() {
+        		return $('input[name=library_check]:checked').size() > 0;
         	}, "Please select ligands/compounds.");
         
             $('body').data('ajax-urls', {
@@ -61,9 +65,9 @@
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=160"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=113"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=109"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=225"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=116"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=113"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=229"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=117"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

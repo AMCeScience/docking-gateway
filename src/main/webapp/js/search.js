@@ -104,9 +104,6 @@ function trigger_search(scope) {
 function init_list_search() {
     log("start quicksearch");
     
-    $('.compound_search').show();
-    $('.spinner').hide();
-    
     $("#list_search").quicksearch("ul.library_list li", {
         noResults: "div.noresults",
         loader: "span.loading"

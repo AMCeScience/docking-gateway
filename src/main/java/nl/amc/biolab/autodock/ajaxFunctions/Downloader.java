@@ -17,9 +17,9 @@ public class Downloader extends AjaxInterface {
     }
     
     private void _createDownloads() {
-        Long project_id = new Long(_getSearchTermEntry("project_id"));
+        //Long project_id = new Long(_getSearchTermEntry("project_id"));
         String project_name = _getSearchTermEntry("project_name");
-        int compound_count = new Integer(_getSearchTermEntry("compound_count"));
+        //int compound_count = new Integer(_getSearchTermEntry("compound_count"));
         
         _unpack(project_name);
         

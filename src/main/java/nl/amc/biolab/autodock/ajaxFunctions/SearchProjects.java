@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
 import nl.amc.biolab.autodock.output.objects.LocalProject;
-import nl.amc.biolab.nsgdm.Processing;
-import nl.amc.biolab.nsgdm.Project;
+import nl.amc.biolab.datamodel.objects.Processing;
+import nl.amc.biolab.datamodel.objects.Project;
 
 /**
  * Searches for projects and their data and outputs formatted json data
@@ -131,10 +131,8 @@ public class SearchProjects extends AjaxInterface {
     	SELECTS = new LinkedHashMap<String, String>();
         
         // Add selections
-        SELECTS.put("p.*", null);
-        SELECTS.put("po.*", null);
-        SELECTS.put("app.*", null);
-        SELECTS.put("CONCAT(u.FirstName, ' ', u.LastName)", "UserName");
+        SELECTS.put("{p.*}", null);
+        SELECTS.put("{po.*}", null);
     	
         int page_nr = Integer.parseInt(_getSearchTermEntry("page"));
         int items_per_page = config.getItemsPerPage(); 

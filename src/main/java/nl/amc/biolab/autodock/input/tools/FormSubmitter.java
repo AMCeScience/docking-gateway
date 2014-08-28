@@ -15,12 +15,12 @@ import nl.amc.biolab.autodock.input.objects.Configuration;
 import nl.amc.biolab.autodock.input.objects.JobSubmission;
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.input.objects.Receptor;
+import nl.amc.biolab.datamodel.objects.Application;
+import nl.amc.biolab.datamodel.objects.DataElement;
+import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.Resource;
+import nl.amc.biolab.datamodel.objects.User;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
-import nl.amc.biolab.nsgdm.Application;
-import nl.amc.biolab.nsgdm.DataElement;
-import nl.amc.biolab.nsgdm.Project;
-import nl.amc.biolab.nsgdm.Resource;
-import nl.amc.biolab.nsgdm.User;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
 import org.apache.commons.fileupload.FileItem;
@@ -69,8 +69,8 @@ public class FormSubmitter extends VarConfig {
             String liferayUserId = formParameters.getRemoteUser();
 
             // Get catalog user
-            User catalogUser = _getDb().getUser(liferayUserId);
-
+            User catalogUser = _getDb().get.user(liferayUserId);
+            
             // Check if user exists in catalog database
             if (catalogUser != null) {                
                 // Project name is set but is not unique
@@ -193,15 +193,18 @@ public class FormSubmitter extends VarConfig {
     	// Create list of apps used
     	ArrayList<Application> apps = new ArrayList<Application>();
     	// Add autodock app
-    	apps.add(_getDb().getApplicationByName(config.getAutodockName()));
+    	apps.add(_getDb().get.applicationByName(config.getAutodockName()));
     	
-        Project project = _getDb().storeProject(job.getProjectName(), job.isPilot(), job.getProjectDescription(), job.getUser(), apps);
+    	String pilot = job.isPilot() ? "true" : "false";
+    	String name = job.getUser().getFirstName() + " " + job.getUser().getLastName();
+    	
+        Project project = _getDb().get.project(_getDb().insert.project(pilot, job.getProjectName(), job.getProjectDescription(), name, apps));
         
         return project;
     }
         
     private HashMap<String, DataElement> _saveData(JobSubmission job) {
-    	Resource resource = _getDb().getResource("webdav");
+    	Resource resource = _getDb().get.resourceByName("webdav");
     	
     	Collection<Project> projects = new ArrayList<Project>();
     	
@@ -216,7 +219,7 @@ public class FormSubmitter extends VarConfig {
         String ligandsUri = job.getLigandsUri();
         String ligandsCount = job.getLigandsCount().toString();
         
-        DataElement ligands = _getDb().storeDataElement(ligandsFormat, ligandsName, ligandsUri, ligandsCount, "filler", "filler", projects, resource);
+        DataElement ligands = _getDb().get.dataElement(_getDb().insert.dataElement(ligandsName, ligandsCount, ligandsUri, "filler", "filler", ligandsFormat, 1, "", resource, projects));
         
         DataElement pilotLigands = null;
         
@@ -226,7 +229,7 @@ public class FormSubmitter extends VarConfig {
             String pilotLigandsUri = job.getPilotLigandsUri();
             String pilotLigandsCount = String.valueOf(job.getPilotLigandsCount());
             
-            pilotLigands = _getDb().storeDataElement(ligandsFormat, pilotLigandsName, pilotLigandsUri, pilotLigandsCount, "filler", "filler", projects, resource);
+            pilotLigands = _getDb().get.dataElement(_getDb().insert.dataElement(pilotLigandsName, pilotLigandsCount, pilotLigandsUri, "filler", "filler", ligandsFormat, 1, "", resource, projects));
         }
         
         // Store receptor file
@@ -234,14 +237,14 @@ public class FormSubmitter extends VarConfig {
         String receptorName = config.getReceptorFileName();
         String receptorUri = job.getReceptorUri();
         
-        DataElement receptor = _getDb().storeDataElement(receptorFormat, receptorName, receptorUri, null, "filler", "filler", projects, resource);
+        DataElement receptor = _getDb().get.dataElement(_getDb().insert.dataElement(receptorName, null, receptorUri, "filler", "filler", receptorFormat, 1, "", resource, projects));
         
         // Store configuration file
         String configFormat = config.getConfigExt();
         String configName = config.getConfigFileName();
         String configUri = job.getConfigurationUri();
         
-        DataElement configuration = _getDb().storeDataElement(configFormat, configName, configUri, null, "filler", "filler", projects, resource);
+        DataElement configuration = _getDb().get.dataElement(_getDb().insert.dataElement(configName, null, configUri, "filler", "filler", configFormat, 1, "", resource, projects));
         
         dataMap.put("ligands", ligands);
         dataMap.put("pilot_ligands", pilotLigands);
@@ -270,7 +273,7 @@ public class FormSubmitter extends VarConfig {
         
         // Submit the job through the processingmanager webservice
         client.submit(job.getProject().getDbId(), 
-        		_getDb().getApplicationByName(config.getAutodockName()).getDbId(), 
+        		_getDb().get.applicationByName(config.getAutodockName()).getDbId(), 
         		submits, 
         		job.getUser().getDbId(), 
         		job.getProject().getDescription());

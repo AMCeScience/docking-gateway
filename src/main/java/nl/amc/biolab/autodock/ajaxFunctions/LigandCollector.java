@@ -1,12 +1,14 @@
 package nl.amc.biolab.autodock.ajaxFunctions;
 
-import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -84,11 +86,11 @@ public class LigandCollector extends AjaxInterface {
             if (file.isDirectory()) {
                 _fileLoop(file);
             } else {
-                fileNames.add(file.getName());
+                //fileNames.add(file.getName());
             }
         }
         
-        log.log("fileNames: " + fileNames.size());
+        //log.log("fileNames: " + fileNames.size());
         
         if (!folder.getName().equals("ligands")) {
             _getJSONObj().add(folder.getName(), fileNames);

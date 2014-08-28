@@ -25,8 +25,6 @@ public class StatusUpdaterAjax extends AjaxInterface {
         StatusUpdater status = new StatusUpdater();
         String newStatus = status.updateStatus(processId);
         
-        log("done");
-        
         // Output the new status to the ajax request
         _getJSONObj().add("project_id", _getSearchTermEntry("project_id"));
         _getJSONObj().add("processing_id", _getSearchTermEntry("processing_id"));

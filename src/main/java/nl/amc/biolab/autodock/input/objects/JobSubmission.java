@@ -1,8 +1,8 @@
 package nl.amc.biolab.autodock.input.objects;
 
-import nl.amc.biolab.nsgdm.DataElement;
-import nl.amc.biolab.nsgdm.Project;
-import nl.amc.biolab.nsgdm.User;
+import nl.amc.biolab.datamodel.objects.DataElement;
+import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.User;
 
 public class JobSubmission {
 	private String projectName = "";

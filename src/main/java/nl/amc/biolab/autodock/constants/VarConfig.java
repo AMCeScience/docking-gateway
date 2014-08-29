@@ -1,79 +1,73 @@
 package nl.amc.biolab.autodock.constants;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import crappy.logger.Logger;
+import nl.amc.biolab.config.exceptions.ReaderException;
+import nl.amc.biolab.config.manager.ConfigurationManager;
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard van Altena
  */
 public class VarConfig extends Logger {
-	private final String FILE_PATH = "guse/apache-tomcat-6.0.36/webapps/autodock_files/config.json";
-	private JSONObject OBJ;
+	private final String file_path = "guse/apache-tomcat-6.0.36/webapps/config.json";
+	private final String app_name = "docking";
+	private ConfigurationManager config_file;
     
     public VarConfig config;
     
+    /**
+     * Constructor which reads the configuration file, also exposes the config variable to all extending classes
+     */
     public VarConfig() {
-    	JSONParser parser = new JSONParser();
-    	
     	try {
-    		_setJSON((JSONObject) parser.parse(new FileReader(FILE_PATH)));
-    	} catch(FileNotFoundException e) {
-    		log(e.toString());
-    	} catch (IOException e) {
-    		log(e.toString());
-		} catch (ParseException e) {
-			log(e.toString());
+			this.config_file = new ConfigurationManager(this.file_path);
+		} catch (ReaderException e) {
+			log(e.getMessage());
 		}
     	
     	config = this;
     }
-    
-    private void _setJSON(JSONObject obj) {
-    	OBJ = obj;
-    }
-    
-    private JSONObject _getJSON() {
-    	return OBJ;
-    }
-    
-    public String getItem(String name) throws Exception {
-    	if (_getJSON().containsKey(name)) {
-    		return _getItem(name);
-    	} else {
-    		throw new Exception("key does not exist in configuration file.");
+        
+    /**
+     * Get configuration item with certain name in String.
+     * @param name Name of configuration item we are looking for
+     * @return String of configuration item belonging to the input 'name'
+     * @throws Exception Throws exception when name does not exist in file
+     */
+    public String getItem(String name) {
+    	try {
+    		return this.config_file.read.getStringItem(this.app_name, name);
+    	} catch(ReaderException e) {
+    		log(e.getMessage());
     	}
+    	
+    	return null;
     }
     
-    private String _getItem(String name) {
-    	return _getJSON().get(name).toString();
-    }
-    
+    /**
+     * Get boolean whether if the site is in development mode
+     * @return Boolean whether if the site is in development mode
+     */
     public boolean getIsDev() {
-    	if (_getItem("is_dev").equals("true")) {
-    		return true;
-    	}
+    	try {
+			return this.config_file.read.getBooleanItem("is_dev");
+		} catch (ReaderException e) {
+			log(e.getMessage());
+		}
     	
     	return false;
     }
     
     public String getAutodockName() {
-        return _getItem("autodock_name");
+        return getItem("autodock_name");
     }
     
     public String getWebDavUri() {
-        return _getItem("webdav_internal");
+        return getItem("webdav_internal");
     }
     
     public String getExternalWebDavUri() {
-        return _getItem("webdav_external");
+        return getItem("webdav_external");
     }
     
     public String getUri(String folderName, String fileName) {
@@ -81,7 +75,7 @@ public class VarConfig extends Logger {
     }
     
     public String getFilePath() {
-        return _getItem("project_root");
+        return getItem("project_root");
     }
     
     public String getProjectFilePath(String projectName) {
@@ -89,15 +83,15 @@ public class VarConfig extends Logger {
     }
     
     public String getOutputCSVExt() {
-        return _getItem("output_file_csv_ext");
+        return getItem("output_file_csv_ext");
     }
     
     public String getOuputLigandsZipExt() {
-        return _getItem("output_file_ligands_ext");
+        return getItem("output_file_ligands_ext");
     }
     
     public String getOutputUnzipLocation(String folderName) {
-        return getProjectFilePath(folderName) + _getItem("unzip_location") + "/";
+        return getProjectFilePath(folderName) + getItem("unzip_location") + "/";
     }
     
     public String getWebDavPath(String folderName) {
@@ -109,23 +103,23 @@ public class VarConfig extends Logger {
     }
     
     public String getOutputFileName(String folderName) {
-        return getWebDavUri() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
+        return getWebDavUri() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
     public String getExternalOutputFileName(String folderName) {
-        return getExternalWebDavUri() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
+        return getExternalWebDavUri() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
     public String getOutputFilePath(String folderName) {
-        return getFilePath() + folderName + "/" + _getItem("output_file_name") + _getItem("output_file_ext");
+        return getFilePath() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
     public String getExternalUnzippedOutputPath(String folderName) {
-    	return getExternalWebDavPath(folderName) + _getItem("unzip_location");
+    	return getExternalWebDavPath(folderName) + getItem("unzip_location");
     }
     
     public String getLigandPath() {
-        return _getItem("ligand_path");
+        return getItem("ligand_path");
     }
     
     public String getLigandFileName(String folderName, String fileName) {
@@ -133,55 +127,63 @@ public class VarConfig extends Logger {
     }
     
     public String getLigandCache() {
-        return _getItem("ligand_cache_path");
+        return getItem("ligand_cache_path");
     }
     
     public String getLigandsZipFileName() {
-        return _getItem("zip_file_name") + getLigandsZipExt();
+        return getItem("zip_file_name") + getLigandsZipExt();
     }
     
     public String getPilotLigandsZipFileName() {
-        return _getItem("pilot_zip_file_name") + getLigandsZipExt();
+        return getItem("pilot_zip_file_name") + getLigandsZipExt();
     }
     
     public String getLigandsZipExt() {
-        return _getItem("zip_file_ext");
+        return getItem("zip_file_ext");
     }
     
     public String getReceptorFileName() {
-        return _getItem("receptor_file_name") + getReceptorExt();
+        return getItem("receptor_file_name") + getReceptorExt();
     }
     
     public String getReceptorExt() {
-        return _getItem("receptor_file_ext");
+        return getItem("receptor_file_ext");
     }
     
     public String getConfigFileName() {
-        return _getItem("config_file_name") + getConfigExt();
+        return getItem("config_file_name") + getConfigExt();
     }
     
     public String getConfigExt() {
-        return _getItem("config_file_ext");
-    }
-    
-    public String getProcessingWSDL() {
-        return _getItem("processing_wsdl");
-    }
-    
-    public int getPilotLigandCount() {
-    	return new Integer(_getItem("pilot_ligand_count"));
-    }
-    
-    public int getItemsPerPage() {
-    	return new Integer(_getItem("items_per_page"));
+		return getItem("config_file_ext");
     }
     
     /**
-     * Get formatted database connection url
-     * @return Formatted database connection url
+     * Get processing manager WSDL url
+     * @return Processing manager WSDL url
      */
-    public String getDbConnectionUrl() {
-    	return "jdbc:mysql://" + _getItem("db_url") + ":" + _getItem("db_port") + "/" + _getItem("db_scheme") + "?user=" + _getItem("db_user") + "&password=" + _getItem("db_password");
+    public String getProcessingWSDL() {
+        return getItem("processing_wsdl");
+    }
+    
+    public Integer getPilotLigandCount() {
+    	try {
+			return this.config_file.read.getIntegerItem(app_name, "pilot_ligand_count");
+		} catch (ReaderException e) {
+			log(e.getMessage());
+		}
+    	
+    	return null;
+    }
+    
+    public Integer getItemsPerPage() {
+    	try {
+			return this.config_file.read.getIntegerItem(app_name, "items_per_page");
+		} catch (ReaderException e) {
+			log(e.getMessage());
+		}
+    	
+    	return null;
     }
     
     /**
@@ -189,6 +191,6 @@ public class VarConfig extends Logger {
      * @return Formatted database connection url
      */
     public String getLiferayDbConnectionUrl() {
-    	return "jdbc:mysql://" + _getItem("db_url") + ":" + _getItem("db_port") + "/" + _getItem("liferay_db_scheme") + "?user=" + _getItem("db_user") + "&password=" + _getItem("db_password");
+    	return getItem("liferay_db");
     }
 }

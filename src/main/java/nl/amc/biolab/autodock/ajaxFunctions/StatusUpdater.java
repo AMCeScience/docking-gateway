@@ -1,6 +1,7 @@
 package nl.amc.biolab.autodock.ajaxFunctions;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
+import nl.amc.biolab.exceptions.PersistenceException;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
@@ -20,12 +21,18 @@ public class StatusUpdater extends VarConfig {
         
         // Open a session
         PersistenceManagerPlugin db = new PersistenceManagerPlugin();
-        db.init();
+        String newStatus = "";
         
-        // Get the updated status from the database
-        String newStatus = db.get.processing(processId).getSubmissions().iterator().next().getStatus();
-        
-        db.shutdown();
+        try {
+			db.init();
+			
+	        // Get the updated status from the database
+	        newStatus = db.get.processing(processId).getSubmissions().iterator().next().getStatus();
+		} catch (PersistenceException e) {
+			log(e.getMessage());
+		} finally {
+			db.shutdown();
+		}
         
         return newStatus;
     }

@@ -16,7 +16,8 @@ import javax.portlet.ResourceResponse;
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxDispatcher;
 import nl.amc.biolab.autodock.input.tools.FormSubmitter;
 import nl.amc.biolab.autodock.input.tools.UserConfigurator;
-import crappy.logger.Logger;
+import nl.amc.biolab.exceptions.PersistenceException;
+import docking.crappy.logger.Logger;
 
 /**
  * @author Allard van Altena
@@ -34,8 +35,17 @@ public class AutodockVinaPortlet extends GenericPortlet {
     	LOG.log("submitJobForm");
         
         FormSubmitter submit = new FormSubmitter();
+        boolean success = false;
         
-        boolean success = submit.saveForm(formParameters);
+		try {
+			submit.init();
+			
+			success = submit.saveForm(formParameters);
+		} catch (PersistenceException e) {
+			LOG.log(e.getMessage());
+		} finally {
+			submit.close();
+		}
         
         if (!success) {
             // Set errors and reload form page    
@@ -80,16 +90,22 @@ public class AutodockVinaPortlet extends GenericPortlet {
             if (nextJSP.equals(NEW_JOB_PAGE)) {
             	LOG.log("checking user");
             	
-            	UserConfigurator userConfig = new UserConfigurator();
+            	UserConfigurator userConfig = null;
             	
-            	if (!userConfig.checkUser(request.getRemoteUser())) {
-            		LOG.log("user setup");
-            		
-            		userConfig.setupUser(request.getRemoteUser());
-            	}
-            	
-            	// Close db session
-            	userConfig.close();
+				try {
+					userConfig = new UserConfigurator();
+					
+					if (!userConfig.checkUser(request.getRemoteUser())) {
+	            		LOG.log("user setup");
+	            		
+	            		userConfig.setupUser(request.getRemoteUser());
+	            	}
+				} catch (PersistenceException e) {
+					LOG.log(e.getMessage());
+				} finally {
+					// Close db session
+	            	userConfig.close();
+				}
             }
 
             // Load new JSP page

@@ -20,6 +20,7 @@ import nl.amc.biolab.datamodel.objects.DataElement;
 import nl.amc.biolab.datamodel.objects.Project;
 import nl.amc.biolab.datamodel.objects.Resource;
 import nl.amc.biolab.datamodel.objects.User;
+import nl.amc.biolab.exceptions.PersistenceException;
 import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
@@ -35,7 +36,9 @@ public class FormSubmitter extends VarConfig {
     
     public FormSubmitter() {
         _setDb(new PersistenceManagerPlugin());
-        
+    }
+    
+    public void init() throws PersistenceException {
         _getDb().init();
     }
     

@@ -10,4 +10,7 @@
     <welcome-file-list>
         <welcome-file>jsp/new_job.jsp</welcome-file>
     </welcome-file-list>
+    <listener>
+	    <listener-class>nl.amc.biolab.tools.HibernateListener</listener-class>
+	</listener>
 </web-app>

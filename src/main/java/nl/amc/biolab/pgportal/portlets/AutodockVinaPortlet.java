@@ -16,7 +16,7 @@ import javax.portlet.ResourceResponse;
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxDispatcher;
 import nl.amc.biolab.autodock.input.tools.FormSubmitter;
 import nl.amc.biolab.autodock.input.tools.UserConfigurator;
-import crappy.logger.Logger;
+import docking.crappy.logger.Logger;
 
 /**
  * @author Allard van Altena

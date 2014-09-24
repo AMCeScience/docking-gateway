@@ -27,7 +27,7 @@ public class StatusUpdater extends VarConfig {
         db.init();
         
         // Get the updated status from the database
-        String newStatus = db.getProcessing(processId).getSubmissions().iterator().next().getStatus();
+        String newStatus = db.get.processing(processId).getSubmissions().iterator().next().getLastStatus().getValue();
         
         db.shutdown();
         

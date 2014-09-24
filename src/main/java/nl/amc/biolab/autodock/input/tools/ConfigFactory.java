@@ -16,7 +16,7 @@ import nl.amc.biolab.autodock.constants.VarConfig;
 public class ConfigFactory extends VarConfig {    
     public ConfigFactory() {}
     
-    public Configuration setData(HashMap<String, Object> formMap) {
+    public Configuration setData(HashMap<String, Object> formMap, String project_folder) {
         Configuration file = new Configuration();
         
         String project_name = formMap.get("project_name").toString();
@@ -55,12 +55,10 @@ public class ConfigFactory extends VarConfig {
         file.setSize(size);
         
         // Get filenames for configuration file and receptor file
-        String configFilePath = config.getProjectFilePath(project_name) + config.getConfigFileName();
         String receptor_filename = config.getReceptorFileName();
         
-        file.setFilePath(configFilePath);
-        
         // Set configuration items
+        file.setFilePath(config.getProjectFilePath(project_folder) + config.getConfigFileName());
         file.setReceptor(receptor_filename);
         
         String energy_range = formMap.get("energy_range").toString();

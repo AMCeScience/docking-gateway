@@ -7,11 +7,11 @@ import java.util.LinkedHashMap;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.output.tools.ProjectOutput;
-import nl.amc.biolab.nsgdm.DataElement;
-import nl.amc.biolab.nsgdm.Processing;
-import nl.amc.biolab.nsgdm.Project;
-import nl.amc.biolab.nsgdm.Submission;
-import nl.amc.biolab.nsgdm.SubmissionIO;
+import nl.amc.biolab.datamodel.objects.DataElement;
+import nl.amc.biolab.datamodel.objects.Processing;
+import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.Submission;
+import nl.amc.biolab.datamodel.objects.SubmissionIO;
 
 /**
  * Takes the nsgdm objects and creates object with more complete data
@@ -23,7 +23,7 @@ public class LocalProject extends VarConfig {
     private Long ID = null;
     private String NAME = "";
     private String DESCRIPTION = "";
-    private String OWNER = "";
+    private String OWNER = null;
     private String APPLICATION = "";
     private String OVERALL_STATUS = "";
     
@@ -132,16 +132,15 @@ public class LocalProject extends VarConfig {
     	HashMap<String, Object> dataMap = new HashMap<String, Object>();
     	
     	dataMap.put("name", dataEl.getName());
-    	dataMap.put("scan_id", dataEl.getScanID());
+    	dataMap.put("ligand_count", dataEl.getValueByName("ligand_count"));
     	dataMap.put("uri", dataEl.getURI());
-    	dataMap.put("subject", dataEl.getSubject());
     	dataMap.put("type", dataEl.getType());
     	dataMap.put("format", dataEl.getFormat());
     	dataMap.put("date", (dataEl.getDate() != null ? dataEl.getDate().toString() : ""));
     	dataMap.put("size", dataEl.getSize());
     	
-    	if (dataEl.getScanID() != null) {
-    		_setCompoundCount(Integer.parseInt(dataEl.getScanID()));
+    	if (dataEl.getValueByName("ligand_count") != null) {
+    		_setCompoundCount(Integer.parseInt(dataEl.getValueByName("ligand_count")));
     	}
     	
     	return dataMap;
@@ -252,7 +251,7 @@ public class LocalProject extends VarConfig {
     	HashMap<String, Object> local = new HashMap<String, Object>();
     	
     	local.put("submission_id", submission.getDbId());
-    	local.put("status", submission.getStatus());
+    	local.put("status", submission.getLastStatus().getValue());
     	local.put("submission", submission.getName());
     	local.put("submissionIO", _getSubmissionIOs());
     	
@@ -275,7 +274,8 @@ public class LocalProject extends VarConfig {
     	return COMPOUND_COUNT;
     }
     
-    private void _setProvenanceCount(int count) {
+    @SuppressWarnings("unused")
+	private void _setProvenanceCount(int count) {
     	PROVENANCE_COUNT = count;
     }
     

@@ -1,25 +1,24 @@
 package nl.amc.biolab.autodock.input.objects;
 
-import nl.amc.biolab.nsgdm.DataElement;
-import nl.amc.biolab.nsgdm.Project;
-import nl.amc.biolab.nsgdm.User;
+import java.util.UUID;
+
+import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.User;
 
 public class JobSubmission {
 	private String projectName = "";
 	private String projectDescription = "";
 	private boolean pilot = false;
-	private DataElement ligands;
 	private String ligandsUri = "";
 	private Long ligandsCount = 0L;
-	private DataElement pilotLigands;
 	private String pilotLigandsUri = "";
 	private Long pilotLigandsCount = 0L;
-	private DataElement receptor;
 	private String receptorUri = "";
-	private DataElement configuration;
 	private String configurationUri = "";
 	private User user;
 	private Project project;
+	
+	private String uriBase = "";
 	
 	public String getProjectName() {
 		return projectName;
@@ -27,6 +26,14 @@ public class JobSubmission {
 	
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
+	}
+	
+	public void setProjectFolder(String projectName) {
+		this.uriBase = projectName + "-" + UUID.randomUUID().toString();
+	}
+	
+	public String getProjectFolder() {
+		return uriBase;
 	}
 	
 	public boolean isPilot() {
@@ -45,14 +52,6 @@ public class JobSubmission {
 		this.projectDescription = projectDescription;
 	}
 	
-	public DataElement getLigands() {
-		return ligands;
-	}
-	
-	public void setLigands(DataElement ligands) {
-		this.ligands = ligands;
-	}
-	
 	public String getLigandsUri() {
 		return ligandsUri;
 	}
@@ -67,14 +66,6 @@ public class JobSubmission {
 	
 	public void setLigandsCount(Long ligandsCount) {
 		this.ligandsCount = ligandsCount;
-	}
-	
-	public DataElement getPilotLigands() {
-		return pilotLigands;
-	}
-	
-	public void setPilotLigands(DataElement pilotLigands) {
-		this.pilotLigands = pilotLigands;
 	}
 	
 	public String getPilotLigandsUri() {
@@ -93,28 +84,12 @@ public class JobSubmission {
 		this.pilotLigandsCount = pilotLigandsCount;
 	}
 	
-	public DataElement getReceptor() {
-		return receptor;
-	}
-	
-	public void setReceptor(DataElement receptor) {
-		this.receptor = receptor;
-	}
-	
 	public String getReceptorUri() {
 		return receptorUri;
 	}
 	
 	public void setReceptorUri(String receptorUri) {
 		this.receptorUri = receptorUri;
-	}
-	
-	public DataElement getConfiguration() {
-		return configuration;
-	}
-	
-	public void setConfiguration(DataElement configuration) {
-		this.configuration = configuration;
 	}
 	
 	public String getConfigurationUri() {
@@ -127,6 +102,10 @@ public class JobSubmission {
 	
 	public User getUser() {
 		return user;
+	}
+	
+	public String getUserString() {
+		return user.getFirstName() + " " + user.getLastName();
 	}
 	
 	public void setUser(User user) {

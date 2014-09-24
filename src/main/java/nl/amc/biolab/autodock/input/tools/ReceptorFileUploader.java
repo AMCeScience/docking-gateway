@@ -12,7 +12,7 @@ import org.apache.commons.fileupload.FileItem;
 public class ReceptorFileUploader extends VarConfig {    
     public ReceptorFileUploader() {}
     
-    public Receptor doUpload(FileItem receptorFile, String project_name) {
+    public Receptor doUpload(FileItem receptorFile, String project_folder) {
         Receptor receptor = new Receptor();
         
         try {
@@ -21,7 +21,7 @@ public class ReceptorFileUploader extends VarConfig {
             if (receptorFile != null && receptorFile.getSize() > 0) {
                 log.log("Receptor file size: " + receptorFile.getSize());
                 
-                File receptor_file = new File(config.getProjectFilePath(project_name) + config.getReceptorFileName());
+                File receptor_file = new File(config.getProjectFilePath(project_folder) + config.getReceptorFileName());
 
                 // Create new file on the system
                 receptor_file.createNewFile();
@@ -29,7 +29,7 @@ public class ReceptorFileUploader extends VarConfig {
                 // Write upload to created file on system
                 receptorFile.write(receptor_file);
                 
-                log.log("Receptor file uploaded in: " + config.getProjectFilePath(project_name) + config.getReceptorFileName());
+                log.log("Receptor file uploaded in: " + config.getProjectFilePath(project_folder) + config.getReceptorFileName());
                 
                 if (receptor_file.exists()) {
                     receptor.setValid(true);

@@ -84,11 +84,11 @@ public class LigandCollector extends AjaxInterface {
             if (file.isDirectory()) {
                 _fileLoop(file);
             } else {
-                fileNames.add(file.getName());
+//                fileNames.add(file.getName());
             }
         }
         
-        log.log("fileNames: " + fileNames.size());
+//        log.log("fileNames: " + fileNames.size());
         
         if (!folder.getName().equals("ligands")) {
             _getJSONObj().add(folder.getName(), fileNames);

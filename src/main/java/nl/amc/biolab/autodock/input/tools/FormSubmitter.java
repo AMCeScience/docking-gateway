@@ -3,7 +3,6 @@ package nl.amc.biolab.autodock.input.tools;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,12 +14,10 @@ import nl.amc.biolab.autodock.input.objects.Configuration;
 import nl.amc.biolab.autodock.input.objects.JobSubmission;
 import nl.amc.biolab.autodock.input.objects.Ligands;
 import nl.amc.biolab.autodock.input.objects.Receptor;
-import nl.amc.biolab.nsg.pm.ProcessingManagerClient;
-import nl.amc.biolab.nsgdm.Application;
-import nl.amc.biolab.nsgdm.DataElement;
-import nl.amc.biolab.nsgdm.Project;
-import nl.amc.biolab.nsgdm.Resource;
-import nl.amc.biolab.nsgdm.User;
+import nl.amc.biolab.datamodel.objects.Application;
+import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.User;
+import nl.amc.biolab.datamodel.objects.Value;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
 import org.apache.commons.fileupload.FileItem;
@@ -30,293 +27,269 @@ import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.io.FileUtils;
 
 public class FormSubmitter extends VarConfig {
-    private String ERRORS = "";
-    private PersistenceManagerPlugin PERSISTENCE;
-    
-    public FormSubmitter() {
-        _setDb(new PersistenceManagerPlugin());
-        
-        _getDb().init();
-    }
-    
-    public void close() {
-        _getDb().shutdown();
-    }
-    
-    private void _cleanUp(HashMap<String, Object> formMap) {        
-        File directory = new File(config.getProjectFilePath(formMap.get("project_name").toString()));
-        
-        try {
-            FileUtils.deleteDirectory(directory);
-        } catch(IOException e) {
-            log.log(e);
-        }
-    }
-    
-    public boolean saveForm(ActionRequest formParameters) {
-        // Determains the success of this method
-        boolean stored = false;
-        
-        HashMap<String, Object> formMap = _createFormMap(formParameters);
-        
-        if (formMap != null) {
-        	JobSubmission job = new JobSubmission();
-            
-            job.setProjectName(formMap.get("project_name").toString());
-            job.setProjectDescription(formMap.get("project_description").toString());
-        	
-            // Get liferay user ID
-            String liferayUserId = formParameters.getRemoteUser();
+	private String ERRORS = "";
+	private PersistenceManagerPlugin PERSISTENCE;
 
-            // Get catalog user
-            User catalogUser = _getDb().getUser(liferayUserId);
+	public FormSubmitter() {
+		_setDb(new PersistenceManagerPlugin());
 
-            // Check if user exists in catalog database
-            if (catalogUser != null) {                
-                // Project name is set but is not unique
-                if (!_getDb().checkProjectNameUnique(job.getProjectName())) {
-                    _setError("Project name is not unique.<br/>");
+		_getDb().init();
+	}
 
-                    close();
+	public void close() {
+		_getDb().shutdown();
+	}
 
-                    return false;
-                }
-                
-                File directory = new File(config.getFilePath() + "/" + job.getProjectName());
-                
-                directory.mkdirs();
-                
-                // Project name is not set, return immediately                
-                if (!directory.exists()) {
-                    _setError("Could not create project folder.<br/>");
-                    
-                    close();
-                    
-                    return false;
-                }
-                
-                // Create configuration file
-                ConfigFactory configFactory = new ConfigFactory();
-                Configuration configuration = configFactory.setData(formMap);
+	private void _cleanUp(JobSubmission job) {
+		File directory = new File(config.getProjectFilePath(job.getProjectFolder()));
 
-                if (!configuration.getValid()) {
-                    _setError(configuration.getErrors());
+		try {
+			FileUtils.deleteDirectory(directory);
+		} catch (IOException e) {
+			log.log(e);
+		}
+	}
 
-                    close();
-                    _cleanUp(formMap);
+	public boolean saveForm(ActionRequest formParameters) {
+		// Determines the success of this method
+		boolean stored = false;
 
-                    return false;
-                }
-                
-                // Write ligands to zip file
-                LigandZipper ligandZipper = new LigandZipper();
-                Ligands ligands = ligandZipper.prepareLigandFile(formMap);
-                
-                if (!ligands.validate()) {
-                    close();
-                    _cleanUp(formMap);
-                    
-                    return false;
-                }
+		HashMap<String, Object> formMap = _createFormMap(formParameters);
 
-                // Write the receptor file to the system
-                ReceptorFileUploader uploader = new ReceptorFileUploader();
-                Receptor receptor = uploader.doUpload((FileItem) formMap.get("receptor_file"), job.getProjectName());
+		if (formMap != null) {
+			JobSubmission job = new JobSubmission();
 
-                if (!receptor.validate()) {
-                    _setError(receptor.getErrors());
+			job.setProjectFolder(formMap.get("project_name").toString());
+			job.setProjectName(formMap.get("project_name").toString());
+			job.setProjectDescription(formMap.get("project_description").toString());
 
-                    close();
-                    _cleanUp(formMap);
+			// Get liferay user ID
+			String liferayUserId = formParameters.getRemoteUser();
 
-                    return false;
-                }
-                
-                if (!configFactory.writeToDisk(configuration)) {
-                    _setError(configuration.getErrors());
-                    
-                    close();
-                    _cleanUp(formMap);
-                    
-                    return false;
-                }
-                
-                job.setLigandsUri(config.getUri(job.getProjectName(), config.getLigandsZipFileName()));
-                job.setLigandsCount(ligands.getCount());
-                
-                if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
-	                job.setPilotLigandsUri(config.getUri(job.getProjectName(), config.getPilotLigandsZipFileName()));
-	                job.setPilotLigandsCount(ligands.getPilotCount());
-	                job.setPilot(true);
-                }
-                
-                job.setReceptorUri(config.getUri(job.getProjectName(), config.getReceptorFileName()));
-                job.setConfigurationUri(config.getUri(job.getProjectName(), config.getConfigFileName()));
-                
-                job.setUser(catalogUser);
-                
-                // Store project
-                Project project = _saveProject(job);
-                job.setProject(project);
-                
-                // Store data elements
-                HashMap<String, DataElement> data = _saveData(job);
-                job.setLigands(data.get("ligands"));
-                job.setConfiguration(data.get("configuration"));
-                job.setReceptor(data.get("receptor"));
-                job.setPilotLigands(data.get("pilot_ligands"));
-                
-                // Submit the job
-            	_submit(job);
+			// Get catalog user
+			User catalogUser = _getDb().get.user(liferayUserId);
 
-                stored = true;
-            } else {
-                // Liferay user not found in catalog
-                _setError("Liferay user not found in catalog database. You probably don't have permission to save projects<br/>");
-                
-                stored = false;
-            }
-        } else {
-            // FormMap is empty
-            _setError("formMap error.<br/>");
-            
-            stored = false;
-        }
-        
-        // Close session before returning
-        close();
-        
-        return stored;
-    }
-    
-    private Project _saveProject(JobSubmission job) {
-    	// Create list of apps used
-    	ArrayList<Application> apps = new ArrayList<Application>();
-    	// Add autodock app
-    	apps.add(_getDb().getApplicationByName(config.getAutodockName()));
-    	
-        Project project = _getDb().storeProject(job.getProjectName(), job.isPilot(), job.getProjectDescription(), job.getUser(), apps);
-        
-        return project;
-    }
-        
-    private HashMap<String, DataElement> _saveData(JobSubmission job) {
-    	Resource resource = _getDb().getResource("webdav");
-    	
-    	Collection<Project> projects = new ArrayList<Project>();
-    	
-    	HashMap<String, DataElement> dataMap = new HashMap<String, DataElement>();
-    	
-        // Add created project to collection
-        projects.add(job.getProject());
-        
-        // Store ligands zip
-        String ligandsFormat = config.getLigandsZipExt();
-        String ligandsName = config.getLigandsZipFileName();
-        String ligandsUri = job.getLigandsUri();
-        String ligandsCount = job.getLigandsCount().toString();
-        
-        DataElement ligands = _getDb().storeDataElement(ligandsFormat, ligandsName, ligandsUri, ligandsCount, "filler", "filler", projects, resource);
-        
-        DataElement pilotLigands = null;
-        
-        if (job.isPilot()) {
-        	// Store ligands zip
-            String pilotLigandsName = config.getPilotLigandsZipFileName();
-            String pilotLigandsUri = job.getPilotLigandsUri();
-            String pilotLigandsCount = String.valueOf(job.getPilotLigandsCount());
-            
-            pilotLigands = _getDb().storeDataElement(ligandsFormat, pilotLigandsName, pilotLigandsUri, pilotLigandsCount, "filler", "filler", projects, resource);
-        }
-        
-        // Store receptor file
-        String receptorFormat = config.getReceptorExt();
-        String receptorName = config.getReceptorFileName();
-        String receptorUri = job.getReceptorUri();
-        
-        DataElement receptor = _getDb().storeDataElement(receptorFormat, receptorName, receptorUri, null, "filler", "filler", projects, resource);
-        
-        // Store configuration file
-        String configFormat = config.getConfigExt();
-        String configName = config.getConfigFileName();
-        String configUri = job.getConfigurationUri();
-        
-        DataElement configuration = _getDb().storeDataElement(configFormat, configName, configUri, null, "filler", "filler", projects, resource);
-        
-        dataMap.put("ligands", ligands);
-        dataMap.put("pilot_ligands", pilotLigands);
-        dataMap.put("receptor", receptor);
-        dataMap.put("configuration", configuration);
-        
-        return dataMap;
-    }
-    
-    private void _submit(JobSubmission job) {
-    	// Send to processing manager
-        List<Long> submits = new ArrayList<Long>();
-        
-        // Do not change order of adding ids, this is linked to the processingmanager which requires the input to be in the right order
-        // Add either the pilot ligands to the submission or the full ligand set
-        if (job.isPilot()) {
-        	submits.add(job.getPilotLigands().getDbId());
-        } else {
-        	submits.add(job.getLigands().getDbId());
-        }
-        submits.add(job.getConfiguration().getDbId());
-        submits.add(job.getReceptor().getDbId());
-        
-        // Get processingmanager webservice client
-        ProcessingManagerClient client = new ProcessingManagerClient(config.getProcessingWSDL());
-        
-        // Submit the job through the processingmanager webservice
-        client.submit(job.getProject().getDbId(), 
-        		_getDb().getApplicationByName(config.getAutodockName()).getDbId(), 
-        		submits, 
-        		job.getUser().getDbId(), 
-        		job.getProject().getDescription());
-    }
-    
-    private HashMap<String, Object> _createFormMap(ActionRequest formParameters) {
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        PortletFileUpload pfu = new PortletFileUpload(factory);
+			// Check if user exists in catalog database
+			if (catalogUser != null) {
+				File directory = new File(config.getProjectFilePath(job.getProjectFolder()));
 
-        HashMap<String, Object> formMap = new HashMap<String, Object>();
-        
-        try {
-            @SuppressWarnings("rawtypes")
+				directory.mkdirs();
+
+				// Project name is not set, return immediately
+				if (!directory.exists()) {
+					_setError("Could not create project folder.<br/>");
+
+					close();
+
+					return false;
+				}
+				log(directory.getAbsolutePath());
+				log(job.getProjectFolder());
+				log("folder done");
+				// Create configuration file
+				ConfigFactory configFactory = new ConfigFactory();
+				Configuration configuration = configFactory.setData(formMap, job.getProjectFolder());
+				log("config done");
+				if (!configuration.getValid()) {
+					_setError(configuration.getErrors());
+
+					close();
+					_cleanUp(job);
+
+					return false;
+				}
+
+				// Write ligands to zip file
+				LigandZipper ligandZipper = new LigandZipper();
+				Ligands ligands = ligandZipper.prepareLigandFile(formMap, job.getProjectFolder());
+				log("ligands done");
+				if (!ligands.validate()) {
+					close();
+					_cleanUp(job);
+
+					return false;
+				}
+
+				// Write the receptor file to the system
+				ReceptorFileUploader uploader = new ReceptorFileUploader();
+				Receptor receptor = uploader.doUpload(
+						(FileItem) formMap.get("receptor_file"),
+						job.getProjectFolder());
+				log("receptor done");
+				if (!receptor.validate()) {
+					_setError(receptor.getErrors());
+
+					close();
+					_cleanUp(job);
+
+					return false;
+				}
+
+				if (!configFactory.writeToDisk(configuration)) {
+					_setError(configuration.getErrors());
+
+					close();
+					_cleanUp(job);
+
+					return false;
+				}
+
+				job.setLigandsUri(config.getUri(job.getProjectFolder(),
+						config.getLigandsZipFileName()));
+				job.setLigandsCount(ligands.getCount());
+
+				if (formMap.containsKey("run_pilot")
+						&& formMap.get("run_pilot").equals("1")) {
+					job.setPilotLigandsUri(config.getUri(job.getProjectFolder(),
+							config.getPilotLigandsZipFileName()));
+					job.setPilotLigandsCount(ligands.getPilotCount());
+					job.setPilot(true);
+				}
+
+				job.setReceptorUri(config.getUri(job.getProjectFolder(),
+						config.getReceptorFileName()));
+				job.setConfigurationUri(config.getUri(job.getProjectFolder(),
+						config.getConfigFileName()));
+
+				job.setUser(catalogUser);
+
+				// Store project
+				Project project = _saveProject(job);
+				job.setProject(project);
+
+				// Submit the job
+				_submit(job);
+
+				stored = true;
+			} else {
+				// Liferay user not found in catalog
+				_setError("Liferay user not found in catalog database. You probably don't have permission to save projects<br/>");
+
+				stored = false;
+			}
+		} else {
+			// FormMap is empty
+			_setError("formMap error.<br/>");
+
+			stored = false;
+		}
+
+		// Close session before returning
+		close();
+
+		return stored;
+	}
+
+	private Project _saveProject(JobSubmission job) {
+		// Create lists
+		ArrayList<Application> apps = new ArrayList<Application>();
+		ArrayList<Value> values = new ArrayList<Value>();
+		// Add items
+		apps.add(_getDb().getApplicationByName(config.getAutodockName()));
+		
+		values.add(_getDb().get.value(_getDb().insert.value("is_pilot", String.valueOf(job.isPilot()))));
+		values.add(_getDb().get.value(_getDb().insert.value("folder_name", job.getProjectFolder())));
+		
+		Project project = _getDb().get.project(_getDb().insert.project(
+				job.getProjectName(), job.getProjectDescription(),
+				job.getUserString(), apps, values));
+		
+		return project;
+	}
+
+	private void _submit(JobSubmission job) {
+		// Send to processing manager
+		HashMap<String, Object> submission = new HashMap<String, Object>();
+		List<HashMap<String, Object>> submits = new ArrayList<HashMap<String, Object>>();
+
+		if (job.isPilot()) {
+			submits.add(_createSubmissionMap(1, "ligands",
+					job.getPilotLigandsUri()));
+		} else {
+			submits.add(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
+		}
+
+		submits.add(_createSubmissionMap(2, "configuration",
+				job.getConfigurationUri()));
+		submits.add(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
+
+		Long appId = _getDb().getApplicationByName(config.getAutodockName())
+				.getDbId();
+
+		submission.put("applicationId", appId);
+		submission.put("description", job.getProjectDescription());
+		submission.put("userId", job.getUser().getDbId());
+		submission.put("projectId", job.getProject().getDbId());
+		submission.put("submission", new ArrayList<Object>().addAll(submits));
+
+		// TODO send to client
+		/*ClientConfig clientConfig = new DefaultClientConfig();
+		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
+				Boolean.TRUE);
+		Client client = Client.create(clientConfig);
+
+		WebResource webResource = client.resource(config
+				.getProcessingResource());
+
+		ClientResponse response = webResource.accept("application/json")
+				.type("application/json")
+				.post(ClientResponse.class, submission);
+		
+		log(response);*/
+	}
+
+	private HashMap<String, Object> _createSubmissionMap(int portId,
+			String name, String dataUri) {
+		HashMap<String, Object> submit_map = new HashMap<String, Object>();
+
+		submit_map.put("portId", portId);
+		submit_map.put("name", name);
+		submit_map.put("data", dataUri);
+
+		return submit_map;
+	}
+
+	private HashMap<String, Object> _createFormMap(ActionRequest formParameters) {
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		PortletFileUpload pfu = new PortletFileUpload(factory);
+
+		HashMap<String, Object> formMap = new HashMap<String, Object>();
+
+		try {
+			@SuppressWarnings("rawtypes")
 			Iterator iter = pfu.parseRequest(formParameters).iterator();
 
-            while(iter.hasNext()) {
-                FileItem item = (FileItem) iter.next();
+			while (iter.hasNext()) {
+				FileItem item = (FileItem) iter.next();
 
-                if (item.getFieldName().equals("receptor_file")) {
-                    formMap.put(item.getFieldName(), item);
-                } else {
-                    formMap.put(item.getFieldName(), item.getString());
-                }
-            }
-        } catch (FileUploadException e) {
-            log.log(e.toString());
-            
-            return null;
-        }
-        
-        return formMap;
-    }
-    
-    private void _setError(String error) {
-        ERRORS = ERRORS + error;
-    }
-    
-    public String getErrors() {
-        return ERRORS;
-    }
-    
-    private void _setDb(PersistenceManagerPlugin persistence) {
-        PERSISTENCE = persistence;
-    }
-    
-    private PersistenceManagerPlugin _getDb() {
-        return PERSISTENCE;
-    }
+				if (item.getFieldName().equals("receptor_file")) {
+					formMap.put(item.getFieldName(), item);
+				} else {
+					formMap.put(item.getFieldName(), item.getString());
+				}
+			}
+		} catch (FileUploadException e) {
+			log.log(e.toString());
+
+			return null;
+		}
+
+		return formMap;
+	}
+
+	private void _setError(String error) {
+		ERRORS = ERRORS + error;
+	}
+
+	public String getErrors() {
+		return ERRORS;
+	}
+
+	private void _setDb(PersistenceManagerPlugin persistence) {
+		PERSISTENCE = persistence;
+	}
+
+	private PersistenceManagerPlugin _getDb() {
+		return PERSISTENCE;
+	}
 }

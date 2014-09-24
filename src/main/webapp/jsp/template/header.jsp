@@ -45,8 +45,12 @@
         
         <!-- bind ajax urls to body as data, add validation methods -->
         <script type="text/javascript">
-        	$.validator.addMethod("ligandCount", function() {
+        	/*$.validator.addMethod("ligandCount", function() {
         		return $('input[name=compound_check]:checked').size() > 0;
+        	}, "Please select ligands/compounds.");*/
+        	
+        	$.validator.addMethod("ligandCount", function() {
+        		return $('input[name=library_check]:checked').size() > 0;
         	}, "Please select ligands/compounds.");
         
             $('body').data('ajax-urls', {
@@ -59,11 +63,11 @@
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=160"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=113"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=109"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=225"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=116"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=161"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=114"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=111"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=226"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=117"></script>
     </head>
     <body>
         <div id="portlet-wrapper">
@@ -84,9 +88,9 @@
                                 && request.getParameter("nextJSP").equals("project_display") 
                                 && request.getParameter("page_type") != null
                                 && request.getParameter("page_type").equals("in_process")) { %>
-                                <a href="<%= in_process_page.toString() %>" class="active">In Process</a>
+                                <a href="<%= in_process_page.toString() %>" class="active">In Progess</a>
                             <% } else { %>
-                                <a href="<%= in_process_page.toString() %>">In Process</a>
+                                <a href="<%= in_process_page.toString() %>">In Progess</a>
                             <% } %>
                         </li>
                         <li>

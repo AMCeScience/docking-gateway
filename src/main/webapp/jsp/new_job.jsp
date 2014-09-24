@@ -83,12 +83,15 @@
 
     <div class="bottom">
         <div class="compound_search">
-            <div class="search_header">
+        	<div class="search_header">
+        		<label>Compounds</label>
+        	</div>
+            <!--div class="search_header">
                 <label for="list_search">Search Compounds</label>
                 <input type="text" name="list_search" id="list_search"/><span class="loading">Loading...</span>
             </div>
 
-            <div class="noresults">No Results</div>
+            <div class="noresults">No Results</div-->
             
             <ul class="library_list"></ul>
             <div class="clear"></div>
@@ -96,7 +99,8 @@
         
         <span class="spinner"></span>
 
-        <input name="compound_list" type="hidden"/>
+        <!--input name="compound_list" type="hidden"/-->
+        <input name="library_list" type="hidden"/>
     </div>
 </form>
     

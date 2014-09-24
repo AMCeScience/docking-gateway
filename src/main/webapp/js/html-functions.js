@@ -99,7 +99,7 @@ function project_html(project_data) {
         "<h3 class='header " + header_class + " " + header_div + project_data.project_id + project_data.processing_id + "'>\
         	<span class='header-cols first'>" + project_data.date_started + "</span>\
     		| <span class='header-cols second'>" + project_data.overall_status + "</span>\
-			| <span class='header-cols third'>" + project_data.user + "</span>\
+			| <span class='header-cols third'>" + project_data.project_name + "</span>\
 		</h3>\
         <div class='project_data_div " + data_div + project_data.project_id + project_data.processing_id + "' data-project=''>\
             <div class='accordion_content'>\
@@ -135,8 +135,8 @@ function build_inside_project_html(project_data) {
             project_html += "<div class='" + class_name + "'>\
                 <a href='/webdav/" + project_data.project_name.replace("_pilot", "") + "/" + data_element.name + "'>Name: " + data_element.name + "</a>";
 
-            if (data_element.scan_id !== null) {
-                project_html += "<span>Ligand count: " + data_element.scan_id + "</span>";
+            if (data_element.ligand_count !== null) {
+                project_html += "<span>Ligand count: " + data_element.ligand_count + "</span>";
             }
 
             project_html += "<span>Format: " + data_element.format + "</span>\
@@ -175,11 +175,11 @@ function build_inside_project_html(project_data) {
             <h2>Output</h2>\
             <div class='graph graph_" + project_data.project_id + "'></div>\
             \
-            <span class='bold'>Select % of data to download</span>\
-            <div class='download_slider'></div>\
+            <span class='bold' style='display:none;'>Select % of data to download</span>\
+            <div class='download_slider' style='display:none;'></div>\
             \
-            <input class='download_input' name='download_input' type='text' value='100'/>\
-            <label class='download_input' for='download_input'>%</label>\
+            <input class='download_input' name='download_input' type='text' style='display:none;' value='100'/>\
+            <label class='download_input' style='display:none;' for='download_input'>%</label>\
             \
             <span>Selected number of compounds: <span class='compound_disp'>" + project_data.compound_count + "</span></span>\
             \
@@ -214,25 +214,23 @@ function buildLibraryHtml(ajax_data) {
     $.each(ajax_data, function(key, files) {
         var folder_name = key;
         
-        html.push("<li class='lib_" + folder_name + " library'>\
+        /*html.push("<li class='lib_" + folder_name + " library'>\
                     <span class='library_drop arrow_right'></span>\
                     <input name='library_check' type='checkbox' value='1'/>\
                     " + folder_name + "<br/>\
-                    <ul class='lib_" + folder_name + " compound_list'>");
+                    <ul class='lib_" + folder_name + " compound_list'>");*/
         
-        /*html.push("<li class='compounds compound'>");
+        html.push("<li class='lib_" + folder_name + " library'>\
+                <input name='library_check' type='checkbox' value='1'/>\
+        		" + folder_name + "</li>");
         
-        html.push(files.join("</li><li class='compounds compound'>"));
-        
-        html.push("</li>");*/
-        
-        $.each(files, function(key, file_name) {
+        /*$.each(files, function(key, file_name) {
             html.push("<li class='compounds compound_" + file_name + "'>\
                         <input name='compound_check' type='checkbox' value='" + file_name + "'/>" + file_name + "\
                        </li>");
-        });
+        });*/
         
-        html.push("</ul></li>");
+        //html.push("</ul></li>");
     });
     
     return html;

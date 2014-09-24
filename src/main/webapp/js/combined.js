@@ -37,9 +37,13 @@ function new_job() {
         
         $('.library_list').html(html.join(''));
         
-        libraryInit();
+        // Disable separate ligand selection for now
+        //libraryInit();
         
-        init_list_search();
+        //init_list_search();
+        
+        $('.compound_search').show();
+        $('.spinner').hide();
     }
 
     log("getLigands call for new job page");
@@ -94,19 +98,26 @@ function new_job_submit() {
     	    });
 
     	    // Get all selected compounds in a map
-    	    var checked_compounds = $('input[name=compound_check]:checked', form).map(function() {
+    	    /*var checked_compounds = $('input[name=compound_check]:checked', form).map(function() {
     	        // Put value in array
     	        var folder_name = $(this).parent().parent().attr('class').split(' ')[0];
     	        
     	        return "{\"" + folder_name.slice(4, folder_name.length) + "\":\"" + this.value + "\"}";
-    	    });
+    	    });*/
+    		
+    		var checked_libraries = $('input[name=library_check]:checked', form).map(function() {
+    			var folder_name = $(this).parent().attr('class').split(' ')[0];
+    			
+    			return '"' + folder_name.slice(4, folder_name.length) + '"';
+    		});
 
     	    // Remove checkboxes from form, so we don't post these to the backend
     	    $('input[name=library_check]', form).remove();
-    	    $('input[name=compound_check]', form).remove();
+    	    //$('input[name=compound_check]', form).remove();
 
     	    // Add values to one input field
-    	    $('input[name=compound_list]', form).val("{ \"compound_array\": [" + checked_compounds.get().join(',') + "]}");
+    	    //$('input[name=compound_list]', form).val("{ \"compound_array\": [" + checked_compounds.get().join(',') + "]}");
+    	    $('input[name=library_list]', form).val("{ \"library_array\": [" + checked_libraries.get().join(',') + "]}");
 
     	    form.submit();
     	}

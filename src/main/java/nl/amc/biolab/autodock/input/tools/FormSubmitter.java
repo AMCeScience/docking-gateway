@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.portlet.ActionRequest;
 
@@ -25,6 +24,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -196,19 +197,20 @@ public class FormSubmitter extends VarConfig {
 		return project;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void _submit(JobSubmission job) {
 		// Send to processing manager
-		HashMap<String, Object> submission = new HashMap<String, Object>();
-		List<HashMap<String, Object>> submits = new ArrayList<HashMap<String, Object>>();
+		JSONObject submission = new JSONObject();
+		JSONArray submits = new JSONArray();
 
 		if (job.isPilot()) {
-			submits.add(_createSubmissionMap(1, "ligands", job.getPilotLigandsUri()));
+			submits.put(_createSubmissionMap(1, "ligands", job.getPilotLigandsUri()));
 		} else {
-			submits.add(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
+			submits.put(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
 		}
 
-		submits.add(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
-		submits.add(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
+		submits.put(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
+		submits.put(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
 
 		Long appId = _getDb().getApplicationByName(config.getAutodockName()).getDbId();
 
@@ -216,8 +218,10 @@ public class FormSubmitter extends VarConfig {
 		submission.put("description", job.getProjectDescription());
 		submission.put("userId", job.getUser().getDbId());
 		submission.put("projectId", job.getProject().getDbId());
-		submission.put("submission", new ArrayList<Object>().addAll(submits));
-
+		submission.put("submission", submits);
+		
+		log(submission.toJSONString());
+		
 		// TODO send to client
 		ClientConfig clientConfig = new DefaultClientConfig();
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -225,7 +229,7 @@ public class FormSubmitter extends VarConfig {
 
 		WebResource webResource = client.resource(config.getProcessingResource());
 
-		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission);
+		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission.toJSONString());
 
 		log(response);
 	}

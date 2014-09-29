@@ -229,7 +229,7 @@ public class FormSubmitter extends VarConfig {
 
 		WebResource webResource = client.resource(config.getProcessingResource());
 
-		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission.toJSONString());
+		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission);
 
 		log(response);
 	}

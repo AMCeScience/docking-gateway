@@ -22,7 +22,6 @@
 
 <% // Ajax url declarations %>
 <portlet:resourceURL var="ajaxSearchUrl" id="SearchProjects"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxUpdateStatusUrl" id="StatusUpdaterAjax"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxGetDetailsUrl" id="SubmissionDetails"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxLigandsUrl" id="LigandCollector"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxDownloadOutputUrl" id="Downloader"></portlet:resourceURL>
@@ -55,7 +54,6 @@
         
             $('body').data('ajax-urls', {
                 "searchUrl": "<%= ajaxSearchUrl %>",
-                "updateStatusUrl": "<%= ajaxUpdateStatusUrl %>",
                 "getDetailsUrl": "<%= ajaxGetDetailsUrl %>",
                 "ligandsUrl": "<%= ajaxLigandsUrl %>",
                 "downloadOutputUrl": "<%= ajaxDownloadOutputUrl %>"
@@ -65,9 +63,9 @@
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=161"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=114"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=111"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=226"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=117"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=114"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=230"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=118"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

@@ -16,6 +16,7 @@ import javax.portlet.ResourceResponse;
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxDispatcher;
 import nl.amc.biolab.autodock.input.tools.FormSubmitter;
 import nl.amc.biolab.autodock.input.tools.UserConfigurator;
+import nl.amc.biolab.exceptions.PersistenceException;
 import docking.crappy.logger.Logger;
 
 /**
@@ -35,7 +36,13 @@ public class AutodockVinaPortlet extends GenericPortlet {
         
         FormSubmitter submit = new FormSubmitter();
         
-        boolean success = submit.saveForm(formParameters);
+        boolean success = false;
+        
+		try {
+			success = submit.saveForm(formParameters);
+		} catch (PersistenceException e) {
+			LOG.log(e.getMessage());
+		}
         
         if (!success) {
             // Set errors and reload form page    

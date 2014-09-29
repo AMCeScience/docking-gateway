@@ -10,12 +10,6 @@ function getLigands(successFunc) {
     ajax_call(null, successFunc, $('body').data('ajax-urls').ligandsUrl, "GET", true);
 }
 
-function updateStatus(dataArr, successFunc) {
-    log('updateStatus function running');
-
-    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').updateStatusUrl, "POST", false);
-}
-
 function downloadOutput(dataArr, successFunc) {
     log('downloadOutput function running');
     

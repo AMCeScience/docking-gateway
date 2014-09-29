@@ -158,14 +158,6 @@ public class VarConfig extends Logger {
 		return getItem("config_file_ext");
     }
     
-    /**
-     * Get processing manager WSDL url
-     * @return Processing manager WSDL url
-     */
-    public String getProcessingWSDL() {
-        return getItem("processing_wsdl");
-    }
-    
     public String getProcessingResource() {
     	return getItem("processing_resource");
     }

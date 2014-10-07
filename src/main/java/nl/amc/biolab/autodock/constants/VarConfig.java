@@ -158,6 +158,14 @@ public class VarConfig extends Logger {
 		return getItem("config_file_ext");
     }
     
+    public String getOutputFileName() {
+    	return getItem("output_file_name") + getOutputExt();
+    }
+    
+    public String getOutputExt() {
+    	return getItem("output_file_ext");
+    }
+    
     public String getProcessingResource() {
     	return getItem("processing_resource");
     }

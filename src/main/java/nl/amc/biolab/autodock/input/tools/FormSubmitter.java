@@ -24,7 +24,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jettison.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.sun.jersey.api.client.Client;
@@ -32,6 +32,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.json.JSONConfiguration;
 
 public class FormSubmitter extends VarConfig {
@@ -151,6 +152,8 @@ public class FormSubmitter extends VarConfig {
 
 				job.setReceptorUri(config.getUri(job.getProjectFolder(), config.getReceptorFileName()));
 				job.setConfigurationUri(config.getUri(job.getProjectFolder(), config.getConfigFileName()));
+				
+				job.setOutputUri(config.getUri(job.getProjectFolder(), config.getOutputFileName()));
 
 				job.setUser(catalogUser);
 
@@ -201,16 +204,20 @@ public class FormSubmitter extends VarConfig {
 	private void _submit(JobSubmission job) {
 		// Send to processing manager
 		JSONObject submission = new JSONObject();
+		JSONArray wrapper = new JSONArray();
 		JSONArray submits = new JSONArray();
 
 		if (job.isPilot()) {
-			submits.put(_createSubmissionMap(1, "ligands", job.getPilotLigandsUri()));
+			submits.add(_createSubmissionMap(1, "ligands", job.getPilotLigandsUri()));
 		} else {
-			submits.put(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
+			submits.add(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
 		}
 
-		submits.put(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
-		submits.put(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
+		submits.add(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
+		submits.add(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
+		submits.add(_createSubmissionMap(4, "output", job.getOutputUri()));
+
+		wrapper.add(submits);
 
 		Long appId = _getDb().getApplicationByName(config.getAutodockName()).getDbId();
 
@@ -218,14 +225,15 @@ public class FormSubmitter extends VarConfig {
 		submission.put("description", job.getProjectDescription());
 		submission.put("userId", job.getUser().getDbId());
 		submission.put("projectId", job.getProject().getDbId());
-		submission.put("submission", submits);
-		
-		log(submission.toJSONString());
-		
+		submission.put("submission", wrapper);
+
 		// TODO send to client
 		ClientConfig clientConfig = new DefaultClientConfig();
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 		Client client = Client.create(clientConfig);
+
+		// Logging
+		client.addFilter(new LoggingFilter(System.out));
 
 		WebResource webResource = client.resource(config.getProcessingResource());
 

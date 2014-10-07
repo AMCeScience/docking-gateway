@@ -17,6 +17,7 @@ public class JobSubmission {
 	private String configurationUri = "";
 	private User user;
 	private Project project;
+	private String outputUri = "";
 	
 	private String uriBase = "";
 	
@@ -118,5 +119,13 @@ public class JobSubmission {
 
 	public void setProject(Project project) {
 		this.project = project;
+	}
+	
+	public String getOutputUri() {
+		return outputUri;
+	}
+	
+	public void setOutputUri(String outputUri) {
+		this.outputUri = outputUri;
 	}
 }

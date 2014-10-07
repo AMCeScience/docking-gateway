@@ -11,13 +11,18 @@ import java.util.List;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.datamodel.manager.PersistenceManager;
+import nl.amc.biolab.datamodel.objects.Application;
+import nl.amc.biolab.datamodel.objects.IOPort;
 import nl.amc.biolab.datamodel.objects.Processing;
 import nl.amc.biolab.datamodel.objects.Project;
+import nl.amc.biolab.datamodel.objects.Resource;
 import nl.amc.biolab.datamodel.objects.User;
 import nl.amc.biolab.datamodel.objects.UserAuthentication;
 import nl.amc.biolab.tools.BlobHandler;
 
 public class PersistenceManagerPlugin extends PersistenceManager {    
+    Connection connect = null;
+    
     /**
      * Only runs when the application is first deployed and the webdav resource is not stored in the database yet.
      */
@@ -27,18 +32,21 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     	if (get.resourceByName("webdav") == null) {
             System.out.println("setting up appliciation and resources");
             
+            Resource webdav = new Resource("webdav", "localhost resource", config.getWebDavUri(), "http", true, false, false);
+            Resource vlemed = new Resource("glite;vlemed", "glite;vlemed", "lfn:/grid/vlemed/AutodockVinaGateway/autodock", "lcg", true, false, false);
+            
             // Create resources
-            insert.resource("webdav", "localhost resource", config.getWebDavUri(), false, false, false, "http"); // local
-            insert.resource("glite;vlemed", "glite;vlemed",	"lfn:/grid/vlemed/AutodockVinaGateway/autodock", false, false, true, "lcg"); // grid
+            insert.resource(webdav); // local
+            insert.resource(vlemed); // grid
 
             // Create application
             Long appId = insert.application("Autodock", "Autodock description test", "121;10196", 1);
-            
+
             // Create IOPorts
-            insert.ioPort(1, "3@Generator", "ligands.zip", "Input", "File", "test", true, get.application(appId), get.resourceByName("glite;vlemed"));
-            insert.ioPort(2, "4@Generator", "config.txt", "Input", "File", "test", true, get.application(appId), get.resourceByName("glite;vlemed"));
-            insert.ioPort(3, "5@Generator", "receptor.pdbqt", "Input", "File", "test", true, get.application(appId), get.resourceByName("glite;vlemed"));
-            insert.ioPort(4, "0@Generator", "output.tar.gz", "Output", "File", "ZIP", true, get.application(appId), get.resourceByName("glite;vlemed"));
+            insert.ioPort(new IOPort("3@Generator", 1, "ligands.zip", "Input", "File", null, true, null, get.application(appId), webdav, null, null));
+            insert.ioPort(new IOPort("4@Generator", 2, "config.txt", "Input", "File", null, true, null, get.application(appId), webdav, null, null));
+            insert.ioPort(new IOPort("5@Generator", 3, "receptor.pdbqt", "Input", "File", null, true, null, get.application(appId), webdav, null, null));
+            insert.ioPort(new IOPort("0@collector.sh", 4, "output.tar.gz", "Output", "File", "ZIP", true, null, get.application(appId), vlemed, null, null));
     	}
     }
     
@@ -51,17 +59,15 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     	
     	if (catalogUser != null) {
     		HashMap<String, String> liferayUser = _getLiferayCredentials(liferayId);
+    	
+    		UserAuthentication userAuth = _getUserAuthentication(catalogUser.getDbId());
     		
-    		if (!catalogUser.getUserAuthentication().isEmpty()) {
-    			UserAuthentication userAuth = catalogUser.getUserAuthentication().iterator().next();
+    		if (userAuth != null) {
+    			BlobHandler handler = new BlobHandler();
     			
-    			BlobHandler blob = new BlobHandler();
-        		
-        		if (userAuth != null) {
-    	    		if (blob.decryptString(userAuth.getAuthentication()).equals(liferayUser.get("password"))) {
-    	    			return true;
-    	    		}
-        		}
+	    		if (handler.decryptString(userAuth.getAuthentication()).equals(liferayUser.get("password"))) {
+	    			return true;
+	    		}
     		}
     	}
     	
@@ -70,6 +76,8 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     
     public boolean userSetup(String liferayId) {
     	User catalogUser = get.user(liferayId);
+    	
+    	Long userId = null;
     	
     	HashMap<String, String> liferayUser = _getLiferayCredentials(liferayId);
     	
@@ -84,17 +92,17 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     	// User does not exist in catalog yet, need to set up a new user and password
     	if (catalogUser == null && liferayUser != null) {
         	// Create user
-            catalogUser = get.user(insert.user(liferayId, liferayUser.get("first_name"), liferayUser.get("last_name"), liferayUser.get("email")));
+            userId = insert.user(liferayId, liferayUser.get("first_name"), liferayUser.get("last_name"), liferayUser.get("email"));
             
             // Check if success
-            if (catalogUser != null) {
+            if (userId != null) {
             	// Going to set a password for this user
             	setPass = true;
             }
         }
     	
     	if (setPass) {
-			update.userPassword(catalogUser.getEmail(), liferayUser.get("password"), get.resourceByName("webdav"), catalogUser);
+			_setUserPassword(catalogUser, liferayUser.get("password"), get.resourceByName("webdav"));
 			
 			// Setup is done
     		setup = true;
@@ -102,6 +110,30 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     	
     	return setup;
     }
+    
+    private UserAuthentication _setUserPassword(User user, String userPass, Resource resource) {
+    		UserAuthentication auth = null;
+    		BlobHandler handler = new BlobHandler();
+    		
+    		auth = get.userAuthenticationByResourceId(user.getDbId(), resource.getDbId());
+    		
+	    	if (auth != null && auth.getUserLogin().equalsIgnoreCase(user.getEmail())) {
+	    		auth.setAuthentication(handler.encryptString(userPass));
+		    	
+	    		crud.update(auth);
+	    	} else {
+	    	    auth = new UserAuthentication();
+	    	    
+	    	    auth.setUser(user);
+	    	    auth.setResource(resource);
+	    	    auth.setUserLogin(user.getEmail());
+	    	    auth.setAuthentication(handler.encryptString(userPass));
+	    		
+	    	    insert.userAuthentication(auth);
+	    	}
+	    	
+	    	return auth;
+       }
     
     private HashMap<String, String> _getLiferayCredentials(String liferayId) {
     	HashMap<String, String> results = new HashMap<String, String>();
@@ -112,7 +144,7 @@ public class PersistenceManagerPlugin extends PersistenceManager {
 	
 	    	Statement statement = connect.createStatement();
 	    	ResultSet resultSet = statement.executeQuery("select * from User_ where userId = " + liferayId);
-	      
+	    	
 	    	while (resultSet.next()) {
 	    		results.put("email", resultSet.getString("emailAddress"));
 	    		results.put("password", resultSet.getString("password_"));
@@ -133,12 +165,30 @@ public class PersistenceManagerPlugin extends PersistenceManager {
 	    return null;
     }
     
+	private UserAuthentication _getUserAuthentication(Long userId) {
+    	try {
+            return (UserAuthentication) query.executeQuery("from UserAuthentication where UserID ='" + userId + "'", true);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    	
+    	return null;
+    }
+	
+	public Application getApplicationByName(String name) {
+    	try {
+            return (Application) query.executeQuery("from Application where Name ='" + name + "'", true);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    	
+    	return null;
+    }
+    
     // ##########################################################################################################################
     // #   												Projects functions														#
     // ##########################################################################################################################
-    
-    Connection connect = null;
-	
+
     /**
 	 * Searches the database with the provided sql, the sql should contain a join of Project and Processing for this to work
 	 * @param sql Sql by which we search for the projects, should contain a join of Project and Processing tables
@@ -170,12 +220,5 @@ public class PersistenceManagerPlugin extends PersistenceManager {
 	 */
     public int countProjectsBySQL(String sql) {
         return ((BigInteger) session.createSQLQuery(sql).uniqueResult()).intValue();
-    }
-
-    public boolean checkProjectNameUnique(String projectName) {
-        @SuppressWarnings("unchecked")
-		List<Project> projects = (List<Project>) query.executeSQL("SELECT ProjectName FROM Project WHERE ProjectName = '" + projectName + "'");
-
-        return projects.isEmpty();
     }
 }

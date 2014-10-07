@@ -38,13 +38,9 @@ public class AutodockVinaPortlet extends GenericPortlet {
         boolean success = false;
         
 		try {
-			submit.init();
-			
 			success = submit.saveForm(formParameters);
 		} catch (PersistenceException e) {
 			LOG.log(e.getMessage());
-		} finally {
-			submit.close();
 		}
         
         if (!success) {

@@ -106,11 +106,10 @@ function new_job_submit() {
     	    });*/
     		
     		var checked_libraries = $('input[name=library_check]:checked', form).map(function() {
-    	        // Put value in array
-    	        var folder_name = $(this).parent().attr('class').split(' ')[0];
-    	        
-    	        return '"' + folder_name.slice(4, folder_name.length) + '"';
-    	    });
+    			var folder_name = $(this).parent().attr('class').split(' ')[0];
+    			
+    			return '"' + folder_name.slice(4, folder_name.length) + '"';
+    		});
 
     	    // Remove checkboxes from form, so we don't post these to the backend
     	    $('input[name=library_check]', form).remove();
@@ -185,17 +184,8 @@ function after_search(ajax_data) {
             		
             		$(ui.newPanel[0]).data('project', data);
             		
-            		var update_status = false;
-            		
-            		// Disabled for now
-            		/*if (data.overall_status.indexOf("In Progress") > -1
-						|| data.overall_status.indexOf("In Preparation") > -1
-						|| data.overall_status.indexOf("On Hold") > -1) {
-            			update_status = true;
-            		}*/
-            		
             		// Draw the panel html
-            		update_panel(data.project_id, data.processing_id, update_status);
+            		update_panel(data.project_id, data.processing_id);
         		}
         	}
         });

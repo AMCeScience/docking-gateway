@@ -25,27 +25,7 @@ function init_project_buttons() {
 		}
 		
 		get_details(ajax_data, ajax_continue);
-	})
-	
-    $('.update').click(function() {
-        function ajaxContinue(response) {
-        	// Update display line of status
-        	$('.project_status_disp', '.' + data_div + response.project_id + response.processing_id).text(response.new_status);
-        	
-            return;
-        }
-        
-        var project_data = $(this).closest('.project_data_div').data('project');
-
-        var ajax_data = {
-    		project_id: project_data.project_id,
-            processing_id: project_data.processing_id
-        };
-        
-        $('.project_status_disp', $(this).parent()).text('Updating...');
-        
-        updateStatus(ajax_data, ajaxContinue);
-    });
+	});
     
     $('.download').click(function() {
         var data = $(this).closest('.project_data_div').data('project');

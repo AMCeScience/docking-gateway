@@ -20,9 +20,7 @@ import org.json.simple.parser.ParseException;
 public class LigandZipper extends VarConfig {
     public LigandZipper() {}
     
-    public Ligands prepareLigandFile(HashMap<String, Object> formMap) {
-    	log("prepareLigandFile");
-    	
+    public Ligands prepareLigandFile(HashMap<String, Object> formMap, String project_folder) {
         JSONParser parser = new JSONParser();
         
         Ligands ligandsObj = new Ligands();
@@ -37,50 +35,50 @@ public class LigandZipper extends VarConfig {
             int pilotLigandCount = config.getPilotLigandCount();
             
             // Create streams
-            String zipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getLigandsZipFileName();
-            String pilotZipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getPilotLigandsZipFileName();
+            String zipFilePath = config.getProjectFilePath(project_folder) + config.getLigandsZipFileName();
+            String pilotZipFilePath = config.getProjectFilePath(project_folder) + config.getPilotLigandsZipFileName();
             
             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFilePath));
             ZipOutputStream pilotZip = new ZipOutputStream(new FileOutputStream(pilotZipFilePath));
 
             for (Object obj : libraryArray) {
-                String folder = obj.toString();
-                File library_folder = new File(config.getLigandPath() + folder);
-                
-                if (library_folder.isDirectory()) {
-                	for (File ligand : library_folder.listFiles()) {
-                		FileInputStream fin = new FileInputStream(ligand);
-                        
-                        zip.putNextEntry(new ZipEntry(ligand.getName()));
-                        
-                        if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-                        	pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
-                        }
-                        
-                        int length;
+            	String folder = obj.toString();
+            	File library_folder = new File(config.getLigandPath() + folder);
 
-                        byte[] b = new byte[1024];
-
-                        while((length = fin.read(b)) > 0) {
-                            zip.write(b, 0, length);
-                            
-                            if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-                            	pilotZip.write(b, 0, length);
-                            }
-                        }
-                        
-                        ligandsObj.addCount();
-                        
-                        zip.closeEntry();
-                        
-                        if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-                        	ligandsObj.addPilotCount();
-                        	
-                        	pilotZip.closeEntry();
-                        }
-                        
-                        fin.close();
-                	}
+            	if (library_folder.isDirectory()) {
+            		for (File ligand : library_folder.listFiles()) {
+	            		FileInputStream fin = new FileInputStream(ligand);
+	            		
+	            		zip.putNextEntry(new ZipEntry(ligand.getName()));
+	            		
+	            		if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+		            		pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
+	            		}
+            		
+	            		int length;
+            	
+	            		byte[] b = new byte[1024];
+	            		
+	            		while((length = fin.read(b)) > 0) {
+	            			zip.write(b, 0, length);
+	            			
+	            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+	            				pilotZip.write(b, 0, length);
+	            			}
+            			}
+	            			
+            			ligandsObj.addCount();
+            			
+            			zip.closeEntry();
+            			
+            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+	            			ligandsObj.addPilotCount();
+	            			
+	            			pilotZip.closeEntry();
+            			}
+            			
+            			fin.close();
+        			}
                 }
             }
 

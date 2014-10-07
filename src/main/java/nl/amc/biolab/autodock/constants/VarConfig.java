@@ -158,12 +158,16 @@ public class VarConfig extends Logger {
 		return getItem("config_file_ext");
     }
     
-    /**
-     * Get processing manager WSDL url
-     * @return Processing manager WSDL url
-     */
-    public String getProcessingWSDL() {
-        return getItem("processing_wsdl");
+    public String getOutputFileName() {
+    	return getItem("output_file_name") + getOutputExt();
+    }
+    
+    public String getOutputExt() {
+    	return getItem("output_file_ext");
+    }
+    
+    public String getProcessingResource() {
+    	return getItem("processing_resource");
     }
     
     public Integer getPilotLigandCount() {
@@ -184,6 +188,14 @@ public class VarConfig extends Logger {
 		}
     	
     	return null;
+    }
+    
+    /**
+     * Get formatted database connection url
+     * @return Formatted database connection url
+     */
+    public String getDbConnectionUrl() {
+    	return getItem("neuro_db");
     }
     
     /**

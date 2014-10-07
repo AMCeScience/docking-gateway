@@ -1,7 +1,7 @@
 var header_div = "header_div_id_";
 var data_div = "data_div_id_";
 
-function update_panel(project_id, processing_id, update_status) {
+function update_panel(project_id, processing_id) {
 	log("update panel called");
 	
 	function draw_panel(response) {
@@ -37,13 +37,7 @@ function update_panel(project_id, processing_id, update_status) {
 		"processing_id": processing_id
 	}
 	
-	if (update_status !== undefined && update_status === true) {
-		//TODO: Disabled for now until processing manager can handle status updates simultaneously
-		//do_search_and_update(ajax_data, draw_panel);
-		do_search(ajax_data, draw_panel);
-	} else {
-		do_search(ajax_data, draw_panel);
-	}
+	do_search(ajax_data, draw_panel);
 }
 
 function build_project_html(div, ajax_data) {
@@ -135,8 +129,8 @@ function build_inside_project_html(project_data) {
             project_html += "<div class='" + class_name + "'>\
                 <a href='/webdav/" + project_data.project_name.replace("_pilot", "") + "/" + data_element.name + "'>Name: " + data_element.name + "</a>";
 
-            if (data_element.scan_id !== null) {
-                project_html += "<span>Ligand count: " + data_element.scan_id + "</span>";
+            if (data_element.ligand_count !== null) {
+                project_html += "<span>Ligand count: " + data_element.ligand_count + "</span>";
             }
 
             project_html += "<span>Format: " + data_element.format + "</span>\
@@ -152,13 +146,6 @@ function build_inside_project_html(project_data) {
         "<div class='in_process_items_wrapper'>\
             <h2>Status</h2>\
             <span class='project_status_disp'>" + project_data.submissions[0].status + "</span>";
-            
-        	if (project_data.overall_status.indexOf("In Progress") > -1
-				|| project_data.overall_status.indexOf("In Preparation") > -1
-				|| project_data.overall_status.indexOf("On Hold") > -1
-				|| project_data.overall_status.indexOf("Resuming") > -1) {
-				project_html += "<input class='button update' type='button' value='Update'/>";
-			}
         	
         project_html += "</div>";
     }
@@ -213,24 +200,10 @@ function buildLibraryHtml(ajax_data) {
     
     $.each(ajax_data, function(key, files) {
         var folder_name = key;
-        
+       
         html.push("<li class='lib_" + folder_name + " library'>\
                 <input name='library_check' type='checkbox' value='1'/>\
                 " + folder_name + "</li>");
-        
-        /*html.push("<li class='lib_" + folder_name + " library'>\
-                    <span class='library_drop arrow_right'></span>\
-                    <input name='library_check' type='checkbox' value='1'/>\
-                    " + folder_name + "<br/>\
-                    <ul class='lib_" + folder_name + " compound_list'>");*/
-        
-        /*$.each(files, function(key, file_name) {
-            html.push("<li class='compounds compound_" + file_name + "'>\
-                        <input name='compound_check' type='checkbox' value='" + file_name + "'/>" + file_name + "\
-                       </li>");
-        });*/
-        
-        //html.push("</ul></li>");
     });
     
     return html;

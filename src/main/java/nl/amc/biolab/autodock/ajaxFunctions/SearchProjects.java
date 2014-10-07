@@ -188,7 +188,7 @@ public class SearchProjects extends AjaxInterface {
         }
         
         if (LIMIT.length() > 0) {
-        	_getSQLBuilder().setLimit(LIMIT);
+        	//_getSQLBuilder().setLimit(LIMIT);
         }
         
         // Get SQL string
@@ -216,8 +216,8 @@ public class SearchProjects extends AjaxInterface {
         // Add joins
         JOINS.put("Processing as po", "p.ProjectID = po.ProjectID");
         JOINS.put("Application as app", "po.ApplicationID = app.ApplicationID");
-        JOINS.put("UserProcessing as up", "po.ProcessingID = up.ProcessingID");
-        JOINS.put("User as u", "up.UserKey = u.UserKey");
+        JOINS.put("User as u", "po.UserID = u.UserID");
+        JOINS.put("Submission as sub", "po.ProcessingID = sub.ProcessingID");
         
         // We are at: SELECT ... FROM ... JOIN ... ON ...
         
@@ -236,7 +236,6 @@ public class SearchProjects extends AjaxInterface {
         	LinkedHashMap<Object, String> tempMap = new LinkedHashMap<Object, String>();
         	ArrayList<String> tempList = new ArrayList<String>();
         	
-        	//String[] searchFields = {"p.ProjectName", "p.ProjectDescription", "p.ProjectOwner", "po.ProcessingDate"};
         	String concat = "CONCAT_WS(',', LOWER(p.ProjectName), LOWER(p.ProjectDescription), LOWER(u.FirstName), LOWER(u.LastName), LOWER(po.ProcessingDate))";
 
         	String[] terms = _getSearchTermEntry("search_terms").trim().split(" ");
@@ -286,7 +285,7 @@ public class SearchProjects extends AjaxInterface {
             
             while (statusIter.hasNext()) {
                 // WHERE status = xxxxx
-            	tempList.add(_getSQLBuilder().getWhere("po.ProcessingStatus", "LIKE", "'%" + statusIter.next().trim() + "%'"));
+            	tempList.add(_getSQLBuilder().getWhere("(SELECT Value FROM Status as s WHERE s.SubmissionID = sub.SubmissionID ORDER BY s.StatusTime DESC LIMIT 1)", "LIKE", "'%" + statusIter.next().trim() + "%'"));
             }
             
             tempMap.put(tempList, "OR");

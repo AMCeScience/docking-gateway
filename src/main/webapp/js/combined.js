@@ -43,7 +43,7 @@ function new_job() {
         //init_list_search();
         
         $('.compound_search').show();
-        $('.spinner').hide();
+        $('.spinner', '.bottom').hide();
     }
 
     log("getLigands call for new job page");

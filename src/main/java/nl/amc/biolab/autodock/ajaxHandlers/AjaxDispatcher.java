@@ -7,14 +7,14 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import nl.amc.biolab.autodock.ajaxFunctions.AjaxError;
-import nl.amc.biolab.autodock.constants.VarConfig;
+import docking.crappy.logger.Logger;
 
 /**
  * This class handles calling the appropriate class for the ajax request and passes on the ajax parameters.
  * 
  * @author Allard van Altena
  */
-public class AjaxDispatcher extends VarConfig {
+public class AjaxDispatcher {
     private AjaxInterface AJAXOBJ;
             
     public AjaxDispatcher() {}
@@ -34,7 +34,7 @@ public class AjaxDispatcher extends VarConfig {
         // Init AjaxInterface as null
         _setAjaxObj(null);
         
-        log(callFunction);
+        Logger.log(callFunction, Logger.debug);
         
         // Get called for class, catch errors
         try {
@@ -61,7 +61,8 @@ public class AjaxDispatcher extends VarConfig {
         	_setAjaxObj(new AjaxError());
         	_getAjaxObj().init(params, new JSONOutput(response));
         	_getAjaxObj()._getJSONObj().add("error_val", error_msg);
-        	log(error_msg);
+        	
+        	Logger.log(error_msg, Logger.error);
         }
     }
     
@@ -69,10 +70,10 @@ public class AjaxDispatcher extends VarConfig {
      * Writes the ajax response to the client
      */
     public void response() {
-        log("Writing response."); 
+        Logger.log("Writing response.", Logger.debug); 
        
         if(!_getAjaxObj().getResponse()) {
-            log("Ajax message not set.");
+            Logger.log("Ajax message not set.", Logger.error);
         }
     }
     

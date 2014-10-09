@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
+import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.output.objects.LocalProject;
 import nl.amc.biolab.datamodel.objects.Processing;
 import nl.amc.biolab.datamodel.objects.Project;
+import docking.crappy.logger.Logger;
 
 /**
  * Searches for projects and their data and outputs formatted json data
@@ -61,7 +63,7 @@ public class SearchProjects extends AjaxInterface {
     private void _setPagination() {
     	// Add page count to response object
     	// Cast to integer floors the result
-    	_getJSONObj().add("pages", (int) ((_countProjects() - 1) / config.getItemsPerPage()) + 1);
+    	_getJSONObj().add("pages", (int) ((_countProjects() - 1) / VarConfig.getItemsPerPage()) + 1);
     	
     	// Set default to page 1 if no page is set
     	if (_getSearchTermEntry("page") == null) {
@@ -76,7 +78,7 @@ public class SearchProjects extends AjaxInterface {
      * @param projects ArrayList of LinkedHashMaps with projects as returned by the database call
      */
     private void _setProjectsData(ArrayList<LinkedHashMap<String, Object>> projects) {
-        log.log("Projects size: " + projects.size());
+        Logger.log("Projects size: " + projects.size(), Logger.debug);
         
         ArrayList<Map<String, Object>> projectData = new ArrayList<Map<String, Object>>();
 
@@ -135,7 +137,7 @@ public class SearchProjects extends AjaxInterface {
         SELECTS.put("{po.*}", null);
     	
         int page_nr = Integer.parseInt(_getSearchTermEntry("page"));
-        int items_per_page = config.getItemsPerPage(); 
+        int items_per_page = VarConfig.getItemsPerPage(); 
         
         if (!_isSingleProject()) {
         	LIMIT = ((page_nr - 1) * items_per_page) + ", " + items_per_page;
@@ -197,7 +199,7 @@ public class SearchProjects extends AjaxInterface {
         // Clear variable
         _getSQLBuilder().resetQuery();
         
-        log("SQL search string: " + sql);
+        Logger.log("SQL search string: " + sql, Logger.sql);
         
         return sql;
     }

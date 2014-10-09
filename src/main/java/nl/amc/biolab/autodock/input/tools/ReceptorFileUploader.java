@@ -1,27 +1,31 @@
 package nl.amc.biolab.autodock.input.tools;
 
 import java.io.File;
-import nl.amc.biolab.autodock.input.objects.Receptor;
+
 import nl.amc.biolab.autodock.constants.VarConfig;
+import nl.amc.biolab.autodock.input.objects.Receptor;
+
 import org.apache.commons.fileupload.FileItem;
+
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard
  */
-public class ReceptorFileUploader extends VarConfig {    
+public class ReceptorFileUploader {    
     public ReceptorFileUploader() {}
     
     public Receptor doUpload(FileItem receptorFile, String project_folder) {
         Receptor receptor = new Receptor();
         
         try {
-            log.log(receptorFile);
+            Logger.log(receptorFile, Logger.debug);
             
             if (receptorFile != null && receptorFile.getSize() > 0) {
-                log.log("Receptor file size: " + receptorFile.getSize());
+                Logger.log("Receptor file size: " + receptorFile.getSize(), Logger.debug);
                 
-                File receptor_file = new File(config.getProjectFilePath(project_folder) + config.getReceptorFileName());
+                File receptor_file = new File(VarConfig.getProjectFilePath(project_folder) + VarConfig.getReceptorFileName());
 
                 // Create new file on the system
                 receptor_file.createNewFile();
@@ -29,7 +33,7 @@ public class ReceptorFileUploader extends VarConfig {
                 // Write upload to created file on system
                 receptorFile.write(receptor_file);
                 
-                log.log("Receptor file uploaded in: " + config.getProjectFilePath(project_folder) + config.getReceptorFileName());
+                Logger.log("Receptor file uploaded in: " + VarConfig.getProjectFilePath(project_folder) + VarConfig.getReceptorFileName(), Logger.debug);
                 
                 if (receptor_file.exists()) {
                     receptor.setValid(true);
@@ -40,7 +44,7 @@ public class ReceptorFileUploader extends VarConfig {
                 receptor.setError("Error while uploading file, either file not found or filesize is 0.");
             }
         } catch (Exception e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         }
         
         return receptor;

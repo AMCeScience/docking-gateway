@@ -27,12 +27,10 @@ public class PersistenceManagerPlugin extends PersistenceManager {
      * Only runs when the application is first deployed and the webdav resource is not stored in the database yet.
      */
     public void initApp() {
-    	VarConfig config = new VarConfig();
-    	
     	if (get.resourceByName("webdav") == null) {
             System.out.println("setting up appliciation and resources");
             
-            Resource webdav = new Resource("webdav", "localhost resource", config.getWebDavUri(), "http", true, false, false);
+            Resource webdav = new Resource("webdav", "localhost resource", VarConfig.getWebDavUri(), "http", true, false, false);
             Resource vlemed = new Resource("glite;vlemed", "glite;vlemed", "lfn:/grid/vlemed/AutodockVinaGateway/autodock", "lcg", true, false, false);
             
             // Create resources
@@ -137,10 +135,9 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     
     private HashMap<String, String> _getLiferayCredentials(String liferayId) {
     	HashMap<String, String> results = new HashMap<String, String>();
-    	VarConfig config = new VarConfig();
     	
 	    try {
-	    	connect = DriverManager.getConnection(config.getLiferayDbConnectionUrl());
+	    	connect = DriverManager.getConnection(VarConfig.getLiferayDbConnectionUrl());
 	
 	    	Statement statement = connect.createStatement();
 	    	ResultSet resultSet = statement.executeQuery("select * from User_ where userId = " + liferayId);

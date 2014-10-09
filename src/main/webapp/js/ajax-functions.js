@@ -4,6 +4,18 @@ function do_search(dataArr, successFunc) {
     ajax_call(dataArr, successFunc, $('body').data('ajax-urls').searchUrl, "POST", false);
 }
 
+function getPartialResult(dataArr, successFunc) {
+    log('getPartialResult function running');
+    
+    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').partialResultUrl, "POST", false);
+}
+
+function updateStatus(dataArr, successFunc) {
+    log('updateStatus function running');
+
+    ajax_call(dataArr, successFunc, $('body').data('ajax-urls').updateStatusUrl, "POST", false);
+}
+
 function getLigands(successFunc) {
     log('getLigands function running');
 

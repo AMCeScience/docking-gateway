@@ -4,16 +4,16 @@ import java.io.IOException;
 
 import javax.portlet.ResourceResponse;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
-
 import org.json.simple.JSONObject;
+
+import docking.crappy.logger.Logger;
 
 /**
  * JSON class which makes communication with the client easier, set a ResourceResponse object and add data to the JSONObject to communicate
  *
  * @author Allard van Altena
  */
-public class JSONOutput extends VarConfig {
+public class JSONOutput {
     private JSONObject JSONObj;
     private ResourceResponse RESPONSE;
     
@@ -42,7 +42,7 @@ public class JSONOutput extends VarConfig {
      */
     public boolean echo() {        
         if (_getJSONObj().toString().length() < 4000) {
-            log.log("writing response " + _getJSONObj().toString());
+            Logger.log("writing response " + _getJSONObj().toString(), Logger.json);
         }
 
         try {
@@ -56,7 +56,7 @@ public class JSONOutput extends VarConfig {
                 return true;
             }
         } catch(IOException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         }
         
         return false;

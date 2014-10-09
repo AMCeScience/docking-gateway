@@ -8,25 +8,8 @@ import docking.crappy.logger.Logger;
  *
  * @author Allard van Altena
  */
-public class VarConfig extends Logger {
-	private final String file_path = "guse/apache-tomcat-6.0.36/webapps/config.json";
-	private final String app_name = "docking";
-	private ConfigurationManager config_file;
-    
-    public VarConfig config;
-    
-    /**
-     * Constructor which reads the configuration file, also exposes the config variable to all extending classes
-     */
-    public VarConfig() {
-    	try {
-			this.config_file = new ConfigurationManager(this.file_path);
-		} catch (ReaderException e) {
-			log(e.getMessage());
-		}
-    	
-    	config = this;
-    }
+public class VarConfig {
+	private static final String app_name = "docking";
         
     /**
      * Get configuration item with certain name in String.
@@ -34,11 +17,11 @@ public class VarConfig extends Logger {
      * @return String of configuration item belonging to the input 'name'
      * @throws Exception Throws exception when name does not exist in file
      */
-    public String getItem(String name) {
+    public static String getItem(String name) {
     	try {
-    		return this.config_file.read.getStringItem(this.app_name, name);
+    		return ConfigurationManager.read.getStringItem(VarConfig.app_name, name);
     	} catch(ReaderException e) {
-    		log(e.getMessage());
+    		Logger.log(e, Logger.exception);
     	}
     	
     	return null;
@@ -48,143 +31,147 @@ public class VarConfig extends Logger {
      * Get boolean whether if the site is in development mode
      * @return Boolean whether if the site is in development mode
      */
-    public boolean getIsDev() {
+    public static boolean getIsDev() {
     	try {
-			return this.config_file.read.getBooleanItem("is_dev");
+			return ConfigurationManager.read.getBooleanItem("is_dev");
 		} catch (ReaderException e) {
-			log(e.getMessage());
+			Logger.log(e, Logger.exception);
 		}
     	
     	return false;
     }
     
-    public String getAutodockName() {
+    public static String getAutodockName() {
         return getItem("autodock_name");
     }
     
-    public String getWebDavUri() {
+    public static String getWebDavUri() {
         return getItem("webdav_internal");
     }
     
-    public String getExternalWebDavUri() {
+    public static String getExternalWebDavUri() {
         return getItem("webdav_external");
     }
     
-    public String getUri(String folderName, String fileName) {
+    public static String getUri(String folderName, String fileName) {
         return getWebDavUri() + folderName + "/" + fileName;
     }
     
-    public String getFilePath() {
+    public static String getFilePath() {
         return getItem("project_root");
     }
     
-    public String getProjectFilePath(String projectName) {
+    public static String getProjectFilePath(String projectName) {
         return getFilePath() + projectName + "/";
     }
     
-    public String getOutputCSVExt() {
+    public static String getOutputCSVName() {
+    	return getItem("output_file_csv_name") + getItem("output_file_csv_ext");
+    }
+    
+    public static String getOutputCSVExt() {
         return getItem("output_file_csv_ext");
     }
     
-    public String getOuputLigandsZipExt() {
+    public static String getOuputLigandsZipExt() {
         return getItem("output_file_ligands_ext");
     }
     
-    public String getOutputUnzipLocation(String folderName) {
+    public static String getOutputUnzipLocation(String folderName) {
         return getProjectFilePath(folderName) + getItem("unzip_location") + "/";
     }
     
-    public String getWebDavPath(String folderName) {
+    public static String getWebDavPath(String folderName) {
         return getWebDavUri() + folderName + "/";
     }
     
-    public String getExternalWebDavPath(String folderName) {
+    public static String getExternalWebDavPath(String folderName) {
         return getExternalWebDavUri() + folderName + "/";
     }
     
-    public String getOutputFileName(String folderName) {
+    public static String getOutputFileName(String folderName) {
         return getWebDavUri() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
-    public String getExternalOutputFileName(String folderName) {
+    public static String getExternalOutputFileName(String folderName) {
         return getExternalWebDavUri() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
-    public String getOutputFilePath(String folderName) {
+    public static String getOutputFilePath(String folderName) {
         return getFilePath() + folderName + "/" + getItem("output_file_name") + getItem("output_file_ext");
     }
     
-    public String getExternalUnzippedOutputPath(String folderName) {
+    public static String getExternalUnzippedOutputPath(String folderName) {
     	return getExternalWebDavPath(folderName) + getItem("unzip_location");
     }
     
-    public String getLigandPath() {
+    public static String getLigandPath() {
         return getItem("ligand_path");
     }
     
-    public String getLigandFileName(String folderName, String fileName) {
+    public static String getLigandFileName(String folderName, String fileName) {
         return getLigandPath() + folderName + "/" + fileName;
     }
     
-    public String getLigandCache() {
+    public static String getLigandCache() {
         return getItem("ligand_cache_path");
     }
     
-    public String getLigandsZipFileName() {
+    public static String getLigandsZipFileName() {
         return getItem("zip_file_name") + getLigandsZipExt();
     }
     
-    public String getPilotLigandsZipFileName() {
+    public static String getPilotLigandsZipFileName() {
         return getItem("pilot_zip_file_name") + getLigandsZipExt();
     }
     
-    public String getLigandsZipExt() {
+    public static String getLigandsZipExt() {
         return getItem("zip_file_ext");
     }
     
-    public String getReceptorFileName() {
+    public static String getReceptorFileName() {
         return getItem("receptor_file_name") + getReceptorExt();
     }
     
-    public String getReceptorExt() {
+    public static String getReceptorExt() {
         return getItem("receptor_file_ext");
     }
     
-    public String getConfigFileName() {
+    public static String getConfigFileName() {
         return getItem("config_file_name") + getConfigExt();
     }
     
-    public String getConfigExt() {
+    public static String getConfigExt() {
 		return getItem("config_file_ext");
     }
     
-    public String getOutputFileName() {
+    public static String getOutputFileName() {
     	return getItem("output_file_name") + getOutputExt();
     }
     
-    public String getOutputExt() {
+    public static String getOutputExt() {
     	return getItem("output_file_ext");
     }
     
-    public String getProcessingResource() {
+    public static String getProcessingResource() {
     	return getItem("processing_resource");
     }
     
-    public Integer getPilotLigandCount() {
+    public static Integer getPilotLigandCount() {
     	try {
-			return this.config_file.read.getIntegerItem(app_name, "pilot_ligand_count");
+			return ConfigurationManager.read.getIntegerItem(app_name, "pilot_ligand_count");
 		} catch (ReaderException e) {
-			log(e.getMessage());
+			Logger.log(e, Logger.exception);
 		}
     	
     	return null;
     }
     
-    public Integer getItemsPerPage() {
+    public static Integer getItemsPerPage() {
     	try {
-			return this.config_file.read.getIntegerItem(app_name, "items_per_page");
+			return ConfigurationManager.read.getIntegerItem(app_name, "items_per_page");
 		} catch (ReaderException e) {
-			log(e.getMessage());
+			Logger.log(e, Logger.exception);
 		}
     	
     	return null;
@@ -194,7 +181,7 @@ public class VarConfig extends Logger {
      * Get formatted database connection url
      * @return Formatted database connection url
      */
-    public String getDbConnectionUrl() {
+    public static String getDbConnectionUrl() {
     	return getItem("neuro_db");
     }
     
@@ -202,7 +189,7 @@ public class VarConfig extends Logger {
      * Get formatted database connection url
      * @return Formatted database connection url
      */
-    public String getLiferayDbConnectionUrl() {
+    public static String getLiferayDbConnectionUrl() {
     	return getItem("liferay_db");
     }
 }

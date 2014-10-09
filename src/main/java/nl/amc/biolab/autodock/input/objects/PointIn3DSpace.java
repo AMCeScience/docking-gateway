@@ -1,14 +1,15 @@
 package nl.amc.biolab.autodock.input.objects;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import java.io.BufferedWriter;
 import java.io.IOException;
+
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard van Altena
  */
-public class PointIn3DSpace extends VarConfig {
+public class PointIn3DSpace {
     private String X = "";
     private String Y = "";
     private String Z = "";
@@ -78,7 +79,7 @@ public class PointIn3DSpace extends VarConfig {
             out.write(get_type() + "_z = " + Z);
             out.newLine();
         } catch(IOException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         }
     }
     

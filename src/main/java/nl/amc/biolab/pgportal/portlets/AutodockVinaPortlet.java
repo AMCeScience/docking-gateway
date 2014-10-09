@@ -25,14 +25,13 @@ import docking.crappy.logger.Logger;
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
     private final String PROJECT_DISPLAY_PAGE = "project_display";
-    private Logger LOG = new Logger();
 
     public AutodockVinaPortlet() {}
     
     // Handle job form submission
     @ProcessAction(name = "submitJobForm")
     public void handleSubmitJobForm(ActionRequest formParameters, ActionResponse response) {
-    	LOG.log("submitJobForm");
+    	Logger.log("submitJobForm", Logger.debug);
         
         FormSubmitter submit = new FormSubmitter();
         boolean success = false;
@@ -40,7 +39,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
 		try {
 			success = submit.saveForm(formParameters);
 		} catch (PersistenceException e) {
-			LOG.log(e.getMessage());
+			Logger.log(e, Logger.exception);
 		}
         
         if (!success) {
@@ -48,7 +47,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
             response.setRenderParameter("form_errors", submit.getErrors());
             response.setRenderParameter("nextJSP", NEW_JOB_PAGE);
             
-            LOG.log(submit.getErrors());
+            Logger.log(submit.getErrors(), Logger.error);
         } else {
             // Redirect to project display page of projects in process
             response.setRenderParameter("page_type", "in_process");
@@ -84,7 +83,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
             }
             
             if (nextJSP.equals(NEW_JOB_PAGE)) {
-            	LOG.log("checking user");
+            	Logger.log("checking user", Logger.debug);
             	
             	UserConfigurator userConfig = null;
             	
@@ -92,12 +91,12 @@ public class AutodockVinaPortlet extends GenericPortlet {
 					userConfig = new UserConfigurator();
 					
 					if (!userConfig.checkUser(request.getRemoteUser())) {
-	            		LOG.log("user setup");
+	            		Logger.log("user setup", Logger.debug);
 	            		
 	            		userConfig.setupUser(request.getRemoteUser());
 	            	}
 				} catch (PersistenceException e) {
-					LOG.log(e.getMessage());
+					Logger.log(e, Logger.exception);
 				} finally {
 					// Close db session
 	            	userConfig.close();
@@ -109,14 +108,14 @@ public class AutodockVinaPortlet extends GenericPortlet {
             dispatcher = getPortletContext().getRequestDispatcher("/jsp/".concat(nextJSP).concat(".jsp"));
             dispatcher.include(request, response);
         } catch (IOException e) {
-            LOG.log(e);
+        	Logger.log(e, Logger.exception);
         }
     }
     
     // Handle ajax calls
     @Override
     public void serveResource(ResourceRequest ajaxParameters, ResourceResponse response) throws PortletException {
-    	LOG.log("serveResource");
+    	Logger.log("serveResource", Logger.debug);
     	
         AjaxDispatcher dispatch = new AjaxDispatcher();
         

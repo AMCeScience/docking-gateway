@@ -1,10 +1,9 @@
 package nl.amc.biolab.autodock.input.tools;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.exceptions.PersistenceException;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
-public class UserConfigurator extends VarConfig {
+public class UserConfigurator {
 	private PersistenceManagerPlugin PERSISTENCE;
 	
 	public UserConfigurator() throws PersistenceException {

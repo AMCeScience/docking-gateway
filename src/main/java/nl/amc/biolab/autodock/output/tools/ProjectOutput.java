@@ -2,28 +2,30 @@ package nl.amc.biolab.autodock.output.tools;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+
 import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.output.objects.EnergyMap;
 import nl.amc.biolab.tools.FileCheck;
 import nl.amc.biolab.tools.Unzipper;
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard van Altena
  */
-public class ProjectOutput extends VarConfig {
+public class ProjectOutput {
     private final LinkedHashMap<String, Object> OUTPUT_MAP = new LinkedHashMap<String, Object>();
     
     public ProjectOutput() {}
     
     public void initOutput(String projectName) {
-    	log.log("initOutput");
+    	Logger.log("initOutput", Logger.debug);
     	
         _checkCSVFile(projectName);
         
         EnergyMap processed = _getCSV(projectName);
         
-        _addToMap("table", processed.getEnergyMap());
+//        _addToMap("table", processed.getEnergyMap());
         _addToMap("graph", processed.getEnergyListForFlot());
         _addToMap("compound_count", processed.getLigandCount());
     }
@@ -36,7 +38,7 @@ public class ProjectOutput extends VarConfig {
         FileCheck csvFile = new FileCheck();
         EnergyMap energyMap = new EnergyMap();
         
-        File[] csvFiles = csvFile.getFilesWithExtension(config.getOutputUnzipLocation(name), config.getOutputCSVExt());
+        File[] csvFiles = csvFile.getFilesWithExtension(VarConfig.getOutputUnzipLocation(name), VarConfig.getOutputCSVExt());
         
         if(csvFiles != null && csvFiles.length > 0) {        
             energyMap.initEnergyMapping(csvFiles[0].getPath());
@@ -52,14 +54,14 @@ public class ProjectOutput extends VarConfig {
     private void _checkCSVFile(String projectName) {        
         FileCheck csvExists = new FileCheck();
         
-        // if csv does not exist
-        if(!csvExists.checkIfFilesWithExtensionExists(config.getOutputUnzipLocation(projectName), config.getOutputCSVExt())) {
-        	log.log("untarring");
+        // If csv does not exist
+        if(!csvExists.checkIfFilesWithExtensionExists(VarConfig.getOutputUnzipLocation(projectName), VarConfig.getOutputCSVExt())) {
+        	Logger.log("untarring", Logger.debug);
         	
             Unzipper unzip = new Unzipper();
             
-            // unzip project output folder
-            unzip.untarProjectOutput(projectName);
+            // Unzip CSV file
+            unzip.untarSpecificFile(VarConfig.getOutputUnzipLocation(projectName), VarConfig.getOutputFilePath(projectName), VarConfig.getOutputCSVName());
         }
     }
 }

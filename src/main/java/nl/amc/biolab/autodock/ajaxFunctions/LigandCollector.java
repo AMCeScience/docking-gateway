@@ -5,13 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
+import nl.amc.biolab.autodock.constants.VarConfig;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import docking.crappy.logger.Logger;
 
 /**
  *
@@ -27,24 +29,24 @@ public class LigandCollector extends AjaxInterface {
     
     private void _getLigandsString() {
         if (_cacheNeedsUpdate()) {
-            log.log("ligand cache updating");
+        	Logger.log("ligand cache updating", Logger.debug);
             
             _updateLigandCache();
         }
         
-        log.log("setting ligands");
+        Logger.log("setting ligands", Logger.debug);
         
         _setLigandCache();
     }
     
     private boolean _cacheNeedsUpdate() {        
-        File ligandCache = new File(config.getLigandCache());
+        File ligandCache = new File(VarConfig.getLigandCache());
         
         if (!ligandCache.exists()) {
             return true;
         }
         
-        File folder = new File(config.getLigandPath());
+        File folder = new File(VarConfig.getLigandPath());
         long latestFile = 0;
         
         for (File file : folder.listFiles()) {
@@ -59,19 +61,19 @@ public class LigandCollector extends AjaxInterface {
     }
     
     private boolean _updateLigandCache() {        
-        File folder = new File(config.getLigandPath());
+        File folder = new File(VarConfig.getLigandPath());
         
         _fileLoop(folder);
         
         try {
-            PrintWriter out = new PrintWriter(config.getLigandCache());
+            PrintWriter out = new PrintWriter(VarConfig.getLigandCache());
             
             out.println(_getJSONObj().getAsString());
             
             out.flush();
             out.close();
         } catch(FileNotFoundException e) {
-            log.log(e);
+        	Logger.log(e, Logger.exception);
             
             return false;
         }
@@ -79,35 +81,31 @@ public class LigandCollector extends AjaxInterface {
         return true;
     }
     
-    private void _fileLoop(File folder) {        
-        ArrayList<String> fileNames = new ArrayList<String>();
-        
+    private void _fileLoop(File folder) {
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {
                 _fileLoop(file);
-            } else {
-//                fileNames.add(file.getName());
             }
         }
         
         if (!folder.getName().equals("ligands")) {
-            _getJSONObj().add(folder.getName(), fileNames);
+            _getJSONObj().add(folder.getName(), "");
         }
     }
     
     private void _setLigandCache() {
-        log.log("setting items");
+    	Logger.log("setting items", Logger.debug);
         
         JSONParser parser = new JSONParser();
         
         try {
-            _getJSONObj().setWholeObj((JSONObject) parser.parse(new FileReader(config.getLigandCache())));
+            _getJSONObj().setWholeObj((JSONObject) parser.parse(new FileReader(VarConfig.getLigandCache())));
         } catch(FileNotFoundException e) {
-            log.log(e);
+        	Logger.log(e, Logger.exception);
         } catch(IOException e) {
-            log.log(e);
+        	Logger.log(e, Logger.exception);
         } catch (ParseException e) {
-            log.log(e);
+        	Logger.log(e, Logger.exception);
         }
     }
 }

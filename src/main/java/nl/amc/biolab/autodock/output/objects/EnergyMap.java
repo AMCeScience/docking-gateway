@@ -6,13 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import nl.amc.biolab.autodock.constants.VarConfig;
+
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard van Altena
  */
-public class EnergyMap extends VarConfig {
+public class EnergyMap {
     private final LinkedHashMap<String, String> ENERGY_MAP = new LinkedHashMap<String, String>();
     private final ArrayList<ArrayList<String>> X_TICKS = new ArrayList<ArrayList<String>>();
     private final ArrayList<ArrayList<String>> Y_TICKS = new ArrayList<ArrayList<String>>();
@@ -22,7 +23,7 @@ public class EnergyMap extends VarConfig {
     public EnergyMap() {}
     
     public void initEnergyMapping(String csvName) {
-        log.log(csvName);
+        Logger.log(csvName, Logger.debug);
         
         try {
             BufferedReader csvFile = new BufferedReader(new FileReader(csvName));
@@ -42,9 +43,9 @@ public class EnergyMap extends VarConfig {
             
             csvFile.close();
         } catch(FileNotFoundException e) {
-            log.log(e);
-        } catch(IOException ex) {
-            log.log(ex);
+            Logger.log(e, Logger.exception);
+        } catch(IOException e) {
+            Logger.log(e, Logger.exception);
         }
         
     }

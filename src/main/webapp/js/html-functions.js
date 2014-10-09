@@ -147,7 +147,21 @@ function build_inside_project_html(project_data) {
             <h2>Status</h2>\
             <span class='project_status_disp'>" + project_data.submissions[0].status + "</span>";
         	
+        if (project_data.overall_status.indexOf("In Progress") > -1
+				|| project_data.overall_status.indexOf("In Preparation") > -1
+				|| project_data.overall_status.indexOf("On Hold") > -1
+				|| project_data.overall_status.indexOf("Resuming") > -1) {
+        	// Remove from UI for now
+        	//TODO check if this will be put back into the UI or this is a cronjob function
+			//project_html += "<input class='button update' type='button' value='Update'/>";
+    	}
+        
         project_html += "</div>";
+        
+        if (project_data.overall_status.indexOf("In Progress") > -1
+        		|| project_data.overall_status.indexOf("On Hold") > -1) {
+        	project_html += "<input class='button partial-result' type='button' value='Get Partial Results'/>";
+        }
     }
     
     if (page_type === "outcomes"

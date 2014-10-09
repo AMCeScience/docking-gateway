@@ -5,15 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+
+import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.input.objects.Configuration;
 import nl.amc.biolab.autodock.input.objects.PointIn3DSpace;
-import nl.amc.biolab.autodock.constants.VarConfig;
+import docking.crappy.logger.Logger;
 
 /**
  *
  * @author Allard van Altena
  */
-public class ConfigFactory extends VarConfig {    
+public class ConfigFactory {    
     public ConfigFactory() {}
     
     public Configuration setData(HashMap<String, Object> formMap, String project_folder) {
@@ -55,10 +57,10 @@ public class ConfigFactory extends VarConfig {
         file.setSize(size);
         
         // Get filenames for configuration file and receptor file
-        String receptor_filename = config.getReceptorFileName();
+        String receptor_filename = VarConfig.getReceptorFileName();
         
         // Set configuration items
-        file.setFilePath(config.getProjectFilePath(project_folder) + config.getConfigFileName());
+        file.setFilePath(VarConfig.getProjectFilePath(project_folder) + VarConfig.getConfigFileName());
         file.setReceptor(receptor_filename);
         
         String energy_range = formMap.get("energy_range").toString();
@@ -109,14 +111,14 @@ public class ConfigFactory extends VarConfig {
                 out.flush();
                 out.close();
                 
-                log.log("Config file printed in: " + file.getFilePath());
+                Logger.log("Config file printed in: " + file.getFilePath(), Logger.debug);
                 
                 return true;
             } else {
                 file.setError("Could not validate form.<br/>");
             }
         } catch(IOException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         }
         
         return false;

@@ -2,10 +2,10 @@ package nl.amc.biolab.autodock.ajaxHandlers;
 
 import java.util.LinkedHashMap;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.exceptions.PersistenceException;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 import nl.amc.biolab.persistencemanager.SQLBuilderPlugin;
+import docking.crappy.logger.Logger;
 
 /**
  * Interface class for all the ajax requests.
@@ -13,7 +13,7 @@ import nl.amc.biolab.persistencemanager.SQLBuilderPlugin;
  * 
  * @author Allard van Altena
  */
-public abstract class AjaxInterface extends VarConfig {
+public abstract class AjaxInterface {
     private JSONOutput JSONOBJ;
     private LinkedHashMap<String, String> PARAMS;
     private PersistenceManagerPlugin PERSISTENCE;
@@ -25,7 +25,7 @@ public abstract class AjaxInterface extends VarConfig {
      * @param response JSONOutput object where we can write the response to.
      */
     public void init(LinkedHashMap<String, String> params, JSONOutput response) {
-        log("Init ajaxInterface");
+        Logger.log("Init ajaxInterface", Logger.debug);
         
         // Get new object of the persistence manager
         _setPersistence(new PersistenceManagerPlugin());
@@ -41,7 +41,7 @@ public abstract class AjaxInterface extends VarConfig {
 	        // Call the _run function, this is overridden in the instantiated class of this interface
 	        _run();
 		} catch (PersistenceException e) {
-			log(e.getMessage());
+			Logger.log(e, Logger.exception);
 		} finally {
 			// Close the session
 	        _getPersistence().shutdown();

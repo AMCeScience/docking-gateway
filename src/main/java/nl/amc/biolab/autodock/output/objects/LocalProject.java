@@ -5,20 +5,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.autodock.output.tools.ProjectOutput;
 import nl.amc.biolab.datamodel.objects.DataElement;
 import nl.amc.biolab.datamodel.objects.Processing;
 import nl.amc.biolab.datamodel.objects.Project;
 import nl.amc.biolab.datamodel.objects.Submission;
 import nl.amc.biolab.datamodel.objects.SubmissionIO;
+import docking.crappy.logger.Logger;
 
 /**
  * Takes the nsgdm objects and creates object with more complete data
  *
  * @author Allard
  */
-public class LocalProject extends VarConfig {
+public class LocalProject {
     // Project items
     private Long ID = null;
     private String NAME = "";
@@ -106,12 +106,16 @@ public class LocalProject extends VarConfig {
         project.put("date_started", _getDateStarted().toString());
         
         if (_getFullReport()) {
+        	Logger.log("getting full report", Logger.debug);
+        	
 		    project.put("submissions", _getSubmissions());
 		    
 		    project.put("compound_count", _getCompoundCount());
 		    project.put("provenance_count", _getProvenanceCount());
 		    
 		    if (_getOutput() != null) {
+		    	Logger.log("getting output", Logger.debug);
+		    	
 		    	ProjectOutput output = new ProjectOutput();
 		    	
 		    	output.initOutput(_getName());

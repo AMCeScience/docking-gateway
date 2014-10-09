@@ -22,6 +22,8 @@
 
 <% // Ajax url declarations %>
 <portlet:resourceURL var="ajaxSearchUrl" id="SearchProjects"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxPartialResultUrl" id="PartialResult"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxUpdateStatusUrl" id="StatusUpdater"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxGetDetailsUrl" id="SubmissionDetails"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxLigandsUrl" id="LigandCollector"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxDownloadOutputUrl" id="Downloader"></portlet:resourceURL>
@@ -54,6 +56,8 @@
         
             $('body').data('ajax-urls', {
                 "searchUrl": "<%= ajaxSearchUrl %>",
+                "updateStatusUrl": "<%= ajaxUpdateStatusUrl %>",
+                "partialResultUrl": "<%= ajaxPartialResultUrl %>",
                 "getDetailsUrl": "<%= ajaxGetDetailsUrl %>",
                 "ligandsUrl": "<%= ajaxLigandsUrl %>",
                 "downloadOutputUrl": "<%= ajaxDownloadOutputUrl %>"
@@ -61,11 +65,11 @@
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=161"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=114"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=114"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=230"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=118"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=162"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=115"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=116"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=231"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=119"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

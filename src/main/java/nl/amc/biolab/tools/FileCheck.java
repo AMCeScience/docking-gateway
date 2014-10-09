@@ -1,13 +1,12 @@
 package nl.amc.biolab.tools;
 
-import nl.amc.biolab.autodock.constants.VarConfig;
 import java.io.File;
 import java.io.FileFilter;
 /**
  *
  * @author Allard
  */
-public class FileCheck extends VarConfig {
+public class FileCheck {
     public FileCheck() {}
     
     public File[] getFilesWithExtension(String folderPath, final String extension) {

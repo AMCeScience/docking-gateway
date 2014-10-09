@@ -17,7 +17,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class LigandZipper extends VarConfig {
+import docking.crappy.logger.Logger;
+
+public class LigandZipper {
     public LigandZipper() {}
     
     public Ligands prepareLigandFile(HashMap<String, Object> formMap, String project_folder) {
@@ -32,18 +34,18 @@ public class LigandZipper extends VarConfig {
             JSONArray libraryArray = (JSONArray) libraryJSON.get("library_array");
             
             boolean isPilot = formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1") ? true : false;
-            int pilotLigandCount = config.getPilotLigandCount();
+            int pilotLigandCount = VarConfig.getPilotLigandCount();
             
             // Create streams
-            String zipFilePath = config.getProjectFilePath(project_folder) + config.getLigandsZipFileName();
-            String pilotZipFilePath = config.getProjectFilePath(project_folder) + config.getPilotLigandsZipFileName();
+            String zipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName();
+            String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getPilotLigandsZipFileName();
             
             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFilePath));
             ZipOutputStream pilotZip = new ZipOutputStream(new FileOutputStream(pilotZipFilePath));
 
             for (Object obj : libraryArray) {
             	String folder = obj.toString();
-            	File library_folder = new File(config.getLigandPath() + folder);
+            	File library_folder = new File(VarConfig.getLigandPath() + folder);
 
             	if (library_folder.isDirectory()) {
             		for (File ligand : library_folder.listFiles()) {
@@ -88,15 +90,15 @@ public class LigandZipper extends VarConfig {
             	pilotZip.close();
             }
             
-            log.log("Ligands zip created in: " + zipFilePath);
+            Logger.log("Ligands zip created in: " + zipFilePath, Logger.debug);
             
             ligandsObj.setValid(true);
         } catch (ParseException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         } catch (FileNotFoundException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         } catch (IOException e) {
-            log.log(e);
+            Logger.log(e, Logger.exception);
         }
         
         return ligandsObj;

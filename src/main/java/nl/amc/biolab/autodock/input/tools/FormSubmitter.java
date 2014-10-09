@@ -35,7 +35,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.json.JSONConfiguration;
 
-public class FormSubmitter extends VarConfig {
+import docking.crappy.logger.Logger;
+
+public class FormSubmitter {
 	private String ERRORS = "";
 	private PersistenceManagerPlugin PERSISTENCE;
 
@@ -50,12 +52,12 @@ public class FormSubmitter extends VarConfig {
 	}
 
 	private void _cleanUp(JobSubmission job) {
-		File directory = new File(config.getProjectFilePath(job.getProjectFolder()));
+		File directory = new File(VarConfig.getProjectFilePath(job.getProjectFolder()));
 
 		try {
 			FileUtils.deleteDirectory(directory);
 		} catch (IOException e) {
-			log.log(e);
+			Logger.log(e, Logger.exception);
 		}
 	}
 
@@ -80,7 +82,7 @@ public class FormSubmitter extends VarConfig {
 
 			// Check if user exists in catalog database
 			if (catalogUser != null) {
-				File directory = new File(config.getProjectFilePath(job.getProjectFolder()));
+				File directory = new File(VarConfig.getProjectFilePath(job.getProjectFolder()));
 
 				directory.mkdirs();
 
@@ -92,13 +94,13 @@ public class FormSubmitter extends VarConfig {
 
 					return false;
 				}
-				log(directory.getAbsolutePath());
-				log(job.getProjectFolder());
-				log("folder done");
+
 				// Create configuration file
 				ConfigFactory configFactory = new ConfigFactory();
 				Configuration configuration = configFactory.setData(formMap, job.getProjectFolder());
-				log("config done");
+
+				Logger.log("config done", Logger.debug);
+
 				if (!configuration.getValid()) {
 					_setError(configuration.getErrors());
 
@@ -111,7 +113,9 @@ public class FormSubmitter extends VarConfig {
 				// Write ligands to zip file
 				LigandZipper ligandZipper = new LigandZipper();
 				Ligands ligands = ligandZipper.prepareLigandFile(formMap, job.getProjectFolder());
-				log("ligands done");
+
+				Logger.log("ligands done", Logger.debug);
+
 				if (!ligands.validate()) {
 					close();
 					_cleanUp(job);
@@ -122,7 +126,9 @@ public class FormSubmitter extends VarConfig {
 				// Write the receptor file to the system
 				ReceptorFileUploader uploader = new ReceptorFileUploader();
 				Receptor receptor = uploader.doUpload((FileItem) formMap.get("receptor_file"), job.getProjectFolder());
-				log("receptor done");
+
+				Logger.log("receptor done", Logger.debug);
+
 				if (!receptor.validate()) {
 					_setError(receptor.getErrors());
 
@@ -141,19 +147,19 @@ public class FormSubmitter extends VarConfig {
 					return false;
 				}
 
-				job.setLigandsUri(config.getUri(job.getProjectFolder(), config.getLigandsZipFileName()));
+				job.setLigandsUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getLigandsZipFileName()));
 				job.setLigandsCount(ligands.getCount());
 
 				if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
-					job.setPilotLigandsUri(config.getUri(job.getProjectFolder(), config.getPilotLigandsZipFileName()));
+					job.setPilotLigandsUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getPilotLigandsZipFileName()));
 					job.setPilotLigandsCount(ligands.getPilotCount());
 					job.setPilot(true);
 				}
 
-				job.setReceptorUri(config.getUri(job.getProjectFolder(), config.getReceptorFileName()));
-				job.setConfigurationUri(config.getUri(job.getProjectFolder(), config.getConfigFileName()));
-				
-				job.setOutputUri(config.getUri(job.getProjectFolder(), config.getOutputFileName()));
+				job.setReceptorUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getReceptorFileName()));
+				job.setConfigurationUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getConfigFileName()));
+
+				job.setOutputUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getOutputFileName()));
 
 				job.setUser(catalogUser);
 
@@ -189,7 +195,7 @@ public class FormSubmitter extends VarConfig {
 		ArrayList<Application> apps = new ArrayList<Application>();
 		ArrayList<Value> values = new ArrayList<Value>();
 		// Add items
-		apps.add(_getDb().getApplicationByName(config.getAutodockName()));
+		apps.add(_getDb().getApplicationByName(VarConfig.getAutodockName()));
 
 		values.add(_getDb().get.value(_getDb().insert.value("is_pilot", String.valueOf(job.isPilot()))));
 		values.add(_getDb().get.value(_getDb().insert.value("folder_name", job.getProjectFolder())));
@@ -219,7 +225,7 @@ public class FormSubmitter extends VarConfig {
 
 		wrapper.add(submits);
 
-		Long appId = _getDb().getApplicationByName(config.getAutodockName()).getDbId();
+		Long appId = _getDb().getApplicationByName(VarConfig.getAutodockName()).getDbId();
 
 		submission.put("applicationId", appId);
 		submission.put("description", job.getProjectDescription());
@@ -235,11 +241,11 @@ public class FormSubmitter extends VarConfig {
 		// Logging
 		client.addFilter(new LoggingFilter(System.out));
 
-		WebResource webResource = client.resource(config.getProcessingResource());
+		WebResource webResource = client.resource(VarConfig.getProcessingResource());
 
 		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission);
 
-		log(response);
+		Logger.log(response, Logger.debug);
 	}
 
 	private HashMap<String, Object> _createSubmissionMap(int portId, String name, String dataUri) {
@@ -272,7 +278,7 @@ public class FormSubmitter extends VarConfig {
 				}
 			}
 		} catch (FileUploadException e) {
-			log.log(e.toString());
+			Logger.log(e, Logger.exception);
 
 			return null;
 		}

@@ -70,12 +70,14 @@ function trigger_search(scope) {
     }
     
     if (status == 'all') {
-    	log('in');
-    	
-    	status = 'in preparation, in progress, on hold';
-    } 
+    	status = 'in preparation, in progress, on hold, done, aborted, failed';
+    }
     
-    if (page_type == 'outcomes') {
+    if (status == 'running') {
+    	status = 'in preparation, in progress, on hold';
+    }
+    
+    if (status == 'stopped') {
     	status = 'done, aborted, failed';
     }
     

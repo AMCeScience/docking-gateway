@@ -1,7 +1,3 @@
-<script type="text/javascript">
-    var page_type = "<%= request.getParameter("page_type") %>";
-</script>
-
 <div class="search">
     <form class="search_form">
         <div class="fourth_col">
@@ -25,20 +21,21 @@
             </select>
         </div>
 
-        <% if (request.getParameter("page_type").equals("in_process")) { %>
-            <div class="fourth_col">
-                <label for="status">Status</label>
-                <select name="status">
-                    <option value="all">All</option>
-                    <option value="in preparation">In Preparation</option>
-                    <option value="in progress">In Progress</option>
-                    <option value="on hold">On Hold</option>
-                    <!--<option value="done">Done</option>
-                    <option value="failed">Failed</option>
-                    <option value="aborted">Aborted</option>-->
-                </select>
-            </div>
-        <% } %>
+		<div class="fourth_col">
+		    <label for="status">Status</label>
+		    <select name="status">
+		        <option value="all">All</option>
+		        <option value="in preparation">In Preparation</option>
+		        <option value="in progress">In Progress</option>
+		        <option value="on hold">On Hold</option>
+		        <option value="done">Done</option>
+		        <option value="failed">Failed</option>
+		        <option value="aborted">Aborted</option>
+		        <option class="select-dash" disabled="disabled">----</option>
+		        <option value="running">Running</option>
+		        <option value="stopped">Stopped</option>
+		    </select>
+		</div>
 
         <div class="clear"></div>
     </form>

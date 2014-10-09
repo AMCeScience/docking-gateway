@@ -50,7 +50,6 @@ public class AutodockVinaPortlet extends GenericPortlet {
             Logger.log(submit.getErrors(), Logger.error);
         } else {
             // Redirect to project display page of projects in process
-            response.setRenderParameter("page_type", "in_process");
             response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
         }
     }
@@ -59,13 +58,9 @@ public class AutodockVinaPortlet extends GenericPortlet {
     @ProcessAction(name = "goToPage")
     public void handleGoToPage(ActionRequest request, ActionResponse response) {
         String nextJSP = (String) request.getParameter("page");
-        String page_type = (String) request.getParameter("page_type");
         
         // Clear errors
         response.setRenderParameter("form_errors", "");
-        
-        // Set page type if available
-        response.setRenderParameter("page_type", page_type);
 
         // Set next page to load
         response.setRenderParameter("nextJSP", nextJSP);

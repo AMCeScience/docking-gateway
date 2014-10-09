@@ -126,15 +126,7 @@ function new_job_submit() {
     $('.new_job').submit();
 }
 
-function outcomes() {
-    // Bind search inputs to search function
-    init_search(search_scope, after_search);
-    
-    // Trigger search
-    trigger_search(search_scope);
-}
-
-function in_process() {
+function project_display() {
     // Bind search inputs to search function
     init_search(search_scope, after_search);
     

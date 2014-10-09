@@ -34,6 +34,7 @@ public class LocalProject {
     // Submission items
     private ArrayList<HashMap<String, Object>> SUBMISSIONS = new ArrayList<HashMap<String, Object>>();
     private ArrayList<HashMap<String, Object>> SUBMISSIONIOS = new ArrayList<HashMap<String, Object>>();
+    private Date LAST_UPDATE = null;
     
     // Extra items
     private int COMPOUND_COUNT = 0;
@@ -68,9 +69,12 @@ public class LocalProject {
         _setProcessingID(processing.getDbId());
         _setProjectStatus(processing.getStatus());
         _setDateStarted(processing.getDate());
+        
         _setApplication(processing.getApplication().getName());
         
         if (_getFullReport()) {
+        	long lastUpdate = 0;
+        	
 	        // Get submissions for this project + processing
 	        for(Submission sub : processing.getSubmissions()) {
 	        	// Clear IO variable
@@ -84,6 +88,15 @@ public class LocalProject {
 	        	
 	        	// Set submission
 	        	_setSubmission(sub);
+	        	
+	        	// Find latest update
+	        	if (sub.getLastStatus().getTimestamp().getTime() > lastUpdate) {
+	        		// Set last update Date object
+	        		_setLastUpdate(sub.getLastStatus().getTimestamp());
+	        		
+	        		// Set last update as Long for comparing
+	        		lastUpdate = sub.getLastStatus().getTimestamp().getTime();
+	        	}
 	        }
         }
     }
@@ -109,6 +122,7 @@ public class LocalProject {
         	Logger.log("getting full report", Logger.debug);
         	
 		    project.put("submissions", _getSubmissions());
+		    project.put("last_update", _getLastUpdate().toString());
 		    
 		    project.put("compound_count", _getCompoundCount());
 		    project.put("provenance_count", _getProvenanceCount());
@@ -276,6 +290,14 @@ public class LocalProject {
     
     private int _getCompoundCount() {
     	return COMPOUND_COUNT;
+    }
+    
+    private void _setLastUpdate(Date lastUpdate) {
+    	LAST_UPDATE = lastUpdate;
+    }
+    
+    private Date _getLastUpdate() {
+    	return LAST_UPDATE;
     }
     
     @SuppressWarnings("unused")

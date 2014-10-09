@@ -17,6 +17,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.common.io.Files;
+
 import docking.crappy.logger.Logger;
 
 public class LigandZipper {
@@ -36,61 +38,62 @@ public class LigandZipper {
             boolean isPilot = formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1") ? true : false;
             int pilotLigandCount = VarConfig.getPilotLigandCount();
             
-            // Create streams
-            String zipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName();
-            String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getPilotLigandsZipFileName();
+            if (libraryArray.size() > 1) {
+            	ligandsObj.setError("Can only select one library for now.");
+            	
+            	return ligandsObj;
+            }
             
-            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFilePath));
+            // Create stream
+            String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getPilotLigandsZipFileName();
             ZipOutputStream pilotZip = new ZipOutputStream(new FileOutputStream(pilotZipFilePath));
-
+            
             for (Object obj : libraryArray) {
             	String folder = obj.toString();
             	File library_folder = new File(VarConfig.getLigandPath() + folder);
 
             	if (library_folder.isDirectory()) {
-            		for (File ligand : library_folder.listFiles()) {
-	            		FileInputStream fin = new FileInputStream(ligand);
-	            		
-	            		zip.putNextEntry(new ZipEntry(ligand.getName()));
-	            		
-	            		if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-		            		pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
-	            		}
+            		File[] fileList = library_folder.listFiles();
             		
-	            		int length;
-            	
-	            		byte[] b = new byte[1024];
+            		ligandsObj.addCount(fileList.length);
+            		
+            		// Copy the library
+            		Files.copy(library_folder, new File(VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName()));
+            		
+            		if (isPilot) {
+	            		for (File ligand : fileList) {
+		            		FileInputStream fin = new FileInputStream(ligand);
+		            		
+		            		pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
 	            		
-	            		while((length = fin.read(b)) > 0) {
-	            			zip.write(b, 0, length);
-	            			
-	            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-	            				pilotZip.write(b, 0, length);
+		            		int length;
+	            	
+		            		byte[] b = new byte[1024];
+		            		
+		            		while((length = fin.read(b)) > 0) {
+		            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+		            				pilotZip.write(b, 0, length);
+		            			}
 	            			}
-            			}
 	            			
-            			ligandsObj.addCount();
-            			
-            			zip.closeEntry();
-            			
-            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
 	            			ligandsObj.addPilotCount();
 	            			
 	            			pilotZip.closeEntry();
-            			}
-            			
-            			fin.close();
-        			}
+	            			
+	            			fin.close();
+	            			
+	            			// Exit loop if we have enough ligands in pilot library
+	            			if (ligandsObj.getPilotCount() >= VarConfig.getPilotLigandCount()) {
+	            				break;
+	            			}
+	        			}
+	            	}
                 }
             }
-
-            zip.close();
             
-            if (isPilot) {
-            	pilotZip.close();
-            }
+        	pilotZip.close();
             
-            Logger.log("Ligands zip created in: " + zipFilePath, Logger.debug);
+            Logger.log("Ligands zip created in: " + VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName(), Logger.debug);
             
             ligandsObj.setValid(true);
         } catch (ParseException e) {
@@ -104,7 +107,7 @@ public class LigandZipper {
         return ligandsObj;
     }
     
-//    public Ligands prepareLigandFile(HashMap<String, Object> formMap) {
+//    public Ligands prepareLigandFile(HashMap<String, Object> formMap, String project_folder) {
 //        JSONParser parser = new JSONParser();
 //        
 //        Ligands ligandsObj = new Ligands();
@@ -112,59 +115,58 @@ public class LigandZipper {
 //        ligandsObj.setValid(false);
 //        
 //        try {
-//            JSONObject ligandJSON = (JSONObject) parser.parse(formMap.get("compound_list").toString());
-//            JSONArray ligandArray = (JSONArray) ligandJSON.get("compound_array");
+//            JSONObject libraryJSON = (JSONObject) parser.parse(formMap.get("library_list").toString());
+//            JSONArray libraryArray = (JSONArray) libraryJSON.get("library_array");
 //            
 //            boolean isPilot = formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1") ? true : false;
-//            int pilotLigandCount = config.getPilotLigandCount();
+//            int pilotLigandCount = VarConfig.getPilotLigandCount();
 //            
 //            // Create streams
-//            String zipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getLigandsZipFileName();
-//            String pilotZipFilePath = config.getProjectFilePath(formMap.get("project_name").toString()) + config.getPilotLigandsZipFileName();
+//            String zipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName();
+//            String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getPilotLigandsZipFileName();
 //            
 //            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFilePath));
 //            ZipOutputStream pilotZip = new ZipOutputStream(new FileOutputStream(pilotZipFilePath));
 //
-//            for (Object obj : ligandArray) {
-//                JSONObject ligand = (JSONObject) obj;
-//                
-//                @SuppressWarnings("rawtypes")
-//				Iterator ligandIter = ligand.keySet().iterator();
-//                
-//                String folder = ligandIter.next().toString();
-//                String fileName = ligand.get(folder).toString();
-//                
-//                FileInputStream fin = new FileInputStream(new File(config.getLigandFileName(folder, fileName)));
-//                
-//                zip.putNextEntry(new ZipEntry(fileName));
-//                
-//                if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-//                	pilotZip.putNextEntry(new ZipEntry(fileName));
-//                }
-//                
-//                int length;
+//            for (Object obj : libraryArray) {
+//            	String folder = obj.toString();
+//            	File library_folder = new File(VarConfig.getLigandPath() + folder);
 //
-//                byte[] b = new byte[1024];
-//
-//                while((length = fin.read(b)) > 0) {
-//                    zip.write(b, 0, length);
-//                    
-//                    if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-//                    	pilotZip.write(b, 0, length);
-//                    }
+//            	if (library_folder.isDirectory()) {
+//            		for (File ligand : library_folder.listFiles()) {
+//	            		FileInputStream fin = new FileInputStream(ligand);
+//	            		
+//	            		zip.putNextEntry(new ZipEntry(ligand.getName()));
+//	            		
+//	            		if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+//		            		pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
+//	            		}
+//            		
+//	            		int length;
+//            	
+//	            		byte[] b = new byte[1024];
+//	            		
+//	            		while((length = fin.read(b)) > 0) {
+//	            			zip.write(b, 0, length);
+//	            			
+//	            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+//	            				pilotZip.write(b, 0, length);
+//	            			}
+//            			}
+//	            			
+//            			ligandsObj.addCount();
+//            			
+//            			zip.closeEntry();
+//            			
+//            			if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
+//	            			ligandsObj.addPilotCount();
+//	            			
+//	            			pilotZip.closeEntry();
+//            			}
+//            			
+//            			fin.close();
+//        			}
 //                }
-//                
-//                ligandsObj.addCount();
-//                
-//                zip.closeEntry();
-//                
-//                if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-//                	ligandsObj.addPilotCount();
-//                	
-//                	pilotZip.closeEntry();
-//                }
-//                
-//                fin.close();
 //            }
 //
 //            zip.close();
@@ -173,15 +175,15 @@ public class LigandZipper {
 //            	pilotZip.close();
 //            }
 //            
-//            log.log("Ligands zip created in: " + zipFilePath);
+//            Logger.log("Ligands zip created in: " + zipFilePath, Logger.debug);
 //            
 //            ligandsObj.setValid(true);
 //        } catch (ParseException e) {
-//            log.log(e);
+//            Logger.log(e, Logger.exception);
 //        } catch (FileNotFoundException e) {
-//            log.log(e);
+//            Logger.log(e, Logger.exception);
 //        } catch (IOException e) {
-//            log.log(e);
+//            Logger.log(e, Logger.exception);
 //        }
 //        
 //        return ligandsObj;

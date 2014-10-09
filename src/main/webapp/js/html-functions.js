@@ -141,20 +141,19 @@ function build_inside_project_html(project_data) {
     
     project_html += "</div><div class='clear'></div>";
 
-    if (page_type === "in_process") {
+    // Job is in progress
+    if (project_data.overall_status.indexOf("In Progress") > -1
+			|| project_data.overall_status.indexOf("In Preparation") > -1
+			|| project_data.overall_status.indexOf("On Hold") > -1
+			|| project_data.overall_status.indexOf("Resuming")) {
         project_html +=
         "<div class='in_process_items_wrapper'>\
             <h2>Status</h2>\
             <span class='project_status_disp'>" + project_data.submissions[0].status + "</span>";
         	
-        if (project_data.overall_status.indexOf("In Progress") > -1
-				|| project_data.overall_status.indexOf("In Preparation") > -1
-				|| project_data.overall_status.indexOf("On Hold") > -1
-				|| project_data.overall_status.indexOf("Resuming") > -1) {
-        	// Remove from UI for now
-        	//TODO check if this will be put back into the UI or this is a cronjob function
-			//project_html += "<input class='button update' type='button' value='Update'/>";
-    	}
+    	// Remove from UI for now
+    	//TODO check if this will be put back into the UI or this is a cronjob function
+		//project_html += "<input class='button update' type='button' value='Update'/>";
         
         project_html += "</div>";
         
@@ -162,15 +161,17 @@ function build_inside_project_html(project_data) {
         		|| project_data.overall_status.indexOf("On Hold") > -1) {
         	project_html += "<input class='button partial-result' type='button' value='Get Partial Results'/>";
         }
+        
+        project_html += "<span>Last update: " + project_data.last_update + "</span>"
     }
     
-    if (page_type === "outcomes"
-    	&& (project_data.overall_status.indexOf("Aborted") > -1
-		|| project_data.overall_status.indexOf("Failed") > -1)) {
+    // Job is done (but failed)
+    if (project_data.overall_status.indexOf("Aborted") > -1 || project_data.overall_status.indexOf("Failed") > -1) {
 		project_html += "<input class='button details' data-submission_id='" + project_data.submissions[0].submission_id + "' type='button' value='Details'/>";
 	}
 
-    if (page_type === "outcomes" && project_data.overall_status.indexOf("Done") > -1) {
+    // Job is done
+    if (project_data.overall_status.indexOf("Done") > -1) {
         project_html +=
         "<div class='outcomes_items_wrapper'>\
             <h2>Output</h2>\

@@ -34,6 +34,10 @@ public class Ligands {
         COUNT = COUNT + 1;
     }
     
+    public void addCount(int count) {
+        COUNT = COUNT + count;
+    }
+    
     public Long getCount() {
         return COUNT;
     }

@@ -20,7 +20,7 @@ public class FileCheck {
     }
     
     private File[] _fileLoop(String folderPath, final String extension) {
-        // Check if file with CSV extension exists
+        // Check if file with extension exists
         File[] projFiles = new File(folderPath).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {                

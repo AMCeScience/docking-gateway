@@ -102,12 +102,3 @@ function trigger_search(scope) {
     
     do_search(this_search, $(scope).data("ajax_function"));
 }
-
-function init_list_search() {
-    log("start quicksearch");
-    
-    $("#list_search").quicksearch("ul.library_list li", {
-        noResults: "div.noresults",
-        loader: "span.loading"
-    });
-}

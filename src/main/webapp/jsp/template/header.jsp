@@ -1,8 +1,5 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
 
 <% // Navigation url declarations %>
 <portlet:actionURL name="goToPage" var="new_job_page">
@@ -26,7 +23,7 @@
 <html>
     <head>
         <!-- load CSS files -->
-        <link href="${pageContext.request.contextPath}/css/styles.css?v=173" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/styles.css?v=179" rel="stylesheet" type="text/css"/>
         <link href="${pageContext.request.contextPath}/css/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
         <link href="${pageContext.request.contextPath}/css/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
         
@@ -64,22 +61,14 @@
         <div id="portlet-wrapper">
             <div id="content">
                 <!-- menu wrapper -->
-                <div class="menu-wrapper" id="navigation">
+                <div class="menu-wrapper">
                     <!-- menu, includes jsp logic for setting active item -->
                     <ul class="menu">
-                        <li>
-                            <% if(request.getParameter("nextJSP") == null || request.getParameter("nextJSP").equals("new_job")) { %>
-                                <a href="<%= new_job_page.toString() %>" class="active">New Submission</a>
-                            <% } else { %>
-                                <a href="<%= new_job_page.toString() %>">New Submission</a>
-                            <% } %>
+                        <li <% if(request.getParameter("nextJSP") == null || request.getParameter("nextJSP").equals("new_job")) { %> class="selected" <% } %>>
+                        	<a href="<%= new_job_page.toString() %>">New Submission</a>
                         </li>
-                        <li>
-                            <% if(request.getParameter("nextJSP") != null && request.getParameter("nextJSP").equals("project_display")) { %>
-                                <a href="<%= jobs_page.toString() %>" class="active">Submissions</a>
-                            <% } else { %>
-                                <a href="<%= jobs_page.toString() %>">Submissions</a>
-                            <% } %>
+                        <li <% if(request.getParameter("nextJSP") != null && request.getParameter("nextJSP").equals("project_display")) { %> class="selected" <% } %>>
+                        	<a href="<%= jobs_page.toString() %>">Submissions</a>
                         </li>
                     </ul>
                     <!-- end menu -->

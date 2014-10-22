@@ -183,7 +183,7 @@
 	cursor: pointer;
 	position: relative;
 	margin: 10px 0 0 0;
-	padding: .5em .5em .5em .7em;
+	/*padding: .5em .5em .5em .7em;*/
 	min-height: 0; /* support: IE7 */
 	font-size: 100%;
 	border-color: #b3b3b3;

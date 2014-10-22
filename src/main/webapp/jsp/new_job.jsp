@@ -72,27 +72,11 @@
         </div>
         
         <div class="clear"></div>
-        
-        <div class="submit_row">
-			<input name="run_pilot" type="checkbox" value="1" checked="checked"/>
-			<label for="run_pilot">Run pilot job</label>
-			
-			<input class="submit" type="button" value="Submit" onclick="new_job_submit();" />
-		</div>
     </div>
 
     <div class="bottom">
         <div class="compound_search">
-        	<div class="search_header">
-        		<label>Compounds</label>
-        	</div>
-            <!--div class="search_header">
-                <label for="list_search">Search Compounds</label>
-                <input type="text" name="list_search" id="list_search"/><span class="loading">Loading...</span>
-            </div>
-
-            <div class="noresults">No Results</div-->
-            
+        	<h3>Compounds</h3>
             <ul class="library_list"></ul>
             <div class="clear"></div>
         </div>
@@ -102,6 +86,13 @@
         <!--input name="compound_list" type="hidden"/-->
         <input name="library_list" type="hidden"/>
     </div>
+    
+    <div class="submit_row">
+		<input name="run_pilot" type="checkbox" value="1" checked="checked"/>
+		<label for="run_pilot">Run pilot job</label>
+		
+		<input class="submit" type="button" value="Submit" onclick="new_job_submit();" />
+	</div>
 </form>
     
 <div id="dialog-modal" class="hidden">

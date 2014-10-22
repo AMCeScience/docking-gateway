@@ -127,7 +127,7 @@ public class LocalProject {
 		    project.put("compound_count", _getCompoundCount());
 		    project.put("provenance_count", _getProvenanceCount());
 		    
-		    if (_getOutput() != null) {
+		    if (_getOutput() != null && _getProjectStatus().contains("Done")) {
 		    	Logger.log("getting output", Logger.debug);
 		    	
 		    	ProjectOutput output = new ProjectOutput();

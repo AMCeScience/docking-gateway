@@ -11,19 +11,14 @@
 </portlet:actionURL>
 
 <% // Ajax url declarations %>
-<portlet:resourceURL var="ajaxSearchUrl" id="SearchProjects"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxPartialResultUrl" id="PartialResult"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxUpdateStatusUrl" id="StatusUpdater"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxGetDetailsUrl" id="SubmissionDetails"></portlet:resourceURL>
 <portlet:resourceURL var="ajaxLigandsUrl" id="LigandCollector"></portlet:resourceURL>
-<portlet:resourceURL var="ajaxDownloadOutputUrl" id="Downloader"></portlet:resourceURL>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <html>
     <head>
         <!-- load CSS files -->
-        <link href="${pageContext.request.contextPath}/css/styles.css?v=179" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/styles.css?v=180" rel="stylesheet" type="text/css"/>
         <link href="${pageContext.request.contextPath}/css/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
         <link href="${pageContext.request.contextPath}/css/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
         
@@ -41,36 +36,14 @@
         	}, "Please select ligands/compounds.");
         
             $('body').data('ajax-urls', {
-                "searchUrl": "<%= ajaxSearchUrl %>",
-                "updateStatusUrl": "<%= ajaxUpdateStatusUrl %>",
-                "partialResultUrl": "<%= ajaxPartialResultUrl %>",
-                "getDetailsUrl": "<%= ajaxGetDetailsUrl %>",
-                "ligandsUrl": "<%= ajaxLigandsUrl %>",
-                "downloadOutputUrl": "<%= ajaxDownloadOutputUrl %>"
+                "ligandsUrl": "<%= ajaxLigandsUrl %>"
             });
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=163"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/project-functions.js?v=116"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/html-functions.js?v=118"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=232"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/search.js?v=122"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=164"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=234"></script>
     </head>
     <body>
         <div id="portlet-wrapper">
             <div id="content">
-                <!-- menu wrapper -->
-                <div class="menu-wrapper">
-                    <!-- menu, includes jsp logic for setting active item -->
-                    <ul class="menu">
-                        <li <% if(request.getParameter("nextJSP") == null || request.getParameter("nextJSP").equals("new_job")) { %> class="selected" <% } %>>
-                        	<a href="<%= new_job_page.toString() %>">New Submission</a>
-                        </li>
-                        <li <% if(request.getParameter("nextJSP") != null && request.getParameter("nextJSP").equals("project_display")) { %> class="selected" <% } %>>
-                        	<a href="<%= jobs_page.toString() %>">Submissions</a>
-                        </li>
-                    </ul>
-                    <!-- end menu -->
-                </div>
-                <!-- end menu wrapper -->

@@ -24,7 +24,6 @@ import docking.crappy.logger.Logger;
  */
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
-    private final String PROJECT_DISPLAY_PAGE = "project_display";
 
     public AutodockVinaPortlet() {}
     
@@ -49,58 +48,39 @@ public class AutodockVinaPortlet extends GenericPortlet {
             
             Logger.log(submit.getErrors(), Logger.error);
         } else {
+        	response.setRenderParameter("form_errors", "");
+        	
             // Redirect to project display page of projects in process
-            response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
+            //response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
         }
-    }
-
-    // Handle menu clicks
-    @ProcessAction(name = "goToPage")
-    public void handleGoToPage(ActionRequest request, ActionResponse response) {
-        String nextJSP = (String) request.getParameter("page");
-        
-        // Clear errors
-        response.setRenderParameter("form_errors", "");
-
-        // Set next page to load
-        response.setRenderParameter("nextJSP", nextJSP);
     }
 
     // Handle view changes
     @Override
     public void doView(RenderRequest request, RenderResponse response) throws PortletException {
         try {
-            String nextJSP = (String) request.getParameter("nextJSP");
-            
-            // If no page is set load the new job page
-            if (nextJSP == null) {
-        		nextJSP = NEW_JOB_PAGE;
-            }
-            
-            if (nextJSP.equals(NEW_JOB_PAGE)) {
-            	Logger.log("checking user", Logger.debug);
-            	
-            	UserConfigurator userConfig = null;
-            	
-				try {
-					userConfig = new UserConfigurator();
-					
-					if (!userConfig.checkUser(request.getRemoteUser())) {
-	            		Logger.log("user setup", Logger.debug);
-	            		
-	            		userConfig.setupUser(request.getRemoteUser());
-	            	}
-				} catch (PersistenceException e) {
-					Logger.log(e, Logger.exception);
-				} finally {
-					// Close db session
-	            	userConfig.close();
-				}
-            }
+        	Logger.log("checking user", Logger.debug);
+        	
+        	UserConfigurator userConfig = null;
+        	
+			try {
+				userConfig = new UserConfigurator();
+				
+				if (!userConfig.checkUser(request.getRemoteUser())) {
+            		Logger.log("user setup", Logger.debug);
+            		
+            		userConfig.setupUser(request.getRemoteUser());
+            	}
+			} catch (PersistenceException e) {
+				Logger.log(e, Logger.exception);
+			} finally {
+				// Close db session
+            	userConfig.close();
+			}
 
             // Load new JSP page
             PortletRequestDispatcher dispatcher;
-            dispatcher = getPortletContext().getRequestDispatcher("/jsp/".concat(nextJSP).concat(".jsp"));
+            dispatcher = getPortletContext().getRequestDispatcher("/jsp/" + NEW_JOB_PAGE + ".jsp");
             dispatcher.include(request, response);
         } catch (IOException e) {
         	Logger.log(e, Logger.exception);

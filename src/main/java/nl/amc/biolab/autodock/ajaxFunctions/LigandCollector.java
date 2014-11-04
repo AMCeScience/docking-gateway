@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
 import nl.amc.biolab.autodock.constants.VarConfig;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -83,13 +84,7 @@ public class LigandCollector extends AjaxInterface {
     
     private void _fileLoop(File folder) {
         for (File file : folder.listFiles()) {
-            if (file.isDirectory()) {
-                _fileLoop(file);
-            }
-        }
-        
-        if (!folder.getName().equals("ligands")) {
-            _getJSONObj().add(folder.getName(), "");
+            _getJSONObj().add(FilenameUtils.removeExtension(file.getName()), "");
         }
     }
     

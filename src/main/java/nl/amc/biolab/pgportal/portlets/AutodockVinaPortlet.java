@@ -24,6 +24,7 @@ import docking.crappy.logger.Logger;
  */
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
+    private final String PROJECT_DISPLAY_PAGE = "new_job";
 
     public AutodockVinaPortlet() {}
     
@@ -51,7 +52,11 @@ public class AutodockVinaPortlet extends GenericPortlet {
         	response.setRenderParameter("form_errors", "");
         	
             // Redirect to project display page of projects in process
-            //response.setRenderParameter("nextJSP", PROJECT_DISPLAY_PAGE);
+        	try {
+				response.sendRedirect(PROJECT_DISPLAY_PAGE);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
     }
 

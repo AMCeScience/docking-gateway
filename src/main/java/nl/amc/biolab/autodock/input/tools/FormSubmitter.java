@@ -233,7 +233,6 @@ public class FormSubmitter {
 		submission.put("projectId", job.getProject().getDbId());
 		submission.put("submission", wrapper);
 
-		// TODO send to client
 		ClientConfig clientConfig = new DefaultClientConfig();
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 		Client client = Client.create(clientConfig);

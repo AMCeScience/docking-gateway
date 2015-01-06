@@ -24,7 +24,7 @@ import docking.crappy.logger.Logger;
  */
 public class AutodockVinaPortlet extends GenericPortlet {
     private final String NEW_JOB_PAGE = "new_job";
-    private final String PROJECT_DISPLAY_PAGE = "new_job";
+    private final String PROJECT_DISPLAY_PAGE = "/submissions";
 
     public AutodockVinaPortlet() {}
     
@@ -49,7 +49,7 @@ public class AutodockVinaPortlet extends GenericPortlet {
             
             Logger.log(submit.getErrors(), Logger.error);
         } else {
-        	response.setRenderParameter("form_errors", "");
+        	//response.setRenderParameter("form_errors", "");
         	
             // Redirect to project display page of projects in process
         	try {

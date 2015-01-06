@@ -137,6 +137,8 @@ public class FormSubmitter {
 
 					return false;
 				}
+				
+				configuration.setReceptor(receptor.getName());
 
 				if (!configFactory.writeToDisk(configuration)) {
 					_setError(configuration.getErrors());
@@ -156,7 +158,7 @@ public class FormSubmitter {
 					job.setPilot(true);
 				}
 
-				job.setReceptorUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getReceptorFileName()));
+				job.setReceptorUri(VarConfig.getUri(job.getProjectFolder(), receptor.getName()));
 				job.setConfigurationUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getConfigFileName()));
 
 				job.setOutputUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getOutputFileName()));
@@ -220,7 +222,11 @@ public class FormSubmitter {
 		}
 
 		submits.add(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
-		submits.add(_createSubmissionMap(3, "receptor", job.getReceptorUri()));
+		
+		// Get the actual receptor name to display in the portlet
+		String receptor_uri = job.getReceptorUri();
+		
+		submits.add(_createSubmissionMap(3, receptor_uri.substring(receptor_uri.lastIndexOf("/")), receptor_uri));
 		submits.add(_createSubmissionMap(4, "output", job.getOutputUri()));
 
 		wrapper.add(submits);

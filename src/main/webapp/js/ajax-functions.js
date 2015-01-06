@@ -4,6 +4,12 @@ function getLigands(successFunc) {
     ajax_call(null, successFunc, $('body').data('ajax-urls').ligandsUrl, "GET", true);
 }
 
+function getApplications(successFunc) {
+	log('getApplications function running');
+	
+	ajax_call(null, successFunc, $('body').data('ajax-urls').applicationsUrl, "GET", true);
+}
+
 function ajax_call(dataIn, successFunc, urlIn, typeIn, cacheIn) {
 	log('ajax data:');
 	log(dataIn);

@@ -9,24 +9,19 @@ import nl.amc.biolab.config.manager.ConfigurationManager;
 import nl.amc.biolab.datamodel.manager.HibernateUtil;
 
 public class HibernateListener implements ServletContextListener {
-	private final String file_path = "config.json";
-
     public void contextInitialized(ServletContextEvent event) {
         try {
         	System.out.println("################################### HERE");
             // Initialise configuration manager for this portlet
-			new ConfigurationManager(file_path);
-			System.out.println("################################### " + ConfigurationManager.config_file_path);
+			ConfigurationManager.init();
 			
 			System.out.println("################################### HERE 2");
 	        // Initialise logger for this portlet
 	        new Logger();
-	        System.out.println("################################### " + ConfigurationManager.config_file_path);
 	        
 	        System.out.println("################################### HERE 3");
 	    	// Create database sessionfactory
 	        HibernateUtil.getSessionFactory();
-	        System.out.println("################################### " + ConfigurationManager.config_file_path);
 		} catch (ReaderException e) {
 			e.printStackTrace();
 		}

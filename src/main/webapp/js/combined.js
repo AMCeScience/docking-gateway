@@ -1,3 +1,15 @@
+function get_applications() {
+	function applicationInit(data) {
+		console.log(data);
+		
+		$.each(data, function(key, value) {
+			$('.application_dropdown').append('<option value="' + key + '">' + value + '</option>');
+		});
+	}
+	
+	getApplications(applicationInit);
+}
+
 function new_job() {
     function libraryInit() {
         // Click the dropdown button on a library
@@ -91,9 +103,9 @@ function new_job_submit() {
     	submitHandler: function(form) {
     		log('valid');
     		
-    		$('#dialog-modal').dialog({
+    		/*$('#dialog-modal').dialog({
     	        closeOnEscape: false
-    	    });
+    	    });*/
 
     	    // Get all selected compounds in a map
     	    /*var checked_compounds = $('input[name=compound_check]:checked', form).map(function() {

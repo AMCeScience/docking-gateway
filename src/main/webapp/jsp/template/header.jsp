@@ -12,6 +12,7 @@
 
 <% // Ajax url declarations %>
 <portlet:resourceURL var="ajaxLigandsUrl" id="LigandCollector"></portlet:resourceURL>
+<portlet:resourceURL var="ajaxApplicationsUrl" id="ApplicationsCollector"></portlet:resourceURL>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -36,13 +37,14 @@
         	}, "Please select ligands/compounds.");
         
             $('body').data('ajax-urls', {
-                "ligandsUrl": "<%= ajaxLigandsUrl %>"
+                "ligandsUrl": "<%= ajaxLigandsUrl %>",
+                "applicationsUrl": "<%= ajaxApplicationsUrl %>"
             });
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=164"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=234"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=165"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=238"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

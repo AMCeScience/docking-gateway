@@ -129,14 +129,6 @@ public class VarConfig {
         return getItem("zip_file_ext");
     }
     
-    public static String getReceptorFileName() {
-        return getItem("receptor_file_name") + getReceptorExt();
-    }
-    
-    public static String getReceptorExt() {
-        return getItem("receptor_file_ext");
-    }
-    
     public static String getConfigFileName() {
         return getItem("config_file_name") + getConfigExt();
     }

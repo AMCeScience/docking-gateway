@@ -9,6 +9,8 @@
 <script type="text/javascript">
     $(function() {
         new_job();
+        
+        get_applications();
     });
 </script>
 
@@ -88,13 +90,17 @@
     <div class="submit_row">
 		<input name="run_pilot" type="checkbox" value="1" checked="checked"/>
 		<label for="run_pilot">Run pilot job</label>
+	
+		<br/>
+	
+		<select name="application_select" class="application_dropdown"></select>
 		
 		<input class="submit" type="button" value="Submit" onclick="new_job_submit();" />
 	</div>
 </form>
     
-<div id="dialog-modal" class="hidden">
+<!-- <div id="dialog-modal" class="hidden">
     <span class="spinner"></span>
-</div>
+</div> -->
 
 <jsp:include page="/jsp/template/footer.jsp" />

@@ -25,7 +25,9 @@ public class ReceptorFileUploader {
             if (receptorFile != null && receptorFile.getSize() > 0) {
                 Logger.log("Receptor file size: " + receptorFile.getSize(), Logger.debug);
                 
-                File receptor_file = new File(VarConfig.getProjectFilePath(project_folder) + VarConfig.getReceptorFileName());
+                receptor.setName(receptorFile.getName());
+                
+                File receptor_file = new File(VarConfig.getProjectFilePath(project_folder) + receptorFile.getName());
 
                 // Create new file on the system
                 receptor_file.createNewFile();
@@ -33,7 +35,7 @@ public class ReceptorFileUploader {
                 // Write upload to created file on system
                 receptorFile.write(receptor_file);
                 
-                Logger.log("Receptor file uploaded in: " + VarConfig.getProjectFilePath(project_folder) + VarConfig.getReceptorFileName(), Logger.debug);
+                Logger.log("Receptor file uploaded in: " + VarConfig.getProjectFilePath(project_folder) + receptorFile.getName(), Logger.debug);
                 
                 if (receptor_file.exists()) {
                     receptor.setValid(true);

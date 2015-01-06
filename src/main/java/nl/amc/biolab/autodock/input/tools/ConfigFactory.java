@@ -15,7 +15,7 @@ import docking.crappy.logger.Logger;
  *
  * @author Allard van Altena
  */
-public class ConfigFactory {    
+public class ConfigFactory {
     public ConfigFactory() {}
     
     public Configuration setData(HashMap<String, Object> formMap, String project_folder) {
@@ -56,12 +56,8 @@ public class ConfigFactory {
         
         file.setSize(size);
         
-        // Get filenames for configuration file and receptor file
-        String receptor_filename = VarConfig.getReceptorFileName();
-        
         // Set configuration items
         file.setFilePath(VarConfig.getProjectFilePath(project_folder) + VarConfig.getConfigFileName());
-        file.setReceptor(receptor_filename);
         
         String energy_range = formMap.get("energy_range").toString();
         String number_of_runs = formMap.get("number_runs").toString();

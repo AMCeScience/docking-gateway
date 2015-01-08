@@ -202,8 +202,7 @@ public class FormSubmitter {
 		values.add(_getDb().get.value(_getDb().insert.value("is_pilot", String.valueOf(job.isPilot()))));
 		values.add(_getDb().get.value(_getDb().insert.value("folder_name", job.getProjectFolder())));
 
-		Project project = _getDb().get.project(_getDb().insert.project(job.getProjectName(), job.getProjectDescription(), job.getUserString(), apps,
-				values));
+		Project project = _getDb().get.project(_getDb().insert.project(job.getProjectName(), job.getProjectDescription(), job.getUserString(), apps, values));
 
 		return project;
 	}

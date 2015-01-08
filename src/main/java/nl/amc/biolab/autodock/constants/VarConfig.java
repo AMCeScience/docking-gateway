@@ -54,7 +54,7 @@ public class VarConfig {
     }
     
     public static String getUri(String folderName, String fileName) {
-        return getWebDavUri() + folderName + "/" + fileName;
+        return (getWebDavUri() + folderName + "/" + fileName).replace(" ", "%20");
     }
     
     public static String getFilePath() {

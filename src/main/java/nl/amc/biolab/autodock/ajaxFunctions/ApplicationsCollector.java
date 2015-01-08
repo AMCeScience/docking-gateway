@@ -6,6 +6,8 @@ import nl.amc.biolab.autodock.ajaxHandlers.AjaxInterface;
 import nl.amc.biolab.datamodel.objects.Application;
 import nl.amc.biolab.persistencemanager.PersistenceManagerPlugin;
 
+import org.json.simple.JSONObject;
+
 public class ApplicationsCollector extends AjaxInterface {
     public ApplicationsCollector() {}
     
@@ -14,7 +16,8 @@ public class ApplicationsCollector extends AjaxInterface {
         _getApplicationsObject();
     }
     
-    private void _getApplicationsObject() {
+    @SuppressWarnings("unchecked")
+	private void _getApplicationsObject() {
     	PersistenceManagerPlugin pm = new PersistenceManagerPlugin();
     	
     	pm.init();
@@ -22,7 +25,12 @@ public class ApplicationsCollector extends AjaxInterface {
     	List<Application> apps = pm.get.applications();
     	
     	for (Application app : apps) {
-    		_getJSONObj().add(app.getName(), app.getDescription());
+    		JSONObject obj = new JSONObject();
+    		
+    		obj.put("name", app.getName());
+    		obj.put("description", app.getDescription());
+    		
+    		_getJSONObj().add(Long.toString(app.getDbId()), obj);
     	}
     }
 }

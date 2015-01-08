@@ -44,7 +44,7 @@
         
         <!-- load javascript function files -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=165"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=238"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=239"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

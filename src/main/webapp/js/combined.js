@@ -2,8 +2,8 @@ function get_applications() {
 	function applicationInit(data) {
 		console.log(data);
 		
-		$.each(data, function(key, value) {
-			$('.application_dropdown').append('<option value="' + key + '">' + value + '</option>');
+		$.each(data, function(key, app) {
+			$('.application_dropdown').append('<option value="' + app.name + '">' + app.description + '</option>');
 		});
 	}
 	

@@ -20,13 +20,10 @@
     <head>
         <!-- load CSS files -->
         <link href="${pageContext.request.contextPath}/css/styles.css?v=180" rel="stylesheet" type="text/css"/>
-        <link href="${pageContext.request.contextPath}/css/jquery-ui.structure.css" rel="stylesheet" type="text/css"/>
-        <link href="${pageContext.request.contextPath}/css/jquery-ui.theme.css" rel="stylesheet" type="text/css"/>
         
         <!-- load javascript libraries -->
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/logger.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery.js"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/jquery-ui-1.10.4.custom.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/validation.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery/additional-methods.min.js"></script>
         
@@ -43,8 +40,8 @@
         </script>
         
         <!-- load javascript function files -->
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=165"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=239"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/ajax-functions.js?v=166"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/combined.js?v=244"></script>
     </head>
     <body>
         <div id="portlet-wrapper">

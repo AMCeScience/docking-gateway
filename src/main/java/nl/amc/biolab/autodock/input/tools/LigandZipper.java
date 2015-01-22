@@ -47,8 +47,10 @@ public class LigandZipper {
 			}
 
 			for (Object obj : libraryArray) {
-				String library_name = obj.toString();
-				File library_file = new File(VarConfig.getLigandPath() + library_name + ".zip");
+				String library_name = obj.toString() + ".zip";
+				ligandsObj.setFileName(library_name);
+				
+				File library_file = new File(VarConfig.getLigandPath() + library_name);
 
 				// Count the ligands
 				ZipFile zipCount = new ZipFile(library_file);
@@ -56,11 +58,14 @@ public class LigandZipper {
 				zipCount.close();
 
 				// Copy the library to the project folder
-				Files.copy(library_file, new File(VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName()));
+				Files.copy(library_file, new File(VarConfig.getProjectFilePath(project_folder) + library_name));
 
 				if (isPilot) {
+					String pilot_library_name = "pilot_" + library_name;
+					ligandsObj.setPilotFileName(pilot_library_name);
+					
 					// Create stream
-					String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + VarConfig.getPilotLigandsZipFileName();
+					String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) + pilot_library_name;
 					ZipOutputStream pilotZip = new ZipOutputStream(new FileOutputStream(pilotZipFilePath));
 					
 					// get the zip file content
@@ -91,10 +96,12 @@ public class LigandZipper {
 					library_stream.close();
 					
 					pilotZip.close();
+					
+					Logger.log("Pilot ligands zip created in: " + VarConfig.getProjectFilePath(project_folder) + pilot_library_name, Logger.debug);
 				}
+				
+				Logger.log("Ligands zip created in: " + VarConfig.getProjectFilePath(project_folder) + library_name, Logger.debug);
 			}
-
-			Logger.log("Ligands zip created in: " + VarConfig.getProjectFilePath(project_folder) + VarConfig.getLigandsZipFileName(), Logger.debug);
 
 			ligandsObj.setValid(true);
 		} catch (ParseException e) {
@@ -107,93 +114,4 @@ public class LigandZipper {
 
 		return ligandsObj;
 	}
-
-	// public Ligands prepareLigandFile(HashMap<String, Object> formMap, String
-	// project_folder) {
-	// JSONParser parser = new JSONParser();
-	//
-	// Ligands ligandsObj = new Ligands();
-	//
-	// ligandsObj.setValid(false);
-	//
-	// try {
-	// JSONObject libraryJSON = (JSONObject)
-	// parser.parse(formMap.get("library_list").toString());
-	// JSONArray libraryArray = (JSONArray) libraryJSON.get("library_array");
-	//
-	// boolean isPilot = formMap.containsKey("run_pilot") &&
-	// formMap.get("run_pilot").equals("1") ? true : false;
-	// int pilotLigandCount = VarConfig.getPilotLigandCount();
-	//
-	// // Create streams
-	// String zipFilePath = VarConfig.getProjectFilePath(project_folder) +
-	// VarConfig.getLigandsZipFileName();
-	// String pilotZipFilePath = VarConfig.getProjectFilePath(project_folder) +
-	// VarConfig.getPilotLigandsZipFileName();
-	//
-	// ZipOutputStream zip = new ZipOutputStream(new
-	// FileOutputStream(zipFilePath));
-	// ZipOutputStream pilotZip = new ZipOutputStream(new
-	// FileOutputStream(pilotZipFilePath));
-	//
-	// for (Object obj : libraryArray) {
-	// String folder = obj.toString();
-	// File library_folder = new File(VarConfig.getLigandPath() + folder);
-	//
-	// if (library_folder.isDirectory()) {
-	// for (File ligand : library_folder.listFiles()) {
-	// FileInputStream fin = new FileInputStream(ligand);
-	//
-	// zip.putNextEntry(new ZipEntry(ligand.getName()));
-	//
-	// if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-	// pilotZip.putNextEntry(new ZipEntry(ligand.getName()));
-	// }
-	//
-	// int length;
-	//
-	// byte[] b = new byte[1024];
-	//
-	// while((length = fin.read(b)) > 0) {
-	// zip.write(b, 0, length);
-	//
-	// if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-	// pilotZip.write(b, 0, length);
-	// }
-	// }
-	//
-	// ligandsObj.addCount();
-	//
-	// zip.closeEntry();
-	//
-	// if (isPilot && ligandsObj.getPilotCount() < pilotLigandCount) {
-	// ligandsObj.addPilotCount();
-	//
-	// pilotZip.closeEntry();
-	// }
-	//
-	// fin.close();
-	// }
-	// }
-	// }
-	//
-	// zip.close();
-	//
-	// if (isPilot) {
-	// pilotZip.close();
-	// }
-	//
-	// Logger.log("Ligands zip created in: " + zipFilePath, Logger.debug);
-	//
-	// ligandsObj.setValid(true);
-	// } catch (ParseException e) {
-	// Logger.log(e, Logger.exception);
-	// } catch (FileNotFoundException e) {
-	// Logger.log(e, Logger.exception);
-	// } catch (IOException e) {
-	// Logger.log(e, Logger.exception);
-	// }
-	//
-	// return ligandsObj;
-	// }
 }

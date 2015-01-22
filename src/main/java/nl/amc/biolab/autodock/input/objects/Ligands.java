@@ -9,6 +9,8 @@ public class Ligands {
     private boolean VALIDATES = false;
     private Long COUNT = 0L;
     private Long PILOT_COUNT = 0L;
+    private String FILE_NAME = "";
+    private String PILOT_FILE_NAME = "";
     
     public Ligands() {}
     
@@ -48,5 +50,21 @@ public class Ligands {
     
     public Long getPilotCount() {
         return PILOT_COUNT;
+    }
+    
+    public void setFileName(String filename) {
+    	FILE_NAME = filename;
+    }
+    
+    public String getFileName() {
+    	return FILE_NAME;
+    }
+    
+    public void setPilotFileName(String pilot_filename) {
+    	PILOT_FILE_NAME = pilot_filename;
+    }
+    
+    public String getPilotFileName() {
+    	return PILOT_FILE_NAME;
     }
 }

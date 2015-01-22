@@ -167,14 +167,4 @@ public class PersistenceManagerPlugin extends PersistenceManager {
     	
     	return null;
     }
-	
-	public Application getApplicationByName(String name) {
-    	try {
-            return (Application) query.executeQuery("from Application where Name ='" + name + "'", true);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    	
-    	return null;
-    }
 }

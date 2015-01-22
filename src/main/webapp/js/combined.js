@@ -1,9 +1,7 @@
 function get_applications() {
 	function applicationInit(data) {
-		console.log(data);
-		
-		$.each(data, function(key, app) {
-			$('.application_dropdown').append('<option value="' + app.name + '">' + app.description + '</option>');
+		$.each(data, function(app_id, app) {
+			$('.application_dropdown').append('<option value="' + app_id + '">' + app.description + '</option>');
 		});
 	}
 	
@@ -115,11 +113,13 @@ function new_job_submit() {
     	        return "{\"" + folder_name.slice(4, folder_name.length) + "\":\"" + this.value + "\"}";
     	    });*/
     		
-    		var checked_libraries = $('input[name=library_check]:checked', form).map(function() {
+    		/*var checked_libraries = $('input[name=library_check]:checked', form).map(function() {
     			var folder_name = $(this).parent().attr('class').split(' ')[0];
     			
     			return '"' + folder_name.slice(4, folder_name.length) + '"';
-    		});
+    		});*/
+    		
+    		var library = $('input[name=library_check]:checked', form).val();
 
     	    // Remove checkboxes from form, so we don't post these to the backend
     	    $('input[name=library_check]', form).remove();
@@ -127,8 +127,9 @@ function new_job_submit() {
 
     	    // Add values to one input field
     	    //$('input[name=compound_list]', form).val("{ \"compound_array\": [" + checked_compounds.get().join(',') + "]}");
-    	    $('input[name=library_list]', form).val("{ \"library_array\": [" + checked_libraries.get().join(',') + "]}");
-
+    	    //$('input[name=library_list]', form).val("{ \"library_array\": [" + checked_libraries.get().join(',') + "]}");
+    	    $('input[name=library_list]', form).val("{ \"library_array\": [\"" + library + "\"]}");
+    	    
     	    form.submit();
     	}
 	});
@@ -147,7 +148,7 @@ function buildLibraryHtml(ajax_data) {
         var folder_name = key;
        
         html.push("<li class='lib_" + folder_name + " library'>\
-                <input name='library_check' type='checkbox' value='1'/>\
+                <input name='library_check' type='radio' value='" + folder_name + "'/>\
                 " + folder_name + "</li>");
     });
     

@@ -70,6 +70,8 @@ public class FormSubmitter {
 		if (formMap != null) {
 			JobSubmission job = new JobSubmission();
 
+			job.setApplicationId(formMap.get("application_select").toString());
+			
 			job.setProjectFolder(formMap.get("project_name").toString());
 			job.setProjectName(formMap.get("project_name").toString());
 			job.setProjectDescription(formMap.get("project_description").toString());
@@ -149,11 +151,11 @@ public class FormSubmitter {
 					return false;
 				}
 
-				job.setLigandsUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getLigandsZipFileName()));
+				job.setLigandsUri(VarConfig.getUri(job.getProjectFolder(), ligands.getFileName()));
 				job.setLigandsCount(ligands.getCount());
 
 				if (formMap.containsKey("run_pilot") && formMap.get("run_pilot").equals("1")) {
-					job.setPilotLigandsUri(VarConfig.getUri(job.getProjectFolder(), VarConfig.getPilotLigandsZipFileName()));
+					job.setPilotLigandsUri(VarConfig.getUri(job.getProjectFolder(), ligands.getPilotFileName()));
 					job.setPilotLigandsCount(ligands.getPilotCount());
 					job.setPilot(true);
 				}
@@ -197,7 +199,7 @@ public class FormSubmitter {
 		ArrayList<Application> apps = new ArrayList<Application>();
 		ArrayList<Value> values = new ArrayList<Value>();
 		// Add items
-		apps.add(_getDb().getApplicationByName(VarConfig.getAutodockName()));
+		apps.add(_getDb().get.application(job.getApplicationId()));
 
 		values.add(_getDb().get.value(_getDb().insert.value("is_pilot", String.valueOf(job.isPilot()))));
 		values.add(_getDb().get.value(_getDb().insert.value("folder_name", job.getProjectFolder())));
@@ -213,24 +215,28 @@ public class FormSubmitter {
 		JSONObject submission = new JSONObject();
 		JSONArray wrapper = new JSONArray();
 		JSONArray submits = new JSONArray();
-
+		
 		if (job.isPilot()) {
-			submits.add(_createSubmissionMap(1, "ligands", job.getPilotLigandsUri()));
+			String pilot_ligands_uri = job.getPilotLigandsUri();
+			
+			submits.add(_createSubmissionMap(1, pilot_ligands_uri.substring(pilot_ligands_uri.lastIndexOf("/") + 1), job.getPilotLigandsUri()));
 		} else {
-			submits.add(_createSubmissionMap(1, "ligands", job.getLigandsUri()));
+			String ligands_uri = job.getLigandsUri();
+			
+			submits.add(_createSubmissionMap(1, ligands_uri.substring(ligands_uri.lastIndexOf("/") + 1), job.getLigandsUri()));
 		}
 
-		submits.add(_createSubmissionMap(2, "configuration", job.getConfigurationUri()));
+		submits.add(_createSubmissionMap(2, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_configuration", job.getConfigurationUri()));
 		
 		// Get the actual receptor name to display in the portlet
 		String receptor_uri = job.getReceptorUri();
 		
-		submits.add(_createSubmissionMap(3, receptor_uri.substring(receptor_uri.lastIndexOf("/")), receptor_uri));
-		submits.add(_createSubmissionMap(4, "output", job.getOutputUri()));
+		submits.add(_createSubmissionMap(3, receptor_uri.substring(receptor_uri.lastIndexOf("/") + 1), receptor_uri));
+		submits.add(_createSubmissionMap(4, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_output", job.getOutputUri()));
 
 		wrapper.add(submits);
 
-		Long appId = _getDb().getApplicationByName(VarConfig.getAutodockName()).getDbId();
+		Long appId = _getDb().get.application(job.getApplicationId()).getDbId();
 
 		submission.put("applicationId", appId);
 		submission.put("description", job.getProjectDescription());

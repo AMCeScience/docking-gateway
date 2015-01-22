@@ -1,10 +1,15 @@
 package nl.amc.biolab.autodock.input.objects;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
+
 import nl.amc.biolab.datamodel.objects.Project;
 import nl.amc.biolab.datamodel.objects.User;
 
 public class JobSubmission {
+	private Long applicationId = 0L;
+	private String projectDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 	private String projectName = "";
 	private String projectDescription = "";
 	private boolean pilot = false;
@@ -19,6 +24,18 @@ public class JobSubmission {
 	private String outputUri = "";
 	
 	private String uriBase = "";
+	
+	public Long getApplicationId() {
+		return applicationId;
+	}
+	
+	public void setApplicationId(String id) {
+		applicationId = Long.valueOf(id);
+	}
+	
+	public String getProjectDate() {
+		return projectDate;
+	}
 	
 	public String getProjectName() {
 		return projectName;

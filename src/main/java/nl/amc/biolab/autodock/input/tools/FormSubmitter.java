@@ -3,8 +3,10 @@ package nl.amc.biolab.autodock.input.tools;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import javax.portlet.ActionRequest;
 
@@ -212,38 +214,55 @@ public class FormSubmitter {
 	@SuppressWarnings("unchecked")
 	private void _submit(JobSubmission job) {
 		// Send to processing manager
-		JSONObject submission = new JSONObject();
-		JSONArray wrapper = new JSONArray();
-		JSONArray submits = new JSONArray();
+		JSONObject wrapper = new JSONObject();
+		JSONArray submission = new JSONArray();
+		JSONObject submissionIO = new JSONObject();
+		JSONArray inputs = new JSONArray();
+		JSONArray outputs = new JSONArray();
 		
+		HashMap<String, Object> values = new HashMap<String, Object>();
+		
+		// Create input/output arrays
 		if (job.isPilot()) {
 			String pilot_ligands_uri = job.getPilotLigandsUri();
 			
-			submits.add(_createSubmissionMap(1, pilot_ligands_uri.substring(pilot_ligands_uri.lastIndexOf("/") + 1), job.getPilotLigandsUri()));
+			values.put("ligand_count", job.getPilotLigandsCount());
+			
+			inputs.add(_createSubmissionMap(1, pilot_ligands_uri.substring(pilot_ligands_uri.lastIndexOf("/") + 1), job.getPilotLigandsUri(), values));
 		} else {
 			String ligands_uri = job.getLigandsUri();
 			
-			submits.add(_createSubmissionMap(1, ligands_uri.substring(ligands_uri.lastIndexOf("/") + 1), job.getLigandsUri()));
+			values = new HashMap<String, Object>();
+			values.put("ligand_count", job.getLigandsCount());
+			
+			inputs.add(_createSubmissionMap(1, ligands_uri.substring(ligands_uri.lastIndexOf("/") + 1), job.getLigandsUri(), values));
 		}
 
-		submits.add(_createSubmissionMap(2, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_configuration", job.getConfigurationUri()));
+		inputs.add(_createSubmissionMap(2, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_configuration", job.getConfigurationUri(), null));
 		
 		// Get the actual receptor name to display in the portlet
 		String receptor_uri = job.getReceptorUri();
 		
-		submits.add(_createSubmissionMap(3, receptor_uri.substring(receptor_uri.lastIndexOf("/") + 1), receptor_uri));
-		submits.add(_createSubmissionMap(4, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_output", job.getOutputUri()));
+		inputs.add(_createSubmissionMap(3, receptor_uri.substring(receptor_uri.lastIndexOf("/") + 1), receptor_uri, null));
+		outputs.add(_createSubmissionMap(4, job.getProjectDate() + "_" + job.getProjectName().replace(" ", "_") + "_output", job.getOutputUri(), null));
 
-		wrapper.add(submits);
+		// Create submissionIO wrapper with inputs/outputs
+		submissionIO.put("inputs", inputs);
+		submissionIO.put("outputs", outputs);
+		
+		// Add submissionIO to submission array
+		submission.add(submissionIO);
 
 		Long appId = _getDb().get.application(job.getApplicationId()).getDbId();
 
-		submission.put("applicationId", appId);
-		submission.put("description", job.getProjectDescription());
-		submission.put("userId", job.getUser().getDbId());
-		submission.put("projectId", job.getProject().getDbId());
-		submission.put("submission", wrapper);
+		// Create outside wrapper with all information
+		wrapper.put("applicationId", appId);
+		wrapper.put("description", job.getProjectDescription());
+		wrapper.put("userId", job.getUser().getDbId());
+		wrapper.put("projectId", job.getProject().getDbId());
+		wrapper.put("submission", submission);
 
+		// Send
 		ClientConfig clientConfig = new DefaultClientConfig();
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 		Client client = Client.create(clientConfig);
@@ -253,17 +272,32 @@ public class FormSubmitter {
 
 		WebResource webResource = client.resource(VarConfig.getProcessingResource());
 
-		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, submission);
+		ClientResponse response = webResource.accept("application/json").type("application/json").post(ClientResponse.class, wrapper);
 
 		Logger.log(response, Logger.debug);
 	}
 
-	private HashMap<String, Object> _createSubmissionMap(int portId, String name, String dataUri) {
+	@SuppressWarnings("unchecked")
+	private HashMap<String, Object> _createSubmissionMap(int portId, String name, String dataUri, HashMap<String, Object> keyValues) {
 		HashMap<String, Object> submit_map = new HashMap<String, Object>();
+		
+		JSONObject keyValueObj = new JSONObject();
 
+		if (keyValues != null) {
+			for (Entry<String, Object> entry : keyValues.entrySet()) {
+				keyValueObj.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
 		submit_map.put("portId", portId);
 		submit_map.put("name", name);
 		submit_map.put("data", dataUri);
+		submit_map.put("format", dataUri.substring(dataUri.lastIndexOf(".") + 1, dataUri.length()));
+		submit_map.put("size", 100);
+		submit_map.put("type", "filler");
+		submit_map.put("date", new Date());
+		submit_map.put("resourceId", 1L);
+		submit_map.put("keyValuePairs", keyValueObj);
 
 		return submit_map;
 	}

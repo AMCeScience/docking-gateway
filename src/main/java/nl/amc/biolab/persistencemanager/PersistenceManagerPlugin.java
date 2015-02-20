@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 import nl.amc.biolab.autodock.constants.VarConfig;
 import nl.amc.biolab.datamodel.manager.PersistenceManager;
-import nl.amc.biolab.datamodel.objects.Application;
 import nl.amc.biolab.datamodel.objects.IOPort;
 import nl.amc.biolab.datamodel.objects.Resource;
 import nl.amc.biolab.datamodel.objects.User;

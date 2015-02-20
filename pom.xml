@@ -163,6 +163,63 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-site-plugin</artifactId>
+                                        <version>3.3</version>
+                                        <dependencies>
+                                                <dependency><!-- add support for ssh/scp -->
+                                                        <groupId>org.apache.maven.wagon</groupId>
+                                                        <artifactId>wagon-ssh</artifactId>
+                                                        <version>1.0</version>
+                                                </dependency>
+                                        </dependencies>
+                        </plugin>
+
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-eclipse-plugin</artifactId>
+                                <version>2.9</version>
+                                <configuration>
+                                        <downloadSources>true</downloadSources>
+                                        <downloadJavadocs>true</downloadJavadocs>
+                                </configuration>
+                        </plugin>
+
+			<plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-dependency-plugin</artifactId>
+                                <version>2.8</version>
+                                <executions>
+                                        <execution>
+                                                <id>install-sources</id>
+                                                <phase>dummy</phase>
+                                                <goals>
+                                                        <goal>sources</goal>
+                                                </goals>
+                                        </execution>
+                                        <execution>
+                                                <id>install-javadocs</id>
+                                                <phase>dummy</phase>
+                                                <configuration>
+                                                        <classifier>javadoc</classifier>
+                                                </configuration>
+                                                <goals>
+                                                        <goal>resolve</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+
+
+
 		</plugins>
-	</build>
+</build>
+
+        <distributionManagement>
+	        <site>
+		        <id>dev.ebioscience.amc.nl</id>
+		        <url>scp://dev.ebioscience.amc.nl/var/www/html/docs/docking/</url>
+		    </site>
+		</distributionManagement>
 </project>

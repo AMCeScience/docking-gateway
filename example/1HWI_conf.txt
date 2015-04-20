@@ -1,0 +1,14 @@
+
+receptor = 1HWI_empty.pdbqt 
+
+center_x = 23.6 
+center_y = -26.0 
+center_z = 13.0
+
+size_x = 30
+size_y = 30 
+size_z = 30 
+
+exhaustiveness = 10
+
+num_modes = 8

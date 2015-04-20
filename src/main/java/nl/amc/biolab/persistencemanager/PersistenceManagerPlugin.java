@@ -89,6 +89,8 @@ public class PersistenceManagerPlugin extends PersistenceManager {
             
             // Check if success
             if (userId != null) {
+            	catalogUser = get.user(userId);
+            	
             	// Going to set a password for this user
             	setPass = true;
             }

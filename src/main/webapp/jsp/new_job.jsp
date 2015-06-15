@@ -61,7 +61,7 @@
 
         <div class="third_col">
             <h3>&nbsp;</h3>
-            <label for="number_runs">Number of Runs</label>
+            <label for="number_runs">Number of Modes</label>
             <input name="number_runs" type="text"/>
 
             <label for="exhaustiveness">Exhaustiveness</label>
@@ -93,6 +93,7 @@
 	
 		<br/>
 	
+		<label for="application_select">Target Infrastructure</label>
 		<select name="application_select" class="application_dropdown"></select>
 		
 		<input class="submit" type="button" value="Submit" onclick="new_job_submit();" />

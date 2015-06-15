@@ -19,6 +19,6 @@
         <license osi-approved="true">GPL</license>
     </licenses>
     <liferay-versions>
-        <liferay-version>6.2+</liferay-version>
+        <liferay-version>6.1.0</liferay-version>
     </liferay-versions>
 </plugin-package>

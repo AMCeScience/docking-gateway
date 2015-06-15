@@ -16,6 +16,8 @@ import docking.crappy.logger.Logger;
  * @author Allard van Altena
  */
 public class ConfigFactory {
+	private static final String ENERGY_RANGE = "20";
+	
     public ConfigFactory() {}
     
     public Configuration setData(HashMap<String, Object> formMap, String project_folder) {
@@ -63,7 +65,7 @@ public class ConfigFactory {
         String number_of_runs = formMap.get("number_runs").toString();
         String exhaustiveness = formMap.get("exhaustiveness").toString();
         
-        //file.setEnergyRange(energy_range);
+        file.setEnergyRange(ENERGY_RANGE);
         file.setNumberOfRuns(number_of_runs);
         file.setExhaustiveness(exhaustiveness);
         

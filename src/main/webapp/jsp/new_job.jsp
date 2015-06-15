@@ -62,10 +62,10 @@
         <div class="third_col">
             <h3>&nbsp;</h3>
             <label for="number_runs">Number of Modes</label>
-            <input name="number_runs" type="text"/>
+            <input name="number_runs" type="text" value="9"/>
 
             <label for="exhaustiveness">Exhaustiveness</label>
-            <input name="exhaustiveness" type="text"/>
+            <input name="exhaustiveness" type="text" value="8"/>
 
             <!--label for="energy_range">Energy Range</label-->
             <!--input name="energy_range" type="text"/-->
@@ -88,8 +88,8 @@
     </div>
     
     <div class="submit_row">
-		<input name="run_pilot" type="checkbox" value="1" checked="checked"/>
-		<label for="run_pilot">Run pilot job</label>
+		<input name="run_pilot" type="checkbox" value="1" checked="checked" title="Runs a virtual screening with 15 ligands, for configuration sanity check"/>
+		<label for="run_pilot" title="Runs a virtual screening with 15 ligands, for configuration sanity check">Run pilot job</label>
 	
 		<br/>
 	

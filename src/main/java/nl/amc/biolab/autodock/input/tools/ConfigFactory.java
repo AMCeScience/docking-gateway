@@ -59,11 +59,11 @@ public class ConfigFactory {
         // Set configuration items
         file.setFilePath(VarConfig.getProjectFilePath(project_folder) + VarConfig.getConfigFileName());
         
-        String energy_range = formMap.get("energy_range").toString();
+        //String energy_range = formMap.get("energy_range").toString();
         String number_of_runs = formMap.get("number_runs").toString();
         String exhaustiveness = formMap.get("exhaustiveness").toString();
         
-        file.setEnergyRange(energy_range);
+        //file.setEnergyRange(energy_range);
         file.setNumberOfRuns(number_of_runs);
         file.setExhaustiveness(exhaustiveness);
         

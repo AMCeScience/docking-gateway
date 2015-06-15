@@ -67,8 +67,8 @@
             <label for="exhaustiveness">Exhaustiveness</label>
             <input name="exhaustiveness" type="text"/>
 
-            <label for="energy_range">Energy Range</label>
-            <input name="energy_range" type="text"/>
+            <!--label for="energy_range">Energy Range</label-->
+            <!--input name="energy_range" type="text"/-->
         </div>
         
         <div class="clear"></div>
